@@ -11,6 +11,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
 import { getLogin,getRole } from "./api/TokenService";
 import MyParticles from "./MyParticles";
+import Font from "react-font";
+
 const useStyles = makeStyles({
   position: "relative",
   container: {
@@ -18,7 +20,7 @@ const useStyles = makeStyles({
     position: "relative",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px", // Odstęp między elementami
+    gap: "10px", 
   },
   textFieldContainer: {
     position: "relative",
@@ -31,7 +33,7 @@ const useStyles = makeStyles({
     display: "flex",
     fontWeight: "bold",
     alignItems: "center",
-    gap: "1%", // Odstęp między polem tekstowym a przyciskiem
+    gap: "1%", 
   },
 
   textFxx: {
@@ -45,36 +47,35 @@ const useStyles = makeStyles({
     color: "black",
     display: "flex",
     alignItems: "center",
-    gap: "10px", // Odstęp między polem tekstowym a przyciskiem
+    gap: "10px", 
   },
   textField: {
     position: "relative",
-    // Szerokość pola tekstowego
     height: "70%",
-    backgroundColor: "#000", // Czarny kolor tła
-    color: "#fff", // Biały kolor tekstu
+    backgroundColor: "#000", 
+    color: "#fff", 
     "& .MuiInputBase-input": {
-      color: "#fff", // Biały kolor tekstu
+      color: "#fff", 
     },
     "& .MuiFormLabel-root": {
-      color: "#fff", // Biały kolor etykiety
+      color: "#fff", 
     },
   },
   button: {
     position: "relative",
-    color: "#fff", // Biały kolor ikony
-    backgroundColor: "#000", // Czarny kolor tła
+    color: "#fff",
+    backgroundColor: "#000", 
     "&:hover": {
-      backgroundColor: "#333", // Ciemniejszy czarny na hover
+      backgroundColor: "#333", 
     },
   },
   output: {
     position: "relative",
-    backgroundColor: "#000", // Czarny kolor tła
-    color: "#fff", // Biały kolor tekstu
+    backgroundColor: "#000", 
+    color: "#fff", 
     padding: "10px",
-    height: "30%", // Stała wysokość
-    width: "100%", // Stała szerokość
+    height: "30%", 
+    width: "100%", 
     marginTop: "10px",
     display: "flex",
     alignItems: "center",
@@ -107,7 +108,6 @@ export default function Solution({ task }) {
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
-  const [visible, setVisible] = useState(false);
 
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
@@ -154,11 +154,9 @@ export default function Solution({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
-        console.log("Exec", result);
         setOutput(result);
       })
-      .catch((error) => {
-        console.error("Error:", error);
+      .catch((error) => { 
         setOutput("Error occurred");
       });
   };
@@ -185,7 +183,6 @@ export default function Solution({ task }) {
         console.error("Error:", error);
       });
 
-    setVisible(true);
   };
 
   useEffect(() => {   
@@ -195,14 +192,10 @@ export default function Solution({ task }) {
     })
       .then((res) => res.json())
       .then((result) => {
-      	const role = getRole();
-          console.log(role);
-      
-        console.log("Fetched students:", result); // Dodaj t
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  }, [task]);
+  }, []);
 
   if (!exercise) {
     return <div>Loading...</div>;
@@ -229,12 +222,13 @@ export default function Solution({ task }) {
             <div style={{ flexBasis: "60%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
-                {/* tu bedzie inny font tylko muszę go pobrac */}
+                <Font family="tahoma">
                 <p>{exercise.introduction}</p>
+                </Font>
               </Paper>
               <Paper elevation={3} style={paperStyle}>
                 <p>{exercise.content}</p>
-                <p>Maksymalna ilość punktów: {exercise.maxPoints}</p>
+                <p>Maksymalna ilość punktów: {exercise.maxPoints} </p>
                 <p>Oczekiwane wyjście programu: {exercise.correctOutput}</p>
               </Paper>
             </div>

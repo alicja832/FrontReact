@@ -1,10 +1,9 @@
 import React from "react";
-import { useCallback, useEffect, useState } from "react";
+import {  useState } from "react";
 import { Container, Paper, Button, Box } from "@mui/material";
 import MyParticles from "./MyParticles";
-import Register from "./Register";
 import { Link } from "react-router-dom";
-// import Font, { Text } from "react-font";
+import Font from "react-font";
 
 export default function Home() {
   const [init, setInit] = useState(false);
@@ -18,8 +17,8 @@ export default function Home() {
     backgroundColor: "#FDF5E6",
     top: "50%",
     left: "50%",
-    transform: "translate(-50%, -50%)", //* Przesuni
-    borderRadius: "10px" /* zaokrągla wszystkie rogi */,
+    transform: "translate(-50%, -50%)", 
+    borderRadius: "10px" ,
     textAlign: "center",
     textShadow: "1px 1px 2px black",
   };
@@ -27,15 +26,9 @@ export default function Home() {
   const paperStyleTwo = {
     padding: "3% 3%",
     width: "34%",
-    // margin: "1% auto",
-    // gap: "1%",
     position: "relative",
     backgroundColor: "#FDF5E6",
-    // top: "50%",
-
-    // left: "15%",
-    // transform: "translate(-50%, -50%)", //* Przesuni
-    borderRadius: "10px" /* zaokrągla wszystkie rogi */,
+    borderRadius: "10px" ,
     alignItems: "center",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
@@ -44,14 +37,9 @@ export default function Home() {
     padding: "3% 3%",
     width: "64%",
     margin: "1%",
-    // right: "15%",
-    // gap: "1%",
     position: "relative",
     backgroundColor: "#FDF5E6",
-    // top: "50%",
-    // left: "50%",
-    // transform: "translate(-50%, -50%)", //* Przesuni
-    borderRadius: "10px" /* zaokrągla wszystkie rogi */,
+    borderRadius: "10px",
     alignItems: "center",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
@@ -59,22 +47,22 @@ export default function Home() {
   return (
     <div>
       <MyParticles></MyParticles>
-      {/* Text on top of particles */}
+   
       <div id="sthelse">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-            {/* <Font family="tahoma">
+             <Font family="tahoma">
              
-            </Font> */}
+            </Font> 
             <h1>Lekcje podstaw algorytmiki w języku Python</h1>
-            {/* <Font family="sans-serif"> */}
+            <Font family="sans-serif"> 
               <p>
                 Jako nauczyciel możesz dodawać zadania wraz z opisem
                 teoretycznym, jako uczeń możesz je rozwiązywać.
                 <br />
                 Możesz nauczyć się języka poprzez praktykę!
               </p>
-            {/* </Font> */}
+            </Font> 
 
             <Button
               component={Link}
@@ -89,10 +77,10 @@ export default function Home() {
       </div>
       <div class="right-container">
         <Paper elevation={3} style={paperStyleTwo}>
-          {/* <Font family="tahoma"> */}
+         <Font family="tahoma"> 
             <h1>Walka o Szczyt: Zbieraj Punkty i Rywalizuj z Innymi!</h1>
-          {/* </Font> */}
-          {/* <Font family="sans-serif"> */}
+           </Font> 
+           <Font family="sans-serif"> 
             <p>
               Wyzwania kodowania są doskonałą okazją do rozwijania swoich
               umiejętności programistycznych oraz pogłębiania wiedzy
@@ -102,7 +90,7 @@ export default function Home() {
               najlepszy. Pokaż, na co Cię stać, i sprawdź, jak wypadasz w tej
               pasjonującej grze o kodowanie!
             </p>
-          {/* </Font> */}
+        </Font> 
           <Button
             component={Link}
             to={"/ranking"}
@@ -113,10 +101,10 @@ export default function Home() {
           </Button>
         </Paper>
         <Paper elevation={3} style={paperStyleThree}>
-          {/* <Font family="tahoma"> */}
+           <Font family="tahoma"> 
             <h1> Zdobądź wiedzę i rozwiązuj zadania z łatwością! </h1>
-          {/* </Font> */}
-          {/* <Font family="sans-serif"> */}
+           </Font> 
+          <Font family="sans-serif">
             <p>
               Każde zadanie w aplikacji zaczyna się od wprowadzenia
               teoretycznego, które pozwoli Ci zgłębić istotne aspekty języka
@@ -125,7 +113,7 @@ export default function Home() {
               nasze wskazówki i rozwijaj swoje umiejętności programistyczne w
               sposób efektywny i inspirujący!
             </p>
-          {/* </Font> */}
+           </Font> 
           <Button
             component={Link}
             to={"/tasks"}

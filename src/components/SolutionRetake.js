@@ -9,8 +9,9 @@ import {
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
-import {getLogin,getRole} from "./api/TokenService";
+import { getLogin, getRole } from "./api/TokenService";
 import MyParticles from "./MyParticles";
+import Font from "react-font";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -19,7 +20,7 @@ const useStyles = makeStyles({
     position: "relative",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px", // Odstęp między elementami
+    gap: "10px",
   },
   textFieldContainer: {
     position: "relative",
@@ -32,7 +33,7 @@ const useStyles = makeStyles({
     display: "flex",
     fontWeight: "bold",
     alignItems: "center",
-    gap: "1%", // Odstęp między polem tekstowym a przyciskiem
+    gap: "1%",
   },
 
   textFxx: {
@@ -46,36 +47,35 @@ const useStyles = makeStyles({
     color: "black",
     display: "flex",
     alignItems: "center",
-    gap: "10px", // Odstęp między polem tekstowym a przyciskiem
+    gap: "10px",
   },
   textField: {
     position: "relative",
-    // Szerokość pola tekstowego
     height: "70%",
-    backgroundColor: "#000", // Czarny kolor tła
-    color: "#fff", // Biały kolor tekstu
+    backgroundColor: "#000",
+    color: "#fff",
     "& .MuiInputBase-input": {
-      color: "#fff", // Biały kolor tekstu
+      color: "#fff",
     },
     "& .MuiFormLabel-root": {
-      color: "#fff", // Biały kolor etykiety
+      color: "#fff",
     },
   },
   button: {
     position: "relative",
-    color: "#fff", // Biały kolor ikony
-    backgroundColor: "#000", // Czarny kolor tła
+    color: "#fff",
+    backgroundColor: "#000",
     "&:hover": {
-      backgroundColor: "#333", // Ciemniejszy czarny na hover
+      backgroundColor: "#333",
     },
   },
   output: {
     position: "relative",
-    backgroundColor: "#000", // Czarny kolor tła
-    color: "#fff", // Biały kolor tekstu
+    backgroundColor: "#000",
+    color: "#fff",
     padding: "10px",
-    height: "30%", // Stała wysokość
-    width: "100%", // Stała szerokość
+    height: "30%",
+    width: "100%",
     marginTop: "10px",
     display: "flex",
     alignItems: "center",
@@ -88,9 +88,9 @@ function Toast({ message }) {
   return <div className="toast">{message}</div>;
 }
 export default function SolutionRetake({ task }) {
-  
+  //dlaczego na sztywno to jest ustawione
   const paperStyle = { padding: "50px 20px", width: 600, margin: "20px auto" };
-  
+
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -109,7 +109,6 @@ export default function SolutionRetake({ task }) {
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
-  const [visible, setVisible] = useState(false);
 
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
@@ -131,7 +130,7 @@ export default function SolutionRetake({ task }) {
       }, 0);
     }
   };
-  
+
   const save = () => {
     const id = solution.id;
     setStudentEmail(getLogin());
@@ -143,8 +142,7 @@ export default function SolutionRetake({ task }) {
       score,
       output,
     };
-   
-  
+
     fetch("http://localhost:8080/exercise/solution", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -152,10 +150,12 @@ export default function SolutionRetake({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
-        console.log("Exec", result);
+        setinfoMessage("Zapisano!");
+        setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setinfoMessage("Błąd!");
       });
   };
   const handleButtonClick = () => {
@@ -174,7 +174,6 @@ export default function SolutionRetake({ task }) {
       });
   };
   const check = () => {
-    var student = null;
     const solution = { solutionContent, exercise, studentEmail, score, output };
     fetch("http://localhost:8080/exercise/check", {
       method: "POST",
@@ -183,14 +182,16 @@ export default function SolutionRetake({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
-        console.log("Exec", result);
         setScore(result);
+        setinfoMessage("Twój wynik to: " + result.toString());
+        setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setinfoMessage("Błąd !");
       });
 
-    setVisible(true);
+
   };
 
   useEffect(() => {
@@ -227,8 +228,9 @@ export default function SolutionRetake({ task }) {
             <div style={{ flexBasis: "60%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
-                {/* tu bedzie inny font tylko muszę go pobrac */}
-                <p>{exercise.introduction}</p>
+                <Font family="tahoma">
+                  <p>{exercise.introduction}</p>
+                </Font>
               </Paper>
               <Paper elevation={3} style={paperStyle}>
                 <p>{exercise.content}</p>
@@ -275,8 +277,8 @@ export default function SolutionRetake({ task }) {
               <Box display="flex" flexDirection="column" gap={2}>
                 {infoWindowShown && <Toast message={infoMessage} />}
               </Box>
-               <Box display="flex" flexDirection="column" gap={2}>
-              {(getRole() === "Student")&&
+              <Box display="flex" flexDirection="column" gap={2}>
+                {getRole() === "Student" && (
                   <Button
                     style={{ backgroundColor: "#001f3f" }}
                     variant="contained"
@@ -285,9 +287,8 @@ export default function SolutionRetake({ task }) {
                   >
                     Zapisz rozwiązanie
                   </Button>
-                  }
-                </Box>
-              
+                )}
+              </Box>
             </div>
           </div>
         }

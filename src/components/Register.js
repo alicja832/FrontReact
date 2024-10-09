@@ -8,7 +8,6 @@ import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
 import { setLogin,setRole,getRole } from "./api/TokenService";
 import MyParticles from "./MyParticles";
-//tutaj trzeba jakos lepiej przetrzymac errora - w sensie chodzi o to ze jak np nie mozna sie polaczyc z baza danych to co wtedy mamy zrobic
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Register(props) {
@@ -93,14 +92,13 @@ export default function Register(props) {
         setTimeout(() => {
           setInfoWindowShown(false);
             setLogin(email);
-        //dla próby
+   
         if(roles === 1)
         	setRole("Teacher");
         else setRole("Student");
         setName("");
         setEmail("");
         setPassword("");
-        console.log(getRole());
         setPasswordConfirm("");
         
         }, 3000);
@@ -140,7 +138,7 @@ export default function Register(props) {
                 onChange={(e) => setName(e.target.value)}
                 sx={{ marginBottom: "16px", 
                   '&.Mui-focused fieldset': {
-                    borderColor: 'red' // Kolor obramowania, gdy input jest aktywny (z fokusem)
+                    borderColor: 'red' 
                   }
                 }}
               />
@@ -198,7 +196,6 @@ export default function Register(props) {
                   labelId="role-label"
                   value={roles}
                   sx={{ marginBottom: "16px" }}
-                  // fullWidth
                   onChange={(e) => setRoles(e.target.value)}
                 >
                   <MenuItem value={0}>Uczeń</MenuItem>

@@ -30,25 +30,21 @@ export default function PasswordReminder() {
     function showCodeForm()
     {
       
-      // setemailFormShow(false);
+   
       setIsFormCodeVisible(true);
-      //window.location.reload();
+      
     }
     function closeCodeForm()
     {
       setIsFormCodeVisible(false);
-      //window.location.reload();
+    
     }
     function showForm()
     {
       setIsFormVisible(true);
-     // window.location.reload();
+    
     }
-    function closeForm()
-    {
-      setIsFormVisible(false);
-      //window.location.reload();
-    }
+   
     const paperStyle = {
       top: "4em",
       padding: "50px 20px",

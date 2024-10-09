@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
@@ -9,9 +9,7 @@ import { Select, InputLabel, FormControl } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MyParticles from "./MyParticles";
 import { Link } from "react-router-dom";
-// import TokenService from '../api/TokenService';
-// import LoginInformation from '../api/LoginInformation'
-// import axios from 'axios';
+
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Login() {
@@ -41,20 +39,7 @@ export default function Login() {
   };
   const classes = useStyles();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [credentials, setCredentials] = useState({
-    id: 1,
-    name: "",
-    email: "a",
-    password: "",
-    role: "TEACHER",
-  });
 
-  const [loginState, setLoginState] = useState({
-    hasLoginFailed: false,
-    showSuccessMessage: false,
-  });
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
@@ -168,7 +153,7 @@ export default function Login() {
                 onChange={(e) => setName(e.target.value)}
                 sx={{ marginBottom: "16px", 
                   '&.Mui-focused fieldset': {
-                    borderColor: 'red' // Kolor obramowania, gdy input jest aktywny (z fokusem)
+                    borderColor: 'red' 
                   }
                 }}
               />

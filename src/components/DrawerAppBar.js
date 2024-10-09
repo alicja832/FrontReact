@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,9 +14,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import ParentComponent from "./ParentComponent";
 import { getLogin } from "./api/TokenService";
-import { VscAccount } from "@mui/icons-material";
 import AccountBoxIcon from "@mui/icons-material/AccountBox"; //import logo from '/logo.svg';
 import Font from "react-font";
 
@@ -28,6 +25,7 @@ export default function DrawerAppBar(register, props) {
     "Zaloguj",
     "Zarejestruj",
   ]);
+
   const [purposes, setPurposes] = useState([
     "/tasks",
     "/",
@@ -36,34 +34,32 @@ export default function DrawerAppBar(register, props) {
   ]);
 
   const profile = "Profil";
+
   useEffect(() => {
     if (getLogin() && !navItems.includes(profile)) {
-    
       navItems.unshift("Profil");
       navItems.unshift("Ranking");
       purposes.unshift("/profil");
       purposes.unshift("/ranking");
       navItems.push("Wyloguj");
       purposes.push("/logout");
-      
+
       setNavItems(
         navItems.filter(
           (element) => element !== "Zaloguj" && element !== "Zarejestruj"
         )
       );
-      
+
       setPurposes(
         purposes.filter(
           (element) => element !== "/login" && element !== "/register"
         )
       );
     }
-  
   }, [register]);
 
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const drawerWidth = 240;
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -82,7 +78,7 @@ export default function DrawerAppBar(register, props) {
               sx={{ textAlign: "center" }}
             >
               <Font family="sans-serif">
-              <ListItemText primary={item} />
+                <ListItemText primary={item} />
               </Font>
             </ListItemButton>
           </ListItem>
@@ -100,10 +96,7 @@ export default function DrawerAppBar(register, props) {
       <AppBar
         component="nav"
         sx={{
-          // paddingTop: "10ox",
-          // paddingBottom: "10px",
           backgroundColor: "#001f3f",
-          // height: "8vh",
           textShadow: "1px 1px 2px white",
         }}
       >
@@ -141,12 +134,10 @@ export default function DrawerAppBar(register, props) {
                 key={item}
                 component={Link}
                 to={purposes[index]}
-                sx={{ color: "#fff",  fontSize: "1.075em" }}
+                sx={{ color: "#fff", fontSize: "1.075em" }}
               >
-                <Font family="sans-serif">
-                {item}
-                </Font>
-                 {item === profile && <AccountBoxIcon sx={{ margin: "1px" }} />}
+                <Font family="sans-serif">{item}</Font>
+                {item === profile && <AccountBoxIcon sx={{ margin: "1px" }} />}
               </Button>
             ))}
           </Box>
@@ -159,7 +150,7 @@ export default function DrawerAppBar(register, props) {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -175,4 +166,3 @@ export default function DrawerAppBar(register, props) {
     </Box>
   );
 }
-

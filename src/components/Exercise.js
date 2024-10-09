@@ -29,11 +29,12 @@ const useStyles = makeStyles({
 });
 
 export default function Exercise() {
+  
   const paperStyle = {
-    backgroundColor: "#FDF5E6",
+    backgroundColor: "#FDFE6",
     top: "4em",
     padding: "50px 20px",
-    width: 600,
+    width: "70%",
     margin: "20px auto",
     position: "relative",
   };
@@ -60,13 +61,10 @@ export default function Exercise() {
       fetch("http://localhost:8080/exercise/")
         .then((res) => res.json())
         .then((result) => {
-          console.log("We have a problem");
           setExercises(result);
-          if (result.length !== 0)
-            { 
-              console.log("We have a problem");
-              setisExercises(true);
-            }
+          console.log(result);
+          if (result.length !== 0)  
+          setisExercises(true);
         })
         .catch((error) => console.error("Error:", error));
     }
@@ -93,8 +91,17 @@ export default function Exercise() {
                   }}
                 >
                   <h3>{exercise.key.name}</h3>
+                   <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginLeft: "auto",
+                      }}
+                    >
+                  <p>Punkty do zdobycia:</p>
+                  </div>
                   <Box className={classes.points}>{exercise.key.maxPoints}</Box>
-
                   {exercise.right ? (
                     <div
                       style={{

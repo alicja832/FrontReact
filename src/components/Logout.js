@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import MyParticles  from './MyParticles'
 import { setLogin } from './api/TokenService';
 import { getLogin } from './api/TokenService';
-import ParentComponent  from './ParentComponent';
 import { Box } from "@mui/material";
 
 export default function Logout(){
   
+  //tu trzeba zrobic ze: pomyślnie wylogowano!
   const navigate = useNavigate();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   useEffect(() => {
-    // Fetch user profile data
+    
     if(getLogin())
     {	
     	setLogin(null);
