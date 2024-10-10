@@ -1,6 +1,21 @@
 import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 
+export class classInfo{
+
+	static message = false;
+	static getmessage()
+	{
+		return this.message;
+	}
+	static setmessage(newMessage)
+	{
+		this.message = newMessage;
+	}
+        
+} 
+
+
 const MyParticles = (props) => {
 
   const {
@@ -14,6 +29,7 @@ const MyParticles = (props) => {
   const [context, setContext] = useState('');
   const [odlX, setOdlX] = useState(0);
   const [odlY, setOdlY] = useState(0);
+
   const step = 0.7;
   
   var order = 0;
@@ -315,8 +331,9 @@ const MyParticles = (props) => {
   useEffect(() => {
 
     let animationFrameId;
+    console.log(classInfo.getmessage());
     
-    if (context.canvas) {
+    if (context.canvas && !classInfo.getmessage()) {
 
       setOdlX(context.canvas.width/6);
       setOdlY(context.canvas.height/8);

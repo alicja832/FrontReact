@@ -8,6 +8,7 @@ import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
 import { setLogin,setRole,getRole } from "./api/TokenService";
 import MyParticles from "./MyParticles";
+import {classInfo} from "./MyParticles";
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Register(props) {
@@ -39,8 +40,11 @@ export default function Register(props) {
   const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
 
   const register = (e) => {
+    
     e.preventDefault();
+    classInfo.setmessage(false);
     const student = { name, email, password };
+    
     if (!email.includes("@")) {
       seterrorMessage("Podano zły adres email");
       seterrorInfoWindowShown(true);
@@ -69,6 +73,8 @@ export default function Register(props) {
       body: JSON.stringify(student),
     
     }).then((response) => {
+      
+
       
       if (!response.ok) {
         
@@ -105,7 +111,16 @@ export default function Register(props) {
         
       
       }
-    });
+    }).catch(Error)
+    {
+    	classInfo.setmessage(false);
+    	seterrorMessage("Błąd połączenia");
+        setInfoWindowShown(false);
+        seterrorInfoWindowShown(true);
+        setTimeout(() => {
+          seterrorInfoWindowShown(false);
+        }, 3000);
+    };
   };
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -135,7 +150,10 @@ export default function Register(props) {
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) =>{ setName(e.target.value);
+                	if(e.target.value!=='')
+                		classInfo.setmessage(true);
+                }}
                 sx={{ marginBottom: "16px", 
                   '&.Mui-focused fieldset': {
                     borderColor: 'red' 

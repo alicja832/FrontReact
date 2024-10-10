@@ -21,6 +21,8 @@ export default function PasswordReminder() {
     const [emailFormShow, setemailFormShow] = useState(true);
     const [infoTwoWindowShown, setInfoTwoWindowShown] = useState(false);
 
+
+
     const handleShowPsw = () => setPsw((show) => !show);
     const handleHidePsw = (e) => {
       e.preventDefault();
@@ -47,10 +49,10 @@ export default function PasswordReminder() {
    
     const paperStyle = {
       top: "4em",
-      padding: "50px 20px",
-      width: 800,
-      margin: "20px auto",
-      gap: "10px",
+      padding: "4% 4%",
+      width: '70%',
+      margin: "1% auto",
+      backgroundColor: "#FDF5E6",
       position: "relative",
     };
   function send()
@@ -165,7 +167,7 @@ export default function PasswordReminder() {
     {(emailFormShow)&&
     <Container>
           <Paper elevation={3} style={paperStyle}>
-          <h5>Wprowadź adres email, na który ma zostać wysłany kod pozwalający na zmianę hasła</h5>
+          <h4>Wprowadź adres email, na który ma zostać wysłany kod pozwalający na zmianę hasła.</h4>
 
             <form className={classes.root} noValidate autoComplete="off">
             

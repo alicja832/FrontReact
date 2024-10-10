@@ -8,7 +8,8 @@ import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MyParticles from "./MyParticles";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import {classInfo} from "./MyParticles";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -43,13 +44,15 @@ export default function Login() {
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
-  function changePassword() {
-  	navigate("/password/");
-    
-  }
+  
+  
 
 
   const loginClicked = async (event) => {
+  
+  //do ogarnięcia
+    classInfo.setmessage(false);
+   
     //bla bla 
     //seterrorMessage("Podany uzytkoni")
     //   console.log(credentials);
@@ -150,7 +153,12 @@ export default function Login() {
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                        setName(e.target.value)
+                        if(e.target.value!==''){
+                		classInfo.setmessage(true);
+                	}
+                }}
                 sx={{ marginBottom: "16px", 
                   '&.Mui-focused fieldset': {
                     borderColor: 'red' 
@@ -163,7 +171,10 @@ export default function Login() {
                 variant="outlined"
                 fullWidth
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                	setEmail(e.target.value)
+                	
+                }}
                 sx={{ marginBottom: "16px" }}
               />
               <FilledInput
@@ -192,7 +203,6 @@ export default function Login() {
                   labelId="role-label"
                   value={role}
                   sx={{ marginBottom: "16px" }}
-                  // fullWidth
                   onChange={(e) => setRole(e.target.value)}
                 >
                   <MenuItem value={0}>Uczeń</MenuItem>
@@ -229,11 +239,7 @@ export default function Login() {
                 </Box>
               </div>
                <Box display="flex" flexDirection="column" gap={2}>
-                  <Link
-                    to={changePassword()}
-                  >
-                    Zapomniałeś hasła?
-                  </Link>
+                 <NavLink to="/password">Zapomniałeś hasła?</NavLink>
                 </Box>
             </form>
           </Paper>

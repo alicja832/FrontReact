@@ -152,7 +152,7 @@ const TeacherProfile = () => {
 
   const addExercise = (e) => {
     e.preventDefault();
-    if(maxPoints.parseInt() === NaN )
+    if(isNaN(maxPoints.parseInt()))
     {
         seterrorInfoWindowShown(true);
         seterrorMessage("Wprowadzono złe dane.");

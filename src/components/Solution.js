@@ -24,10 +24,10 @@ const useStyles = makeStyles({
   },
   textFieldContainer: {
     position: "relative",
-    width: "700px",
-    border: "4px",
+    width: "100%",
+    border: "1%",
     borderStyle: "solid",
-    borderColor: "blue",
+    borderColor: "white",
     height: "900px",
     backgroundColor: "grey",
     display: "flex",
