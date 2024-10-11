@@ -295,12 +295,6 @@ const TeacherProfile = () => {
               >
                 <img
                   src={"/userIcon.svg"}
-                  alt="user"
-                  style={{
-                    height: "100px",
-                    verticalAlign: "middle",
-                    marginRight: "10px",
-                  }}
                 />
                 <h1>Dodaj zdjęcie</h1>
                 <input type="file" onChange={handleChange} />
