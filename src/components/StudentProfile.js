@@ -79,7 +79,7 @@ const StudentProfile = () => {
       <MyParticles></MyParticles>
       <div id="sthelse">
         <Container>
-          <Paper elevation={3} style={paperStyle}>
+          <Paper elevation={1} style={paperStyle}>
             <div>
               <AccountBoxIcon sx={{ margin: "1px" }} />
               <Font family="tahoma">
@@ -88,7 +88,7 @@ const StudentProfile = () => {
               </Font>
             </div>
           </Paper>
-          <Paper elevation={3} style={paperStyle}>
+          <Paper elevation={1} style={paperStyle}>
             <div>
               <Font family="tahoma">
                 <h2>Twoje dane</h2>
@@ -101,7 +101,7 @@ const StudentProfile = () => {
             </div>
           </Paper>
           {
-            <Paper elevation={3} style={paperStyle}>
+            <Paper elevation={1} style={paperStyle}>
               {buttonExercise && (
                 <Box display="flex" flexDirection="column" gap={2}>
                   <Button style={buttonStyle} onClick={fetchStudentExercises}>

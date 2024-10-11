@@ -7,9 +7,7 @@ import React, { useEffect, useState } from "react";
 import { getLogin } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUserLarge } from '@fortawesome/free-solid-svg-icons'
+import { classInfo } from "./MyParticles";
 
 const useStyles = makeStyles((theme) => ({
   points: {
@@ -44,12 +42,21 @@ const TeacherProfile = () => {
     position: "relative",
     textAlign: "center",
   };
-
+  const paperStyleTwo = {
+    padding: "3% 3%",
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#FDF5E6",
+    borderRadius: "10px",
+    textAlign: "center",
+    textShadow: "1px 1px 2px black",
+  };
   const buttonStyle = {
     backgroundColor: "#001f3f",
     color: "white",
     width: "40%",
   };
+
   const classes = useStyles();
   const [id, setId] = useState(0);
   const [indexofExercise, setIndexofExercise] = useState(0);
@@ -63,8 +70,8 @@ const TeacherProfile = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isFormTwoVisible, setIsFormTwoVisible] = useState(false);
   const [isExercises, setisExercises] = useState(false);
-  const [errorMessage, seterrorMessage] = useState(false);
-  const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
+  const [WindowShown, setInfoWindowShown] = useState(false);
+  const [infoMessage, setMessage] = useState(false);
 
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
@@ -84,6 +91,7 @@ const TeacherProfile = () => {
   };
 
   const showForm = () => {
+    classInfo.setmessage(true);
     setIsFormVisible(true);
   };
 
@@ -93,7 +101,7 @@ const TeacherProfile = () => {
   };
 
   const showFormTwo = (e) => {
-    
+    classInfo.setmessage(true);
     setIsFormTwoVisible(true);
     setIndexofExercise(e.target.value);
     const found = exercises[e.target.value];
@@ -121,8 +129,6 @@ const TeacherProfile = () => {
   };
 
   const editExercise = (e) => {
-    
-  
     const exercise = {
       id,
       name,
@@ -148,14 +154,21 @@ const TeacherProfile = () => {
     setContent("");
     setmaxPoints("");
     setcorrectSolution("");
+    setMessage("Zmieniono zadanie.");
+    setInfoWindowShown(true);
+    setTimeout(() => {
+      setInfoWindowShown(false);
+    }, 3000);
   };
-
   const addExercise = (e) => {
     e.preventDefault();
-    if(isNaN(maxPoints.parseInt()))
-    {
-        seterrorInfoWindowShown(true);
-        seterrorMessage("Wprowadzono złe dane.");
+    if (isNaN(parseInt(maxPoints))) {
+      setInfoWindowShown(true);
+      setMessage("Wprowadzono złe dane.");
+      setTimeout(() => {
+        setInfoWindowShown(false);
+      }, 3000);
+      return;
     }
     const exercise = {
       name,
@@ -172,11 +185,20 @@ const TeacherProfile = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(exercise),
     }).then((res) => {
-      var info = res.body;
-      console.log(info);
-      seterrorInfoWindowShown(true);
-      seterrorMessage("Niepoprawny kod pythona, zwraca Error.");
-      window.location.reload();
+      //to jest nie sprawdzone
+      //if(){costamcostam}
+      //powinno byc true
+      if(!res.ok)
+      {
+        console.log(info);
+        setInfoWindowShown(true);
+        setMessage("Niepoprawny kod pythona, zwraca Error.");
+        setTimeout(() => {
+          setInfoWindowShown(false);
+          window.location.reload();
+        }, 3000);
+        return;
+    }
     });
     closeForm();
     setName("");
@@ -192,7 +214,6 @@ const TeacherProfile = () => {
         setTeacher(result[0]);
       })
       .catch((error) => console.error("Error:", error));
-
     fetch("http://localhost:8080/user/exercises/" + getLogin())
       .then((res) => res.json())
       .then((result) => {
@@ -201,7 +222,25 @@ const TeacherProfile = () => {
         console.log(result);
       });
   }, []);
+  function handleChange(event) {
+    setFile(event.target.files[0]);
+  }
 
+  function handleSubmit(event) {
+    event.preventDefault();
+    const url = "http://localhost:3000/uploadFile";
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("fileName", file.name);
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+    axios.post(url, formData, config).then((response) => {
+      console.log(response.data);
+    });
+  }
   if (!teacher) {
     return <div>Loading...</div>;
   }
@@ -216,16 +255,15 @@ const TeacherProfile = () => {
         className={classes.mainContainer}
         style={{
           display: "flex",
-          justifyContent: "space-between", 
-          alignItems: "flex-start", 
-          padding: "10%", 
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          padding: "10%",
         }}
       >
-       
         <div
           style={{ display: "flex", flexBasis: "60%", flexDirection: "column" }}
         >
-          <Paper elevation={3} style={paperStyle}>
+          <Paper elevation={1} style={paperStyle}>
             <div
               className={classes.mainContainer}
               style={{
@@ -255,13 +293,24 @@ const TeacherProfile = () => {
                   flexBasis: "40%",
                 }}
               >
-                <AccountBoxIcon sx={{ margin: "1px" }} fontSize="large" />
+                <img
+                  src={"/userIcon.svg"}
+                  alt="user"
+                  style={{
+                    height: "100px",
+                    verticalAlign: "middle",
+                    marginRight: "10px",
+                  }}
+                />
+                <h1>Dodaj zdjęcie</h1>
+                <input type="file" onChange={handleChange} />
+                <button onClick={handleSubmit}>Dodaj</button>
               </div>
             </div>
             <Box
               display="flex"
               flexDirection="column"
-              justifyContent="center" // Wyśrodkowanie poziome
+              justifyContent="center"
               alignItems="center"
               gap={2}
             >
@@ -276,18 +325,32 @@ const TeacherProfile = () => {
             </Box>
           </Paper>
         </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexBasis: "40%",
+          }}
+        >
+          <Paper elevation={1} style={paperStyleTwo}>
+                        <Font family="sans-serif">
+
+              <h3>Jako nauczyciel możesz dodawać zadania:</h3> 
+              <li> Wstęp teoretyczny
+              informujący, jakich zagadnień teoretycznych ma dotyczyć zadanie
+              (zarówno teoria samego języka programowania jak i teoria z
+              zagadnień algorytmicznych), który ma pomóc w rozwiązaniu.</li>
+              <li>Treść
+              zadania, która informuje, co należy zrobić oraz twoja propozycja rozwiązania.</li>
+              <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
+            </Font>
+          </Paper>
+        </div>
       </div>
-      <div
-        className={classes.mainContainer}
-        style={{
-          display: "flex",
-          justifyContent: "space-between", 
-          alignItems: "flex-start",
-          padding: "10%", 
-        }}
-      >
+
+      <div>
         {isExercises && (
-          <Paper elevation={3} style={paperStyle}>
+          <Paper elevation={1} style={paperStyle}>
             <h3>Twoje zadania:</h3>
             {exercises.map((exercise, index) => (
               <Paper
@@ -305,11 +368,11 @@ const TeacherProfile = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    flexDirection:"row"
+                    flexDirection: "row",
                   }}
                 >
                   <h3>{exercise.name}</h3>
-
+                  <p>{exercise.content}</p>
                   {!isFormTwoVisible && (
                     <div>
                       <div
@@ -320,28 +383,25 @@ const TeacherProfile = () => {
                           marginLeft: "auto",
                         }}
                       >
-                        <Box display="flex" flexDirection="row" gap={2}>
-                          <Button
-                            style={buttonStyle}
-                            variant="contained"
-                            value={exercise.id}
-                            color="inherit"
-                            onClick={deleteExercise}
-                          >
-                            Usuń
-                          </Button>
-                        </Box>
-                        <Box display="flex" flexDirection="row" gap={2}>
-                          <Button
-                            style={buttonStyle}
-                            variant="contained"
-                            value={index}
-                            color="inherit"
-                            onClick={showFormTwo}
-                          >
-                            Edytuj
-                          </Button>
-                        </Box>
+                        <Button
+                          style={buttonStyle}
+                          variant="contained"
+                          value={exercise.id}
+                          color="inherit"
+                          onClick={deleteExercise}
+                        >
+                          Usuń
+                        </Button>
+
+                        <Button
+                          style={buttonStyle}
+                          variant="contained"
+                          value={index}
+                          color="inherit"
+                          onClick={showFormTwo}
+                        >
+                          Edytuj
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -352,83 +412,80 @@ const TeacherProfile = () => {
         )}
       </div>
       {isFormTwoVisible && (
-                    <Container>
-                      <Paper elevation={3} style={paperStyle}>
-                        <form
-                          className={classes.root}
-                          noValidate
-                          autoComplete="off"
-                        >
-                          <TextField
-                            id="outlined-basic"
-                            label="Nazwa"
-                            variant="outlined"
-                            fullWidth
-                            defaultValue={exercises[indexofExercise].name}
-                            onChange={(e) => setName(e.target.value)}
-                          />
+        <Container>
+          <Paper elevation={1} style={paperStyle}>
+            <form className={classes.root} noValidate autoComplete="off">
+              <h3>Edytuj zadanie</h3>
+              <TextField
+                id="outlined-basic"
+                label="Nazwa"
+                variant="outlined"
+                fullWidth
+                defaultValue={exercises[indexofExercise].name}
+                onChange={(e) => setName(e.target.value)}
+              />
 
-                          <TextField
-                            id="outlined-basic"
-                            label="Treść"
-                            variant="outlined"
-                            fullWidth
-                            defaultValue={exercises[indexofExercise].content}
-                            onChange={(e) => setContent(e.target.value)}
-                          />
+              <TextField
+                id="outlined-basic"
+                label="Treść"
+                variant="outlined"
+                fullWidth
+                defaultValue={exercises[indexofExercise].content}
+                onChange={(e) => setContent(e.target.value)}
+              />
 
-                          <TextField
-                            id="outlined-basic"
-                            label="Wstęp teoretyczny"
-                            variant="outlined"
-                            fullWidth
-                            defaultValue={exercises[indexofExercise].introduction}
-                            onChange={(e) => setIntroduction(e.target.value)}
-                          />
-                          <Textarea
-                            sx={{ backgroundColor: "#FDF5E6" }}
-                            minRows={2}
-                            id="outlined-basic"
-                            label="Poprawne rozwiązanie"
-                            placeholder="Poprawne rozwiązanie"
-                            variant="outlined"
-                            fullWidth
-                            defaultValue={exercises[indexofExercise].correctSolution}
-                            onChange={(e) => setcorrectSolution(e.target.value)}
-                          />
-                          <TextField
-                            id="outlined-basic"
-                            label="max ilość punktów"
-                            variant="outlined"
-                            fullWidth
-                            defaultValue={exercises[indexofExercise].maxPoints}
-                            onChange={(e) => setmaxPoints(e.target.value)}
-                          />
+              <TextField
+                id="outlined-basic"
+                label="Wstęp teoretyczny"
+                variant="outlined"
+                fullWidth
+                defaultValue={exercises[indexofExercise].introduction}
+                onChange={(e) => setIntroduction(e.target.value)}
+              />
+              <Textarea
+                sx={{ backgroundColor: "#FDF5E6" }}
+                minRows={2}
+                id="outlined-basic"
+                label="Poprawne rozwiązanie"
+                placeholder="Poprawne rozwiązanie"
+                variant="outlined"
+                fullWidth
+                defaultValue={exercises[indexofExercise].correctSolution}
+                onChange={(e) => setcorrectSolution(e.target.value)}
+              />
+              <TextField
+                id="outlined-basic"
+                label="max ilość punktów"
+                variant="outlined"
+                fullWidth
+                defaultValue={exercises[indexofExercise].maxPoints}
+                onChange={(e) => setmaxPoints(e.target.value)}
+              />
 
-                          <FormControl fullWidth></FormControl>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Box display="flex" flexDirection="column" gap={2}>
-                              <Button
-                                style={buttonStyle}
-                                variant="contained"
-                                color="secondary"
-                                value={indexofExercise}
-                                onClick={editExercise}
-                              >
-                                Zmień
-                              </Button>
-                            </Box>
-                          </div>
-                        </form>
-                      </Paper>
-                    </Container>
-                  )}
+              <FormControl fullWidth></FormControl>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Box display="flex" flexDirection="column" gap={2}>
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    value={indexofExercise}
+                    onClick={editExercise}
+                  >
+                    Zmień
+                  </Button>
+                </Box>
+              </div>
+            </form>
+          </Paper>
+        </Container>
+      )}
       {isFormVisible && (
         <div
           className={classes.mainContainer}
@@ -436,10 +493,10 @@ const TeacherProfile = () => {
             display: "flex",
             justifyContent: "flex-start",
             alignItems: "flex-start",
-            padding: "10%",
+            padding: "0% 10% ",
           }}
         >
-          <Paper elevation={3} style={paperStyle}>
+          <Paper elevation={1} style={paperStyle}>
             <h3>Dodaj zadanie</h3>
             <form className={classes.root} noValidate autoComplete="off">
               <TextField
@@ -507,7 +564,17 @@ const TeacherProfile = () => {
                   </Button>
                 </Box>
               </div>
-              <Toast message={errorMessage}></Toast>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Box display="flex" flexDirection="column" gap={2}>
+                  {WindowShown && <Toast message={infoMessage} />}
+                </Box>
+              </div>
             </form>
           </Paper>
         </div>

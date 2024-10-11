@@ -30,7 +30,7 @@ export default function Register(props) {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [psw, setPsw] = useState(false);
   const [errorMessage, seterrorMessage] = useState(false);
-
+  
   const handleShowPsw = () => setPsw((show) => !show);
   const handleHidePsw = (e) => {
     e.preventDefault();
@@ -111,7 +111,7 @@ export default function Register(props) {
         
       
       }
-    }).catch(Error)
+    }).catch((error)=>
     {
     	classInfo.setmessage(false);
     	seterrorMessage("Błąd połączenia");
@@ -120,7 +120,7 @@ export default function Register(props) {
         setTimeout(() => {
           seterrorInfoWindowShown(false);
         }, 3000);
-    };
+    });
   };
   function Toast({ message }) {
     return <div className="toast">{message}</div>;

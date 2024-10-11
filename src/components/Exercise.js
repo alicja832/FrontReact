@@ -32,12 +32,14 @@ export default function Exercise() {
   
  
   const paperStyle = {
-    backgroundColor: "#FDFE6",
     top: "4em",
-    padding: "50px 20px",
-    width: "70%",
-    margin: "20px auto",
+    padding: "4% 4%",
+    width: "40%",
+    margin: "1% auto",
+    gap: "1%",
     position: "relative",
+    backgroundColor: "#FDF5E6",
+    textAlign: "center"
   };
   const classes = useStyles();
   const [exercises, setExercises] = useState([]);

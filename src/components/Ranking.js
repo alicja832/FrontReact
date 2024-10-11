@@ -56,32 +56,30 @@ export default function Ranking() {
     })
       .then((res) => res.json())
       .then((result) => {
-      console.log(result);
+        console.log(result);
         setPersons(result);
         if (result.length !== 0) setisPersons(true);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  },[]);
+  }, []);
 
   return (
     <div>
       <MyParticles></MyParticles>
-      <div id = "#sthelse">
-       
+      <div id="#sthelse">
         {isPersons && (
           <Paper elevation={3} style={paperStyle}>
-           <Font family="sans-serif">
-          <h2>
-            Ranking osób korzystających z aplikacji z najlepszymi wynikami:
-          </h2>
-        </Font>
-            {persons.map((person,index) => (
+            <Font family="sans-serif">
+              <h2>
+                Ranking osób korzystających z aplikacji z najlepszymi wynikami:
+              </h2>
+            </Font>
+            {persons.map((person, index) => (
               <Paper
                 elevation={6}
                 style={{ margin: "10px", padding: "15px", textAlign: "left" }}
                 key={person.id}
               >
-                
                 <div
                   className={classes.headerContainer}
                   style={{
@@ -90,11 +88,27 @@ export default function Ranking() {
                     alignItems: "center",
                   }}
                 >
-                <h3>{index+1}</h3>
-                  <h3>{person.name}</h3>
-               
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginRight: "auto",
+                    }}
+                  >
+                    <h3>{index + 1}</h3>
+                    <h3>{person.name}</h3>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginRight: "auto",
+                    }}
+                  ><p>Osiągnięty wynik:</p></div>
                   <Box className={classes.points}>{person.score}</Box>
-                   </div>
+                </div>
               </Paper>
             ))}
           </Paper>

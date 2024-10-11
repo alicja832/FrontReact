@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   TextField,
-  IconButton,
   Paper,
-  Typography,
   Button,
-  Box,
+  Box
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
-import { getLogin,getRole } from "./api/TokenService";
+import { getLogin, getRole } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
+import { classInfo } from "./MyParticles";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -20,67 +18,56 @@ const useStyles = makeStyles({
     position: "relative",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px", 
+    gap: "10px",
   },
   textFieldContainer: {
     position: "relative",
-    width: "100%",
+    width: "90%",
+    padding:" 2% 5%",
     border: "1%",
     borderStyle: "solid",
     borderColor: "white",
-    height: "900px",
     backgroundColor: "grey",
     display: "flex",
     fontWeight: "bold",
     alignItems: "center",
-    gap: "1%", 
-  },
-
-  textFxx: {
-    position: "relative",
-    width: "600px",
-    border: "1px",
-    borderStyle: "solid",
-    borderColor: "blue",
-    height: "100px",
-    backgroundColor: "white",
-    color: "black",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px", 
+    gap: "1%",
   },
   textField: {
     position: "relative",
-    height: "70%",
-    backgroundColor: "#000", 
-    color: "#fff", 
+    height: "500px",
+    width: "100%",
+    backgroundColor: "#000",
+    color: "#fff",
     "& .MuiInputBase-input": {
-      color: "#fff", 
+      color: "#fff",
     },
     "& .MuiFormLabel-root": {
-      color: "#fff", 
+      color: "#fff",
     },
+  },
+   headerContainer: {
+    display: "flex",
+    alignItems: "center",
+    margin:"2%",
+    gap: "20px",
+    position: "relative",
   },
   button: {
     position: "relative",
     color: "#fff",
-    backgroundColor: "#000", 
-    "&:hover": {
-      backgroundColor: "#333", 
-    },
+    backgroundColor: "#000"
   },
   output: {
     position: "relative",
-    backgroundColor: "#000", 
-    color: "#fff", 
-    padding: "10px",
-    height: "30%", 
-    width: "100%", 
-    marginTop: "10px",
-    display: "flex",
-    alignItems: "center",
+    backgroundColor: "#000 !important",
+    color: "#fff !important",
+    padding: "1%",
+    width: "100%",
+    marginTop: "1%",
+    display: "block",
     justifyContent: "center",
-    textAlign: "center",
+    flexDirection: "row"
   },
 });
 
@@ -104,7 +91,9 @@ export default function Solution({ task }) {
   const classes = useStyles();
   const [solutionContent, setSolutionContent] = useState("");
   const [output, setOutput] = useState("");
-  const [exercise, setExercise] = useState(null);
+  const [isOutput, setisOutput] = useState(false);
+  const [outputs, setOutputs] = useState([]);
+  const [exercise, setExercise] = useState(null); 
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
@@ -114,6 +103,7 @@ export default function Solution({ task }) {
   };
 
   const handleKeyDown = (e) => {
+    classInfo.setmessage(true);
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
@@ -140,13 +130,16 @@ export default function Solution({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
-        alert("Zapisano");
+          setinfoMessage("Zapisano");
+          setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   };
-  const handleButtonClick = () => {
+  const runCode = () => {
+    setisOutput(true);
+    classInfo.setmessage(false);
     fetch("http://localhost:8080/exercise/interpreter", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -155,15 +148,24 @@ export default function Solution({ task }) {
       .then((res) => res.text())
       .then((result) => {
         setOutput(result);
+        setOutputs(result.split("\n"));
       })
-      .catch((error) => { 
+      .catch((error) => {
         setOutput("Error occurred");
       });
   };
   const check = () => {
-    var student = null;
-    const solution = { solutionContent, exercise, student, score, output };
 
+    var student = null;
+    console.log(outputs);
+    setisOutput(true);
+    const solution = { solutionContent, exercise, student, score, output };
+    console.log(outputs);
+    outputs.map((element)=>(
+                  
+             console.log(element)
+                 
+                ));
     fetch("http://localhost:8080/exercise/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -182,10 +184,10 @@ export default function Solution({ task }) {
       .catch((error) => {
         console.error("Error:", error);
       });
-
   };
 
-  useEffect(() => {   
+  useEffect(() => {
+ 
     fetch("http://localhost:8080/exercise/one/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -216,26 +218,31 @@ export default function Solution({ task }) {
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "flex-start",
-              padding: "10%",
+              padding: "3%",
             }}
           >
-            <div style={{ flexBasis: "60%", flexDirection: "column" }}>
+            <div style={{ flexBasis: "40%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
                 <Font family="tahoma">
-                <p>{exercise.introduction}</p>
+                  <p>{exercise.introduction}</p>
                 </Font>
               </Paper>
               <Paper elevation={3} style={paperStyle}>
-                <p>{exercise.content}</p>
-                <p>Maksymalna ilość punktów: {exercise.maxPoints} </p>
-                <p>Oczekiwane wyjście programu: {exercise.correctOutput}</p>
+                <Font family="sans-serif">
+                  <p>{exercise.content}</p>
+                </Font>
+                <h4>Maksymalna ilość punktów: </h4>
+                <p> {exercise.maxPoints} </p>
+                <h4>Oczekiwane wyjście programu:</h4>
+                <p> {exercise.correctOutput}</p>
               </Paper>
             </div>
             <div
               className={classes.textFieldContainer}
-              style={{ flexDirection: "column", flexBasis: "40%" }}
+              style={{ flexDirection: "column", flexBasis: "60%",marginTop:"2%" }}
             >
+              <h3>Konsola dla Python 2.7</h3>
               <TextField
                 className={classes.textField}
                 variant="outlined"
@@ -247,19 +254,16 @@ export default function Solution({ task }) {
                 multiline
                 maxRows={15}
               />
-              <IconButton
-                className={classes.button}
-                onClick={handleButtonClick}
-                aria-label="submit"
+               <div className={classes.headerContainer}>
+              <Button
+                style={{ backgroundColor: "#adff2f" }}
+                variant="contained"
+                color="secondary"
+                onClick={runCode}
               >
-                <div>
-                  <ArrowForwardIcon />
-                </div>
-              </IconButton>
-              <Paper className={classes.output} fullWidth>
-                <Typography>{output}</Typography>
-              </Paper>
-              <Box display="flex" flexDirection="column" gap={2}>
+                Wykonaj kod
+              </Button>
+             
                 <Button
                   style={{ backgroundColor: "#001f3f" }}
                   variant="contained"
@@ -268,12 +272,15 @@ export default function Solution({ task }) {
                 >
                   Sprawdz
                 </Button>
-              </Box>
-              <Box display="flex" flexDirection="column" gap={2}>
+             
+             
+                
+              <Box  >
                 {infoWindowShown && <Toast message={infoMessage} />}
               </Box>
-               <Box display="flex" flexDirection="column" gap={2}>
-              {(getRole() === "Student")&&
+              
+              <Box display = "inline" flexDirection="column" gap={2}>
+                {getRole() === "Student" && (
                   <Button
                     style={{ backgroundColor: "#001f3f" }}
                     variant="contained"
@@ -282,9 +289,24 @@ export default function Solution({ task }) {
                   >
                     Zapisz rozwiązanie
                   </Button>
-                  }
-                </Box>
-              
+                )}
+              </Box>
+              </div>
+              {isOutput&&
+              <Paper multiline={true}  className={classes.output}>
+          	{
+              	outputs.map((element)=>(
+                 
+          
+                	<p>{element}</p>
+                	
+      
+                 
+                ))
+          	}
+             </Paper>
+              }
+             
             </div>
           </div>
         }

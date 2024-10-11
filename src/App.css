@@ -20,13 +20,17 @@
 }
 
 .toast {
+  display: inline-block; /* Pozwala ustawić szerokość i wysokość oraz utrzymuje elementy w linii */
   padding: 8px 16px; 
   background-color: #6495ED; 
   color:white; 
-  border-radius: 4px; 
+  border-radius: 3px; 
   min-width: 200px; 
   text-align: center; 
-  margin-top: 16px; 
+  margin-top: 1px; 
+  height: "50%";
+  vertical-align: middle; /* Wyrównanie do środka względem innych elementów */
+
 }
 
 .right-container{

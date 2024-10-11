@@ -14,9 +14,11 @@ export default function Logout(){
     
     if(getLogin())
     {	
-    	setLogin(null);
     	setInfoWindowShown(true);
-      
+      setTimeout(() => {
+        setInfoWindowShown(false);
+      }, 3000);
+      setLogin(null);
     }
     navigate("/register");
   },[]);
