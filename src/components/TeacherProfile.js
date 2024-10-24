@@ -72,6 +72,7 @@ const TeacherProfile = () => {
   const [isExercises, setisExercises] = useState(false);
   const [WindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setMessage] = useState(false);
+  const [file, setFile] = useState(null);
 
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
@@ -190,7 +191,7 @@ const TeacherProfile = () => {
       //powinno byc true
       if(!res.ok)
       {
-        console.log(info);
+       
         setInfoWindowShown(true);
         setMessage("Niepoprawny kod pythona, zwraca Error.");
         setTimeout(() => {
@@ -226,21 +227,21 @@ const TeacherProfile = () => {
     setFile(event.target.files[0]);
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const url = "http://localhost:3000/uploadFile";
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("fileName", file.name);
-    const config = {
-      headers: {
-        "content-type": "multipart/form-data",
-      },
-    };
-    axios.post(url, formData, config).then((response) => {
-      console.log(response.data);
-    });
-  }
+  // function handleSubmit(event) {
+  //   event.preventDefault();
+  //   const url = "http://localhost:3000/uploadFile";
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("fileName", file.name);
+  //   const config = {
+  //     headers: {
+  //       "content-type": "multipart/form-data",
+  //     },
+  //   };
+  //   axios.post(url, formData, config).then((response) => {
+  //     console.log(response.data);
+  //   });
+  // }
   if (!teacher) {
     return <div>Loading...</div>;
   }
@@ -297,8 +298,7 @@ const TeacherProfile = () => {
                   src={"/userIcon.svg"}
                 />
                 <h1>Dodaj zdjęcie</h1>
-                <input type="file" onChange={handleChange} />
-                <button onClick={handleSubmit}>Dodaj</button>
+             
               </div>
             </div>
             <Box

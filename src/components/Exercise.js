@@ -77,12 +77,14 @@ export default function Exercise() {
     <div>
       <MyParticles></MyParticles>
       <div className={classes.container}>
+      <Paper style={paperStyle}>
+      <div >
         {isExercises && (
-          <Paper elevation={3} style={paperStyle}>
-            {exercises.map((exercise) => (
+      
+            exercises.map((exercise) => (
               <Paper
                 elevation={6}
-                style={{ margin: "10px", padding: "15px", textAlign: "left" }}
+                style={{ padding: "15px", textAlign: "left" }}
                 key={exercise.key.id}
               >
                 <div
@@ -119,7 +121,7 @@ export default function Exercise() {
                     </div>
                   ) : null}
                 </div>
-
+		
                 <div>
                   <Box display="flex" flexDirection="column" gap={2}>
                     <Button
@@ -133,9 +135,11 @@ export default function Exercise() {
                   </Box>
                 </div>
               </Paper>
-            ))}
-          </Paper>
+            ))
+        
         )}
+      </div>
+      </Paper>
       </div>
     </div>
   );

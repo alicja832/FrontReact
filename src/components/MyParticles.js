@@ -362,7 +362,7 @@ const MyParticles = (props) => {
     <canvas
       ref={canvasRef}
       {...props}
-      style={{ position: "fixed", width, height, background, zIndex: -1 }}
+      style={{ position: "fixed", width, height, background, zIndex: -1 ,margin:0}}
     />
     </div>
   );

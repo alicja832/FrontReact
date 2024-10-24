@@ -85,15 +85,16 @@ export default function Register(props) {
           const text = decoder.decode(value.value);
           seterrorMessage(text);
         });
-
+        console.log("cos");
         setInfoWindowShown(false);
         seterrorInfoWindowShown(true);
         setTimeout(() => {
           seterrorInfoWindowShown(false);
         }, 3000);
       } else {
-        props.changeProperties();
+        console.log("ktos");
       
+        
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -102,10 +103,10 @@ export default function Register(props) {
         if(roles === 1)
         	setRole("Teacher");
         else setRole("Student");
-        setName("");
-        setEmail("");
-        setPassword("");
-        setPasswordConfirm("");
+          setName("");
+          setEmail("");
+          setPassword("");
+          setPasswordConfirm("");
         
         }, 3000);
         
@@ -113,6 +114,7 @@ export default function Register(props) {
       }
     }).catch((error)=>
     {
+      console.log(error);
     	classInfo.setmessage(false);
     	seterrorMessage("Błąd połączenia");
         setInfoWindowShown(false);

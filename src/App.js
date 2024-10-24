@@ -13,9 +13,9 @@
   import Solution from './components/Solution';
   import SolutionRetake from './components/SolutionRetake';
   import PasswordReminder from './components/Password';
-  import ParentComponent from './components/ParentComponent';
   import Ranking from './components/Ranking';
   import Logout from './components/Logout';
+
   function App() {
    
     return (
@@ -26,15 +26,15 @@
         <Routes>
           <Route exact path="/" element={<Home/>}/>
           <Route path="/login" element={<Login/>} /> 
-          <Route path="/register" element={<ParentComponent/>} />
+          <Route path="/register"element={<Register/>} />
           <Route path="/profil" element={<Profile/>} />
           <Route path="/ranking" element={<Ranking/>} />
           <Route path="/tasks" element={<Exercise/>} />
           <Route path="/teacherprofil" element={<TeacherProfile/>} />
           <Route path="/studentprofil" element={<StudentProfile/>} />
-          <Route path="/solution/:id" element={<SolutionWrapper />} />
+          <Route path="/solution/:id" element={<SolutionWrapper/>} />
           <Route path="/password" element={<PasswordReminder/>} />
-          <Route path="/solutionRetake/:id" element={<SolutionRetakeWrapper />} />
+          <Route path="/solutionRetake/:id" element={<SolutionRetakeWrapper/>} />
           <Route path="/logout" element={<Logout/>} />
         </Routes>
       </div>
