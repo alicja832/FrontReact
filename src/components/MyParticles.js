@@ -331,7 +331,6 @@ const MyParticles = (props) => {
   useEffect(() => {
 
     let animationFrameId;
-    console.log(classInfo.getmessage());
     
     if (context.canvas && !classInfo.getmessage()) {
 

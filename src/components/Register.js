@@ -85,14 +85,14 @@ export default function Register(props) {
           const text = decoder.decode(value.value);
           seterrorMessage(text);
         });
-        console.log("cos");
+        
         setInfoWindowShown(false);
         seterrorInfoWindowShown(true);
         setTimeout(() => {
           seterrorInfoWindowShown(false);
         }, 3000);
       } else {
-        console.log("ktos");
+      
       
         
         setInfoWindowShown(true);
@@ -123,7 +123,7 @@ export default function Register(props) {
           seterrorInfoWindowShown(false);
         }, 3000);
     });
-  };
+  };  
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }

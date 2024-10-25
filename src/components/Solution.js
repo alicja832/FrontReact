@@ -147,10 +147,12 @@ export default function Solution({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
+        console.log(result);
         setOutput(result);
         setOutputs(result.split("\n"));
       })
       .catch((error) => {
+        console.log(error);
         setOutput("Error occurred");
       });
   };
@@ -245,7 +247,10 @@ export default function Solution({ task }) {
               <h3>Konsola dla Python 2.7</h3>
               <TextField
                 className={classes.textField}
-                variant="outlined"
+                variant="standard"
+                InputProps={{
+                  disableUnderline: true,
+                }}
                 placeholder="Miejsce na rozwiązanie..."
                 value={solutionContent}
                 onChange={handleInputChange}
@@ -270,7 +275,7 @@ export default function Solution({ task }) {
                   color="secondary"
                   onClick={check}
                 >
-                  Sprawdz
+                  Sprawdź
                 </Button>
              
              
@@ -293,15 +298,15 @@ export default function Solution({ task }) {
               </Box>
               </div>
               {isOutput&&
-              <Paper multiline={true}  className={classes.output}>
+              <Paper multiline="true"  className={classes.output}>
           	{
-              	outputs.map((element)=>(
+              	outputs.map((element,index)=>(
                  
-          
-                	<p>{element}</p>
+                 
+                	<p key={index}>{element}</p>
                 	
       
-                 
+            
                 ))
           	}
              </Paper>

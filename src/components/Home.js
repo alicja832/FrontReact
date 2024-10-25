@@ -79,7 +79,7 @@ export default function Home() {
           </Paper>
     
 
-        <div class="right-container">
+        <div className="right-container">
           <Paper elevation={3} style={paperStyleTwo}>
             <Font family="tahoma">
               <h1>Walka o Szczyt: Zbieraj Punkty i Rywalizuj z Innymi!</h1>
