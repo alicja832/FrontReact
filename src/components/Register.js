@@ -6,7 +6,7 @@ import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
-import { setLogin,setRole,getRole } from "./api/TokenService";
+import { setLogin,setRole,setToken} from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import {classInfo} from "./MyParticles";
 const useStyles = makeStyles((theme) => ({}));
@@ -38,20 +38,16 @@ export default function Register(props) {
   const classes = useStyles();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
+  const validateData =(e)=>
+  {
 
-  const register = (e) => {
-    
-    e.preventDefault();
-    classInfo.setmessage(false);
-    const student = { name, email, password };
-    
     if (!email.includes("@")) {
       seterrorMessage("Podano zły adres email");
       seterrorInfoWindowShown(true);
       setTimeout(() => {
         seterrorInfoWindowShown(false);
       }, 3000);
-      return;
+      throw new Error(`Podano zły adres email!`);
     }
     if (password!==passwordConfirm) {
       seterrorMessage("Podane hasła różnią się");
@@ -59,15 +55,22 @@ export default function Register(props) {
       setTimeout(() => {
         seterrorInfoWindowShown(false);
       }, 3000);
-      return;
+      throw new Error(`Podane hasła różnią się !`);
     }
-    const url =
+  }
+  const register = (e) => {
+    
+    e.preventDefault();
+    classInfo.setmessage(false);
+  
+    
+    const role =
       roles === 1
-        ? "http://localhost:8080/user/teacher"
-        : "http://localhost:8080/user/student";
-
+        ? "TEACHER"
+        : "STUDENT";
+    const student = { name, email, password,role};
+    const url = "http://localhost:8080/user/";
     fetch(url, {
-      
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student),
@@ -91,10 +94,35 @@ export default function Register(props) {
         setTimeout(() => {
           seterrorInfoWindowShown(false);
         }, 3000);
+
+     
       } else {
       
       
+        fetch("http://localhost:8080/user/authenticate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(student)
+        }).then((res) => {
+          if (res != null) {
+            if (res.status === 200) {
+            
+            const promise1 = Promise.resolve(res.body.getReader().read());
+    
+            promise1.then((value) => {
+              const decoder = new TextDecoder("utf-8");
+              const token = decoder.decode(value.value);
+              const token_dict = JSON.parse(token)
+              setToken(token_dict['jwtToken']);
+              console.log(token_dict['jwtToken']);
+            });
+          } else {
+            //TO DO error
+          }
+        }});
         
+
+   
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);

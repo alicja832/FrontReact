@@ -9,12 +9,12 @@ import { Select, InputLabel, FormControl } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MyParticles from "./MyParticles";
 import { NavLink } from "react-router-dom";
-import {classInfo} from "./MyParticles";
+import { classInfo } from "./MyParticles";
+import { setLogin, setRole, setToken,getToken } from "./api/TokenService";
 
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Login() {
-
   const paperStyle = {
     top: "4em",
     padding: "4% 4%",
@@ -23,8 +23,9 @@ export default function Login() {
     gap: "1%",
     position: "relative",
     backgroundColor: "#FDF5E6",
-    textAlign: "center"
+    textAlign: "center",
   };
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
@@ -40,94 +41,53 @@ export default function Login() {
   };
   const classes = useStyles();
   const navigate = useNavigate();
-
+  const validateData = () => {
+    if (!email.includes("@")) {
+      seterrorMessage("Podano zły adres email");
+      seterrorInfoWindowShown(true);
+      setTimeout(() => {
+        seterrorInfoWindowShown(false);
+      }, 3000);
+      throw new Error(`Podano zły adres email!`);
+    }
+  };
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
-  
-  
-
 
   const loginClicked = async (event) => {
-  
-  //do ogarnięcia
+    event.preventDefault();
     classInfo.setmessage(false);
-   
-    //bla bla 
-    //seterrorMessage("Podany uzytkoni")
-    //   console.log(credentials);
-    //   event.preventDefault();
-    //   // setCredentials(name,password)
-    //   let errors = validate(credentials);
-    //   setErrors(errors);
-    //   console.log(errors);
-    //   const toSend = JSON.stringify(credentials);
-    //   if (Object.keys(errors).length === 0) {
-    //     setLoading(true);
-    //     const one = credentials.name;
-    //     const two = credentials.password;
-    //      axios
-    //  .post(`http://localhost:8080/user/authenticate`,
-    //    credentials
-    //   )
-    //    .then((res)=>{
-    //     if (res != null) {
-    //       console.log(res);
-    //       const token = res.data.jwtToken;
-    //       console.log(token);
-    //     // const res = TokenService(
-    //     //   credentials.name,
-    //     //   credentials.password
-    //     // );
-    //     // console.log(res.text());
-    //     // if (res.status !== 200) {
-    //     //   setLoading(false);
-    //     //   setLoginState((prevState) => ({ ...prevState, hasLoginFailed: true }));
-    //     //   setLoginState((prevState) => ({
-    //     //     ...prevState,
-    //     //     showSuccessMessage: false,
-    //     //   }));
-    //     // } else {
-    //     //   let jwtToken = res;
-    //     //   const token = `Bearer ${jwtToken}`;
-    //     //   LoginInformation.setUpToken(token);
-    //     let config = {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     }
-    //     // LoginInformation.setUpToken(token);
-    //     axios.post(`http://localhost:8080/user/login`,
-    //       credentials,
-    //       config
-    //      ).then((response)=>{
-    //     console.log(response.text);
-    //     if (response.status !== 200) {
-    //       setLoading(false);
-    //       setLoginState((prevState) => ({
-    //         ...prevState,
-    //         hasLoginFailed: true,
-    //       }));
-    //       setLoginState((prevState) => ({
-    //         ...prevState,
-    //         showSuccessMessage: false,
-    //       }));
-    //     } else if (response.data === "STUDENT") {
-    //       // AuthenticationService.registerSuccessfulLoginUser(
-    //       //   credentials.name
-    //       console.log("Student");
-    //       navigate("/studentprofil");
-    //     } else if (response.data === "TEACHER") {
-    //      console.log("Teacher");
-    //       navigate("/teacherprofil");
-    //     }
-    //   }).catch((error) => {
-    //     console.error('Error:', error);
-    //   });
-    //    }
-    //   }).catch((err) => {
-    //     console.log(err);
-    // })
+    const student = { name, email, password };
+    try {
+      validateData();
+    } catch (error) {
+      return;
+    }
+    fetch("http://localhost:8080/user/authenticate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(student)
+    }).then((res) => {
+      if (res != null) {
+        if (res.status === 200) {
+        
+        const promise1 = Promise.resolve(res.body.getReader().read());
+
+        promise1.then((value) => {
+          const decoder = new TextDecoder("utf-8");
+          const token = decoder.decode(value.value);
+          const token_dict = JSON.parse(token)
+          console.log(token_dict['jwtToken']);
+          setToken(token_dict['jwtToken']);
+          console.log(token_dict['jwtToken']);
+        });
+      } else {
+        //TO DO error
+      }
+       
+      }
+    });
   };
   return (
     <div>
@@ -135,7 +95,7 @@ export default function Login() {
       <div id="sthelse">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-            <div style = {{fontSize:"large",marginBottom:"8%"}}>
+            <div style={{ fontSize: "large", marginBottom: "8%" }}>
               <img
                 src={"/logo.svg"}
                 alt="Logo"
@@ -154,15 +114,16 @@ export default function Login() {
                 fullWidth
                 value={name}
                 onChange={(e) => {
-                        setName(e.target.value)
-                        if(e.target.value!==''){
-                		classInfo.setmessage(true);
-                	}
-                }}
-                sx={{ marginBottom: "16px", 
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'red' 
+                  setName(e.target.value);
+                  if (e.target.value !== "") {
+                    classInfo.setmessage(true);
                   }
+                }}
+                sx={{
+                  marginBottom: "16px",
+                  "&.Mui-focused fieldset": {
+                    borderColor: "red",
+                  },
                 }}
               />
               <TextField
@@ -172,8 +133,7 @@ export default function Login() {
                 fullWidth
                 value={email}
                 onChange={(e) => {
-                	setEmail(e.target.value)
-                	
+                  setEmail(e.target.value);
                 }}
                 sx={{ marginBottom: "16px" }}
               />
@@ -184,7 +144,7 @@ export default function Login() {
                 type={psw ? "text" : "password"}
                 fullWidth
                 sx={{ marginBottom: "16px" }}
-                endAdornment={ 
+                endAdornment={
                   <InputAdornment position="start">
                     <IconButton
                       onClick={handleShowPsw}
@@ -196,7 +156,9 @@ export default function Login() {
                   </InputAdornment>
                 }
               />
-              <div><p>Wybierz, jaką rolę pełnisz:</p></div>
+              <div>
+                <p>Wybierz, jaką rolę pełnisz:</p>
+              </div>
               <FormControl fullWidth>
                 <InputLabel id="role-label">Rola</InputLabel>
                 <Select
@@ -238,9 +200,9 @@ export default function Login() {
                   {errorWindowShown && <Toast message={errorMessage} />}
                 </Box>
               </div>
-               <Box display="flex" flexDirection="column" gap={2}>
-                 <NavLink to="/password">Zapomniałeś hasła?</NavLink>
-                </Box>
+              <Box display="flex" flexDirection="column" gap={2}>
+                <NavLink to="/password">Zapomniałeś hasła?</NavLink>
+              </Box>
             </form>
           </Paper>
         </Container>

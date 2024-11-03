@@ -6,6 +6,11 @@ export function getRole(){
   return window.localStorage.getItem('role');
 }
 
+export function getToken(){
+  return window.localStorage.getItem('token');
+}
+
+
 export function setLogin(login) {
     if (login !== null) {
       
@@ -20,10 +25,9 @@ export function setLogin(login) {
     }
     return;
 }
-//localStorage.clear(); -> gdzieś to wstawić XD
 
 export function setRole(role) {
-console.log(role);
+
   if (role !== null) {
     window.localStorage.setItem('role', role);
   } else {
@@ -31,3 +35,19 @@ console.log(role);
   }
   return;
 }
+
+export function setToken(token) {
+    
+    window.localStorage.removeItem('token');
+    if(token!==null)
+    {
+      window.localStorage.setItem('token',token);
+    }
+    else
+    {
+      window.localStorage.removeItem('token');
+    }
+
+    return;
+  }
+  

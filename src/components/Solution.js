@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  TextField,
-  Paper,
-  Button,
-  Box
-} from "@mui/material";
+import { TextField, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { getLogin, getRole } from "./api/TokenService";
+import { getLogin, getRole,getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import { classInfo } from "./MyParticles";
@@ -23,7 +18,7 @@ const useStyles = makeStyles({
   textFieldContainer: {
     position: "relative",
     width: "90%",
-    padding:" 2% 5%",
+    padding: " 2% 5%",
     border: "1%",
     borderStyle: "solid",
     borderColor: "white",
@@ -46,17 +41,17 @@ const useStyles = makeStyles({
       color: "#fff",
     },
   },
-   headerContainer: {
+  headerContainer: {
     display: "flex",
     alignItems: "center",
-    margin:"2%",
+    margin: "2%",
     gap: "20px",
     position: "relative",
   },
   button: {
     position: "relative",
     color: "#fff",
-    backgroundColor: "#000"
+    backgroundColor: "#000",
   },
   output: {
     position: "relative",
@@ -67,7 +62,7 @@ const useStyles = makeStyles({
     marginTop: "1%",
     display: "block",
     justifyContent: "center",
-    flexDirection: "row"
+    flexDirection: "row",
   },
 });
 
@@ -93,7 +88,7 @@ export default function Solution({ task }) {
   const [output, setOutput] = useState("");
   const [isOutput, setisOutput] = useState(false);
   const [outputs, setOutputs] = useState([]);
-  const [exercise, setExercise] = useState(null); 
+  const [exercise, setExercise] = useState(null);
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
@@ -125,13 +120,13 @@ export default function Solution({ task }) {
     const solution = { solutionContent, exercise, studentEmail, score, output };
     fetch("http://localhost:8080/exercise/solution", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"  },
       body: JSON.stringify(solution),
     })
       .then((res) => res.text())
       .then((result) => {
-          setinfoMessage("Zapisano");
-          setInfoWindowShown(true);
+        setinfoMessage("Zapisano");
+        setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -157,17 +152,10 @@ export default function Solution({ task }) {
       });
   };
   const check = () => {
-
     var student = null;
-    console.log(outputs);
     setisOutput(true);
     const solution = { solutionContent, exercise, student, score, output };
     console.log(outputs);
-    outputs.map((element)=>(
-                  
-             console.log(element)
-                 
-                ));
     fetch("http://localhost:8080/exercise/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -176,7 +164,7 @@ export default function Solution({ task }) {
       .then((res) => res.text())
       .then((result) => {
         setScore(result);
-        setinfoMessage("Twój wynik to:" + result.toString());
+        setinfoMessage("Twój wynik to " + result.toString() +" pkt");
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -189,7 +177,6 @@ export default function Solution({ task }) {
   };
 
   useEffect(() => {
- 
     fetch("http://localhost:8080/exercise/one/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -242,33 +229,50 @@ export default function Solution({ task }) {
             </div>
             <div
               className={classes.textFieldContainer}
-              style={{ flexDirection: "column", flexBasis: "60%",marginTop:"2%" }}
+              style={{
+                flexDirection: "column",
+                flexBasis: "60%",
+                marginTop: "2%",
+              }}
             >
-              <h3>Konsola dla Python 2.7</h3>
-              <TextField
-                className={classes.textField}
-                variant="standard"
-                InputProps={{
-                  disableUnderline: true,
+              
+            
+                <h3>Konsola dla Python 2.7</h3>
+                {/* Tutaj jest pomysl zeby wpisac po kolei linijki(numery lini) a jako ze to jest zIndex:-1, z zIndex:-1 to nie dziala uwaga to powinno byc git */}
+                <div
+                className={classes.textFieldContainer}
+                style={{
+                  flexDirection: "column",
+                  flexBasis: "55%",
+                  marginTop: "2%",
+                  backgroundColor: "black",
                 }}
-                placeholder="Miejsce na rozwiązanie..."
-                value={solutionContent}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                fullWidth
-                multiline
-                maxRows={15}
-              />
-               <div className={classes.headerContainer}>
-              <Button
-                style={{ backgroundColor: "#adff2f" }}
-                variant="contained"
-                color="secondary"
-                onClick={runCode}
               >
-                Wykonaj kod
-              </Button>
-             
+                <TextField
+                  className={classes.textField}
+                  variant="standard"
+                  InputProps={{
+                    disableUnderline: true,
+                  }}
+                  placeholder="Miejsce na rozwiązanie..."
+                  value={solutionContent}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  fullWidth
+                  multiline
+                  maxRows={15}
+                />
+              </div>
+              <div className={classes.headerContainer}>
+                <Button
+                  style={{ backgroundColor: "#adff2f" }}
+                  variant="contained"
+                  color="secondary"
+                  onClick={runCode}
+                >
+                  Wykonaj kod
+                </Button>
+
                 <Button
                   style={{ backgroundColor: "#001f3f" }}
                   variant="contained"
@@ -277,41 +281,29 @@ export default function Solution({ task }) {
                 >
                   Sprawdź
                 </Button>
-             
-             
-                
-              <Box  >
-                {infoWindowShown && <Toast message={infoMessage} />}
-              </Box>
-              
-              <Box display = "inline" flexDirection="column" gap={2}>
-                {getRole() === "Student" && (
-                  <Button
-                    style={{ backgroundColor: "#001f3f" }}
-                    variant="contained"
-                    color="secondary"
-                    onClick={save}
-                  >
-                    Zapisz rozwiązanie
-                  </Button>
-                )}
-              </Box>
+
+                <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
+
+                <Box display="inline" flexDirection="column" gap={2}>
+                  {getRole() === "Student" && (
+                    <Button
+                      style={{ backgroundColor: "#001f3f" }}
+                      variant="contained"
+                      color="secondary"
+                      onClick={save}
+                    >
+                      Zapisz rozwiązanie
+                    </Button>
+                  )}
+                </Box>
               </div>
-              {isOutput&&
-              <Paper multiline="true"  className={classes.output}>
-          	{
-              	outputs.map((element,index)=>(
-                 
-                 
-                	<p key={index}>{element}</p>
-                	
-      
-            
-                ))
-          	}
-             </Paper>
-              }
-             
+              {isOutput && (
+                <Paper multiline="true" className={classes.output}>
+                  {outputs.map((element, index) => (
+                    <p key={index}>{element}</p>
+                  ))}
+                </Paper>
+              )}
             </div>
           </div>
         }

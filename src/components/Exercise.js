@@ -3,7 +3,7 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { Paper, Button, Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import { getLogin, getRole } from "./api/TokenService";
+import { getLogin, getRole,getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 const useStyles = makeStyles({
   points: {
@@ -48,11 +48,14 @@ export default function Exercise() {
   const openSolution = (e) => {
     navigate("/solution/:" + e.target.value);
   };
-
+//teraz endpointy nie beda wymagac emaila jako pathvariable - wystarczy tylko wziac dane z tokenu
   useEffect(() => {
     let role = getRole();
     if (role === "Student") {
-      fetch("http://localhost:8080/exercise/" + getLogin())
+      fetch("http://localhost:8080/exercise/" + getLogin(),{
+        method: "GET",
+        headers: { Authorization:`Bearer ${getToken()}`},
+      })  
         .then((res) => res.json())
         .then((result) => {
           console.log("Fetched students:", result);
@@ -61,15 +64,15 @@ export default function Exercise() {
         })
         .catch((error) => console.error("Error:", error));
     } else {
-      fetch("http://localhost:8080/exercise/")
+      fetch("http://localhost:8080/exercise/"
+      )
         .then((res) => res.json())
         .then((result) => {
           setExercises(result);
           console.log(result);
           if (result.length !== 0)  
           setisExercises(true);
-        })
-        .catch((error) => console.error("Error:", error));
+        }).catch((error) => console.error("Error:", error));
     }
   }, []);
 

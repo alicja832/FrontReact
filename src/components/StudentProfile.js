@@ -3,7 +3,7 @@ import { Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Container, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { getLogin } from "./api/TokenService";
+import { getLogin,getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
@@ -50,11 +50,11 @@ const StudentProfile = () => {
 
   function fetchStudentExercises() {
     fetch("http://localhost:8080/exercise/solutions/" + student.name, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`},
+      method: "GET"
     })
       .then((res) => res.json())
-      .then((result) => {
+      .then((result) => { 
         if (result.length !== 0) setbuttonExercise(false);
         console.log("Fetched students:", result); // Dodaj t
         setExercisesWithScores(result);
@@ -62,8 +62,11 @@ const StudentProfile = () => {
       .catch((error) => console.error("Error fetching students:", error));
   }
   useEffect(() => {
-    fetch("http://localhost:8080/user/student/" + getLogin())
-      .then((res) => res.json())
+   
+    fetch("http://localhost:8080/user/student/" + getLogin(), {
+      headers: { Authorization:`Bearer ${getToken()}`},
+      method: "GET"
+    }).then((res) => res.json())
       .then((result) => {
         console.log("Fetched students:", result);
         setStudent(result[0]);

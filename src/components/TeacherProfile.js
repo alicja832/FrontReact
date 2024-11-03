@@ -4,7 +4,7 @@ import Textarea from "@mui/joy/Textarea";
 import { Container, Paper, Button, Box } from "@mui/material";
 import { FormControl } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { getLogin } from "./api/TokenService";
+import { getLogin,getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import { classInfo } from "./MyParticles";
@@ -117,13 +117,15 @@ const TeacherProfile = () => {
   const closeFormTwo = () => {
     setIsFormTwoVisible(false);
   };
-
+  //ej bo to jest słabe
   const deleteExercise = (e) => {
+  
     const url = "http://localhost:8080/exercise/delete/" + e.target.value;
     fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: e.target.value,
+      method: "DELETE",
+      mode: 'no-cors',
+      headers: { Authorization:`Bearer ${getToken()}` },
+      body: e.target.value
     }).then(() => {
       window.location.reload();
     });
@@ -143,7 +145,7 @@ const TeacherProfile = () => {
 
     fetch(url, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
       body: JSON.stringify(exercise),
     }).then(() => {
       closeFormTwo();
@@ -183,7 +185,7 @@ const TeacherProfile = () => {
     const url = "http://localhost:8080/exercise/";
     fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"},
       body: JSON.stringify(exercise),
     }).then((res) => {
       //to jest nie sprawdzone
@@ -209,39 +211,33 @@ const TeacherProfile = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/user/teacher/" + getLogin())
-      .then((res) => res.json())
-      .then((result) => {
-        setTeacher(result[0]);
-      })
-      .catch((error) => console.error("Error:", error));
-    fetch("http://localhost:8080/user/exercises/" + getLogin())
+
+    fetch("http://localhost:8080/user/teacher/" + getLogin(), {
+      headers: { Authorization:`Bearer ${getToken()}`},
+      method: "GET"
+    }).then((res) => res.json())
+    .then((result) => {
+      console.log(result);
+      setTeacher(result[0]);
+    });
+
+    
+    fetch("http://localhost:8080/user/exercises/" + getLogin(),{
+      method: "GET",
+      headers: { Authorization:`Bearer ${getToken()}`}
+    })
       .then((res) => res.json())
       .then((result) => {
         setExercises(result);
         if (result.length !== 0) setisExercises(true);
         console.log(result);
       });
+    
   }, []);
   function handleChange(event) {
     setFile(event.target.files[0]);
   }
 
-  // function handleSubmit(event) {
-  //   event.preventDefault();
-  //   const url = "http://localhost:3000/uploadFile";
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   formData.append("fileName", file.name);
-  //   const config = {
-  //     headers: {
-  //       "content-type": "multipart/form-data",
-  //     },
-  //   };
-  //   axios.post(url, formData, config).then((response) => {
-  //     console.log(response.data);
-  //   });
-  // }
   if (!teacher) {
     return <div>Loading...</div>;
   }
@@ -414,7 +410,6 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="Nazwa"
                 variant="outlined"
-                fullWidth
                 defaultValue={exercises[indexofExercise].name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -423,7 +418,6 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="Treść"
                 variant="outlined"
-                fullWidth
                 defaultValue={exercises[indexofExercise].content}
                 onChange={(e) => setContent(e.target.value)}
               />
@@ -432,7 +426,7 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="Wstęp teoretyczny"
                 variant="outlined"
-                fullWidth
+             
                 defaultValue={exercises[indexofExercise].introduction}
                 onChange={(e) => setIntroduction(e.target.value)}
               />
@@ -443,7 +437,7 @@ const TeacherProfile = () => {
                 label="Poprawne rozwiązanie"
                 placeholder="Poprawne rozwiązanie"
                 variant="outlined"
-                fullWidth
+           
                 defaultValue={exercises[indexofExercise].correctSolution}
                 onChange={(e) => setcorrectSolution(e.target.value)}
               />
@@ -451,7 +445,7 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="max ilość punktów"
                 variant="outlined"
-                fullWidth
+            
                 defaultValue={exercises[indexofExercise].maxPoints}
                 onChange={(e) => setmaxPoints(e.target.value)}
               />
@@ -505,7 +499,6 @@ const TeacherProfile = () => {
               <TextField
                 id="outlined-basic"
                 label="Wstęp teoretyczny"
-                variant="outlined"
                 fullWidth
                 value={introduction}
                 onChange={(e) => setIntroduction(e.target.value)}

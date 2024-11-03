@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
-import { getLogin, getRole } from "./api/TokenService";
+import { getLogin, getRole,getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 
@@ -145,7 +145,7 @@ export default function SolutionRetake({ task }) {
 
     fetch("http://localhost:8080/exercise/solution", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
       body: JSON.stringify(updatesolution),
     })
       .then((res) => res.text())
@@ -162,7 +162,7 @@ export default function SolutionRetake({ task }) {
     console.log(solutionContent);
     fetch("http://localhost:8080/exercise/interpreter", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
       body: JSON.stringify(solutionContent),
     })
       .then((res) => res.text())
@@ -177,7 +177,7 @@ export default function SolutionRetake({ task }) {
     const solution = { solutionContent, exercise, studentEmail, score, output };
     fetch("http://localhost:8080/exercise/check", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
       body: JSON.stringify(solution),
     })
       .then((res) => res.text())
@@ -197,7 +197,7 @@ export default function SolutionRetake({ task }) {
   useEffect(() => {
     fetch("http://localhost:8080/exercise/solution/" + task, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization:`Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((result) => {

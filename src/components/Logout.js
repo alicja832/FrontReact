@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyParticles  from './MyParticles'
-import { setLogin } from './api/TokenService';
+import { setLogin, setToken, setRole } from './api/TokenService';
 import { getLogin } from './api/TokenService';
 import { Box } from "@mui/material";
 
@@ -19,6 +19,8 @@ export default function Logout(){
         setInfoWindowShown(false);
       }, 3000);
       setLogin(null);
+      setToken(null);
+      setRole(null);
     }
     navigate("/register");
   },[]);
