@@ -3,8 +3,9 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { Paper, Button, Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import { getLogin, getRole,getToken } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
+import CircularProgress from "@mui/joy/CircularProgress"
 const useStyles = makeStyles({
   points: {
     width: "30px",
@@ -43,16 +44,16 @@ export default function Exercise() {
   };
   const classes = useStyles();
   const [exercises, setExercises] = useState([]);
-  const [isExercises, setisExercises] = useState(false);
+  const [isExercises, setisExercises] = useState(false); 
   const navigate = useNavigate();
   const openSolution = (e) => {
     navigate("/solution/:" + e.target.value);
   };
 //teraz endpointy nie beda wymagac emaila jako pathvariable - wystarczy tylko wziac dane z tokenu
   useEffect(() => {
-    let role = getRole();
-    if (role === "Student") {
-      fetch("http://localhost:8080/exercise/" + getLogin(),{
+   
+    if (getToken()) {
+      fetch("http://localhost:8080/exercise/" ,{
         method: "GET",
         headers: { Authorization:`Bearer ${getToken()}`},
       })  
@@ -82,6 +83,7 @@ export default function Exercise() {
       <div className={classes.container}>
       <Paper style={paperStyle}>
       <div >
+        {!isExercises && (<CircularProgress/>)}
         {isExercises && (
       
             exercises.map((exercise) => (
@@ -110,7 +112,7 @@ export default function Exercise() {
                   <p>Punkty do zdobycia:</p>
                   </div>
                   <Box className={classes.points}>{exercise.key.maxPoints}</Box>
-                  {exercise.right ? (
+                  {exercise.value ? (
                     <div
                       style={{
                         display: "flex",

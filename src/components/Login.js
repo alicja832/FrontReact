@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import MyParticles from "./MyParticles";
 import { NavLink } from "react-router-dom";
 import { classInfo } from "./MyParticles";
-import { setLogin, setRole, setToken,getToken } from "./api/TokenService";
+import {  setToken } from "./api/TokenService";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -69,8 +69,7 @@ export default function Login() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student)
     }).then((res) => {
-      if (res != null) {
-        if (res.status === 200) {
+      if (res.ok)  {
         
         const promise1 = Promise.resolve(res.body.getReader().read());
 
@@ -78,15 +77,25 @@ export default function Login() {
           const decoder = new TextDecoder("utf-8");
           const token = decoder.decode(value.value);
           const token_dict = JSON.parse(token)
-          console.log(token_dict['jwtToken']);
-          setToken(token_dict['jwtToken']);
-          console.log(token_dict['jwtToken']);
+        
+         
+          setInfoWindowShown(true);
+          setTimeout(() => {
+            setInfoWindowShown(false);
+            setToken(token_dict['jwtToken']);
+            navigate("/profil");
+          }, 3000);
+         
+        
         });
       } else {
-        //TO DO error
+        seterrorMessage("Dane logowania niepoprawne!");
+        seterrorInfoWindowShown(true);
+        setTimeout(() => {
+          seterrorInfoWindowShown(false);
+        }, 3000);
       }
        
-      }
     });
   };
   return (
@@ -156,21 +165,6 @@ export default function Login() {
                   </InputAdornment>
                 }
               />
-              <div>
-                <p>Wybierz, jaką rolę pełnisz:</p>
-              </div>
-              <FormControl fullWidth>
-                <InputLabel id="role-label">Rola</InputLabel>
-                <Select
-                  labelId="role-label"
-                  value={role}
-                  sx={{ marginBottom: "16px" }}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <MenuItem value={0}>Uczeń</MenuItem>
-                  <MenuItem value={1}>Nauczyciel</MenuItem>
-                </Select>
-              </FormControl>
               <div
                 style={{
                   display: "flex",

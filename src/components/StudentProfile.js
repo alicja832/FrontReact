@@ -3,10 +3,11 @@ import { Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Container, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { getLogin,getToken } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import Profile from "./Profile";
 
 const useStyles = makeStyles({
   points: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles({
   },
 });
 
-const StudentProfile = () => {
+const StudentProfile = (user) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const paperStyle = {
@@ -40,16 +41,14 @@ const StudentProfile = () => {
     position: "relative",
   };
   const buttonStyle = { backgroundColor: "#001f3f", color: "white" };
-  const [student, setStudent] = useState(null);
   const [exercisesWithScores, setExercisesWithScores] = useState([]);
   const [buttonExercise, setbuttonExercise] = useState(true);
-
+  const [student, setStudent] = useState(null);
   const retake = (e) => {
     navigate("/solutionRetake/:" + e.target.value);
   };
-
-  function fetchStudentExercises() {
-    fetch("http://localhost:8080/exercise/solutions/" + student.name, {
+  const click=()=>{
+    fetch("http://localhost:8080/exercise/solutions/", {
       headers: { Authorization:`Bearer ${getToken()}`},
       method: "GET"
     })
@@ -61,18 +60,13 @@ const StudentProfile = () => {
       })
       .catch((error) => console.error("Error fetching students:", error));
   }
+  
   useEffect(() => {
+    setStudent(user.user);
+    console.log(user.user.name);
    
-    fetch("http://localhost:8080/user/student/" + getLogin(), {
-      headers: { Authorization:`Bearer ${getToken()}`},
-      method: "GET"
-    }).then((res) => res.json())
-      .then((result) => {
-        console.log("Fetched students:", result);
-        setStudent(result[0]);
-      })
-      .catch((error) => console.error("Error:", error));
-  }, []);
+  });
+
   if (!student) {
     return <div>Loading...</div>;
   }
@@ -102,17 +96,12 @@ const StudentProfile = () => {
               </Font>
               <Box className={classes.points}>{student.score}</Box>
             </div>
+            <button onClick = {click}></button>
           </Paper>
           {
             <Paper elevation={1} style={paperStyle}>
-              {buttonExercise && (
-                <Box display="flex" flexDirection="column" gap={2}>
-                  <Button style={buttonStyle} onClick={fetchStudentExercises}>
-                    Zobacz Twoje rozwiązania
-                  </Button>
-                </Box>
-              )}
-              {exercisesWithScores.map((exercise) => (
+             
+              {exercisesWithScores.length!==0 && exercisesWithScores.map((exercise) => (
                 <Paper
                   elevation={6}
                   style={{ margin: "10px", padding: "15px", textAlign: "left" }}

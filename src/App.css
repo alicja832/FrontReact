@@ -68,3 +68,13 @@
     margin: "20px auto";
     position: "relative";
 }
+.paper-style {
+  top: "4em";
+  padding: "4% 4%";
+  width: "40%";
+  margin: "1% auto";
+  gap: "1%";
+  position: "relative";
+  background-color: "#FDF5E6";
+  text-align: "center";
+};

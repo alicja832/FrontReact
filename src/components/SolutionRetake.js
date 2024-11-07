@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
-import { getLogin, getRole,getToken } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 
@@ -133,7 +133,7 @@ export default function SolutionRetake({ task }) {
 
   const save = () => {
     const id = solution.id;
-    setStudentEmail(getLogin());
+    setStudentEmail(getToken());
     const updatesolution = {
       id,
       solutionContent,
@@ -278,7 +278,7 @@ export default function SolutionRetake({ task }) {
                 {infoWindowShown && <Toast message={infoMessage} />}
               </Box>
               <Box display="flex" flexDirection="column" gap={2}>
-                {getRole() === "Student" && (
+                {getToken() === "Student" && (
                   <Button
                     style={{ backgroundColor: "#001f3f" }}
                     variant="contained"

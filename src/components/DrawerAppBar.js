@@ -14,11 +14,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import { getLogin } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import AccountBoxIcon from "@mui/icons-material/AccountBox"; //import logo from '/logo.svg';
 import Font from "react-font";
 
 export default function DrawerAppBar(register, props) {
+  
   const [navItems, setNavItems] = useState([
     "Zadania",
     "Główna",
@@ -36,18 +37,20 @@ export default function DrawerAppBar(register, props) {
   const profile = "Profil";
 
   useEffect(() => {
-    if (getLogin() && !navItems.includes(profile)) {
-      navItems.unshift("Profil");
-      navItems.unshift("Ranking");
-      purposes.unshift("/profil");
-      purposes.unshift("/ranking");
-      navItems.push("Wyloguj");
-      purposes.push("/logout");
+  
+    if (getToken() && !navItems.includes(profile)) {
+        
+        navItems.unshift("Profil");
+        navItems.unshift("Ranking");
+        purposes.unshift("/profil");
+        purposes.unshift("/ranking");
+        navItems.push("Wyloguj");
+        purposes.push("/logout");
 
-      setNavItems(
-        navItems.filter(
-          (element) => element !== "Zaloguj" && element !== "Zarejestruj"
-        )
+        setNavItems(
+          navItems.filter(
+            (element) => element !== "Zaloguj" && element !== "Zarejestruj"
+          )
       );
 
       setPurposes(
@@ -56,6 +59,8 @@ export default function DrawerAppBar(register, props) {
         )
       );
     }
+    
+    
   }, [register]);
 
   const { window } = props;

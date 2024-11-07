@@ -21,8 +21,6 @@ export default function PasswordReminder() {
     const [emailFormShow, setemailFormShow] = useState(true);
     const [infoTwoWindowShown, setInfoTwoWindowShown] = useState(false);
 
-
-
     const handleShowPsw = () => setPsw((show) => !show);
     const handleHidePsw = (e) => {
       e.preventDefault();
@@ -31,15 +29,12 @@ export default function PasswordReminder() {
   
     function showCodeForm()
     {
-      
-   
       setIsFormCodeVisible(true);
       
     }
     function closeCodeForm()
     {
       setIsFormCodeVisible(false);
-    
     }
     function showForm()
     {

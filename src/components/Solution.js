@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { getLogin, getRole,getToken } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import { classInfo } from "./MyParticles";
@@ -32,6 +32,7 @@ const useStyles = makeStyles({
     position: "relative",
     height: "500px",
     width: "100%",
+    marginLeft:"5%",
     backgroundColor: "#000",
     color: "#fff",
     "& .MuiInputBase-input": {
@@ -63,6 +64,7 @@ const useStyles = makeStyles({
     display: "block",
     justifyContent: "center",
     flexDirection: "row",
+    fontWeight: "lighter",
   },
 });
 
@@ -92,13 +94,14 @@ export default function Solution({ task }) {
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
+  const [user, setUser] = useState(null);
 
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
 
   const handleKeyDown = (e) => {
-    classInfo.setmessage(true);
+ 
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
@@ -116,7 +119,7 @@ export default function Solution({ task }) {
   };
 
   const save = () => {
-    var studentEmail = getLogin();
+    var studentEmail = user.email;
     const solution = { solutionContent, exercise, studentEmail, score, output };
     fetch("http://localhost:8080/exercise/solution", {
       method: "POST",
@@ -177,6 +180,7 @@ export default function Solution({ task }) {
   };
 
   useEffect(() => {
+  
     fetch("http://localhost:8080/exercise/one/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -186,6 +190,16 @@ export default function Solution({ task }) {
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
+
+      fetch("http://localhost:8080/user/", {
+        headers: { Authorization: `Bearer ${getToken()}` },
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+          setUser(result[0]);
+        });
   }, []);
 
   if (!exercise) {
@@ -238,7 +252,6 @@ export default function Solution({ task }) {
               
             
                 <h3>Konsola dla Python 2.7</h3>
-                {/* Tutaj jest pomysl zeby wpisac po kolei linijki(numery lini) a jako ze to jest zIndex:-1, z zIndex:-1 to nie dziala uwaga to powinno byc git */}
                 <div
                 className={classes.textFieldContainer}
                 style={{
@@ -285,7 +298,7 @@ export default function Solution({ task }) {
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
 
                 <Box display="inline" flexDirection="column" gap={2}>
-                  {getRole() === "Student" && (
+                  {(user && user.role==="STUDENT") && (
                     <Button
                       style={{ backgroundColor: "#001f3f" }}
                       variant="contained"

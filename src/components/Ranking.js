@@ -43,8 +43,8 @@ export default function Ranking() {
     backgroundColor: "#FDF5E6",
     top: "50%",
     left: "50%",
-    transform: "translate(-50%, -50%)", //* Przesuni
-    borderRadius: "10px" /* zaokrągla wszystkie rogi */,
+    transform: "translate(-50%, -50%)", 
+    borderRadius: "10px",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
   };

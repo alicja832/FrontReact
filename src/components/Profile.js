@@ -1,20 +1,33 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MyParticles } from './MyParticles'
-import { getRole } from "./api/TokenService";
+import React, { useEffect, useState } from "react";
+import MyParticles  from "./MyParticles";
+import TeacherProfile from "./TeacherProfile";
+import {getToken} from "./api/TokenService"
+import StudentProfile from "./StudentProfile";
+
 const Profile = () => {
-  const navigate = useNavigate();
 
+  const [user, setUser] = useState(null);
+  //tutaj trzeba to naprawić niestety
   useEffect(() => {
-     const role = getRole();
-     if (role === "Teacher") {
-      navigate('/teacherprofil');
-    } else {
-      navigate('/studentprofil');
-    }
-},[navigate]);
+    fetch("http://localhost:8080/user/", {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        setUser(result[0]);
+      });
+  },[]);
 
-  return <div>Loading...</div>;
+  return (
+   
+    <div>
+       <MyParticles></MyParticles>
+      {user!==null && user.role === "TEACHER" && <TeacherProfile user={user} />}
+      {user!==null && user.role === "STUDENT" && <StudentProfile user={user} />}
+    </div>
+  );
 };
 
 export default Profile;

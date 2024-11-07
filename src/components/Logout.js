@@ -1,8 +1,8 @@
 import React, { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyParticles  from './MyParticles'
-import { setLogin, setToken, setRole } from './api/TokenService';
-import { getLogin } from './api/TokenService';
+import { setToken} from './api/TokenService';
+import { getToken } from './api/TokenService';
 import { Box } from "@mui/material";
 
 export default function Logout(){
@@ -11,16 +11,16 @@ export default function Logout(){
   const navigate = useNavigate();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   useEffect(() => {
-    
-    if(getLogin())
+   
+    if(getToken())
     {	
     	setInfoWindowShown(true);
       setTimeout(() => {
         setInfoWindowShown(false);
       }, 3000);
-      setLogin(null);
+    
       setToken(null);
-      setRole(null);
+    
     }
     navigate("/register");
   },[]);

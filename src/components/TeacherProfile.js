@@ -4,7 +4,7 @@ import Textarea from "@mui/joy/Textarea";
 import { Container, Paper, Button, Box } from "@mui/material";
 import { FormControl } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { getLogin,getToken } from "./api/TokenService";
+import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
 import { classInfo } from "./MyParticles";
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TeacherProfile = () => {
+const TeacherProfile = (user) => {
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     top: "4em",
@@ -60,7 +60,6 @@ const TeacherProfile = () => {
   const classes = useStyles();
   const [id, setId] = useState(0);
   const [indexofExercise, setIndexofExercise] = useState(0);
-  const [teacher, setTeacher] = useState(null);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [maxPoints, setmaxPoints] = useState("");
@@ -71,8 +70,10 @@ const TeacherProfile = () => {
   const [isFormTwoVisible, setIsFormTwoVisible] = useState(false);
   const [isExercises, setisExercises] = useState(false);
   const [WindowShown, setInfoWindowShown] = useState(false);
+  const [WindowTwoShown, setInfoWindowTwoShown] = useState(false);
   const [infoMessage, setMessage] = useState(false);
   const [file, setFile] = useState(null);
+  const [teacher, setTeacher] = useState(null);
 
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
@@ -117,15 +118,12 @@ const TeacherProfile = () => {
   const closeFormTwo = () => {
     setIsFormTwoVisible(false);
   };
-  //ej bo to jest słabe
+
   const deleteExercise = (e) => {
-  
-    const url = "http://localhost:8080/exercise/delete/" + e.target.value;
+    const url = "http://localhost:8080/exercise/" + e.target.value;
     fetch(url, {
       method: "DELETE",
-      mode: 'no-cors',
-      headers: { Authorization:`Bearer ${getToken()}` },
-      body: e.target.value
+      headers: { Authorization: `Bearer ${getToken()}` },
     }).then(() => {
       window.location.reload();
     });
@@ -145,7 +143,10 @@ const TeacherProfile = () => {
 
     fetch(url, {
       method: "PUT",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(exercise),
     }).then(() => {
       closeFormTwo();
@@ -185,46 +186,36 @@ const TeacherProfile = () => {
     const url = "http://localhost:8080/exercise/";
     fetch(url, {
       method: "POST",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"},
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(exercise),
     }).then((res) => {
-      //to jest nie sprawdzone
-      //if(){costamcostam}
-      //powinno byc true
-      if(!res.ok)
-      {
-       
+      if (!res.ok) {
         setInfoWindowShown(true);
-        setMessage("Niepoprawny kod pythona, zwraca Error.");
+        setMessage("Niepoprawny kod pythona");
         setTimeout(() => {
           setInfoWindowShown(false);
-          window.location.reload();
         }, 3000);
         return;
-    }
+      } else {
+        window.location.reload();
+        closeForm();
+        setName("");
+        setContent("");
+        setmaxPoints("");
+        setcorrectSolution("");
+      }
     });
-    closeForm();
-    setName("");
-    setContent("");
-    setmaxPoints("");
-    setcorrectSolution("");
   };
 
   useEffect(() => {
+    setTeacher(user.user);
 
-    fetch("http://localhost:8080/user/teacher/" + getLogin(), {
-      headers: { Authorization:`Bearer ${getToken()}`},
-      method: "GET"
-    }).then((res) => res.json())
-    .then((result) => {
-      console.log(result);
-      setTeacher(result[0]);
-    });
-
-    
-    fetch("http://localhost:8080/user/exercises/" + getLogin(),{
+    fetch("http://localhost:8080/user/exercises/", {
       method: "GET",
-      headers: { Authorization:`Bearer ${getToken()}`}
+      headers: { Authorization: `Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((result) => {
@@ -232,7 +223,6 @@ const TeacherProfile = () => {
         if (result.length !== 0) setisExercises(true);
         console.log(result);
       });
-    
   }, []);
   function handleChange(event) {
     setFile(event.target.files[0]);
@@ -290,11 +280,8 @@ const TeacherProfile = () => {
                   flexBasis: "40%",
                 }}
               >
-                <img
-                  src={"/userIcon.svg"}
-                />
+                <img src={"/userIcon.svg"} />
                 <h1>Dodaj zdjęcie</h1>
-             
               </div>
             </div>
             <Box
@@ -323,15 +310,19 @@ const TeacherProfile = () => {
           }}
         >
           <Paper elevation={1} style={paperStyleTwo}>
-                        <Font family="sans-serif">
+            <Font family="sans-serif">
+              <h3>Jako nauczyciel możesz dodawać zadania:</h3>
+              <h4>Na zadanie składa się:</h4>
 
-              <h3>Jako nauczyciel możesz dodawać zadania:</h3> 
-              <li> Wstęp teoretyczny
-              informujący, jakich zagadnień teoretycznych ma dotyczyć zadanie
-              (zarówno teoria samego języka programowania jak i teoria z
-              zagadnień algorytmicznych), który ma pomóc w rozwiązaniu.</li>
-              <li>Treść
-              zadania, która informuje, co należy zrobić oraz twoja propozycja rozwiązania.</li>
+              <li>
+                {" "}
+                Wstęp teoretyczny informujący, jakich zagadnień teoretycznych ma
+                dotyczyć zadanie (zarówno teoria samego języka programowania jak
+                i teoria z zagadnień algorytmicznych), który ma pomóc w
+                rozwiązaniu.
+              </li>
+              <li>Treść zadania, która informuje, co należy zrobić </li>
+              <li>Twoja propozycja rozwiązania</li>
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
             </Font>
           </Paper>
@@ -339,6 +330,88 @@ const TeacherProfile = () => {
       </div>
 
       <div>
+      {isFormVisible && (
+        <Paper elevation={1} style={paperStyle}>
+          <h3>Dodaj zadanie</h3>
+          <form className={classes.root} noValidate autoComplete="off">
+            <TextField
+              id="outlined-basic"
+              label="Nazwa"
+              variant="outlined"
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+
+            <TextField
+              id="outlined-basic"
+              label="Wstęp teoretyczny"
+              fullWidth
+              value={introduction}
+              onChange={(e) => setIntroduction(e.target.value)}
+            />
+            <TextField
+              id="outlined-basic"
+              label="Treść"
+              variant="outlined"
+              fullWidth
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+            <Textarea
+              sx={{ backgroundColor: "#FDF5E6" }}
+              minRows={2}
+              id="outlined-basic"
+              label="Poprawne rozwiązanie"
+              placeholder="Poprawne rozwiązanie"
+              variant="outlined"
+              fullWidth
+              value={correctSolution}
+              onChange={(e) => setcorrectSolution(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <TextField
+              id="outlined-basic"
+              label="max ilość punktów"
+              variant="outlined"
+              fullWidth
+              value={maxPoints}
+              onChange={(e) => setmaxPoints(e.target.value)}
+            />
+
+            <FormControl fullWidth></FormControl>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Box display="flex" flexDirection="column" gap={2}>
+                <Button
+                  style={buttonStyle}
+                  variant="contained"
+                  color="secondary"
+                  onClick={addExercise}
+                >
+                  Dodaj
+                </Button>
+              </Box>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Box display="flex" flexDirection="column" gap={2}>
+                {WindowShown && <Toast message={infoMessage} />}
+              </Box>
+            </div>
+          </form>
+        </Paper>
+      )}
         {isExercises && (
           <Paper elevation={1} style={paperStyle}>
             <h3>Twoje zadania:</h3>
@@ -363,44 +436,44 @@ const TeacherProfile = () => {
                 >
                   <h3>{exercise.name}</h3>
                   <p>{exercise.content}</p>
-                  {!isFormTwoVisible && (
-                    <div>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          marginLeft: "auto",
-                        }}
-                      >
-                        <Button
-                          style={buttonStyle}
-                          variant="contained"
-                          value={exercise.id}
-                          color="inherit"
-                          onClick={deleteExercise}
-                        >
-                          Usuń
-                        </Button>
 
-                        <Button
-                          style={buttonStyle}
-                          variant="contained"
-                          value={index}
-                          color="inherit"
-                          onClick={showFormTwo}
-                        >
-                          Edytuj
-                        </Button>
-                      </div>
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        value={exercise.id}
+                        color="inherit"
+                        onClick={deleteExercise}
+                      >
+                        Usuń
+                      </Button>
+
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        value={index}
+                        color="inherit"
+                        onClick={showFormTwo}
+                      >
+                        Edytuj
+                      </Button>
                     </div>
-                  )}
+                  </div>
                 </div>
               </Paper>
             ))}
           </Paper>
         )}
       </div>
+     
       {isFormTwoVisible && (
         <Container>
           <Paper elevation={1} style={paperStyle}>
@@ -409,6 +482,7 @@ const TeacherProfile = () => {
               <TextField
                 id="outlined-basic"
                 label="Nazwa"
+                fullWidth
                 variant="outlined"
                 defaultValue={exercises[indexofExercise].name}
                 onChange={(e) => setName(e.target.value)}
@@ -418,6 +492,7 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="Treść"
                 variant="outlined"
+                fullWidth
                 defaultValue={exercises[indexofExercise].content}
                 onChange={(e) => setContent(e.target.value)}
               />
@@ -426,7 +501,7 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="Wstęp teoretyczny"
                 variant="outlined"
-             
+                fullWidth
                 defaultValue={exercises[indexofExercise].introduction}
                 onChange={(e) => setIntroduction(e.target.value)}
               />
@@ -437,7 +512,7 @@ const TeacherProfile = () => {
                 label="Poprawne rozwiązanie"
                 placeholder="Poprawne rozwiązanie"
                 variant="outlined"
-           
+                fullWidth
                 defaultValue={exercises[indexofExercise].correctSolution}
                 onChange={(e) => setcorrectSolution(e.target.value)}
               />
@@ -445,7 +520,7 @@ const TeacherProfile = () => {
                 id="outlined-basic"
                 label="max ilość punktów"
                 variant="outlined"
-            
+                fullWidth
                 defaultValue={exercises[indexofExercise].maxPoints}
                 onChange={(e) => setmaxPoints(e.target.value)}
               />
@@ -469,102 +544,13 @@ const TeacherProfile = () => {
                     Zmień
                   </Button>
                 </Box>
-              </div>
-            </form>
-          </Paper>
-        </Container>
-      )}
-      {isFormVisible && (
-        <div
-          className={classes.mainContainer}
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            padding: "0% 10% ",
-          }}
-        >
-          <Paper elevation={1} style={paperStyle}>
-            <h3>Dodaj zadanie</h3>
-            <form className={classes.root} noValidate autoComplete="off">
-              <TextField
-                id="outlined-basic"
-                label="Nazwa"
-                variant="outlined"
-                fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <TextField
-                id="outlined-basic"
-                label="Wstęp teoretyczny"
-                fullWidth
-                value={introduction}
-                onChange={(e) => setIntroduction(e.target.value)}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Treść"
-                variant="outlined"
-                fullWidth
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              />
-              <Textarea
-                sx={{ backgroundColor: "#FDF5E6" }}
-                minRows={2}
-                id="outlined-basic"
-                label="Poprawne rozwiązanie"
-                placeholder="Poprawne rozwiązanie"
-                variant="outlined"
-                fullWidth
-                value={correctSolution}
-                onChange={(e) => setcorrectSolution(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <TextField
-                id="outlined-basic"
-                label="max ilość punktów"
-                variant="outlined"
-                fullWidth
-                value={maxPoints}
-                onChange={(e) => setmaxPoints(e.target.value)}
-              />
-
-              <FormControl fullWidth></FormControl>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    onClick={addExercise}
-                  >
-                    Dodaj
-                  </Button>
-                </Box>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
                 <Box display="flex" flexDirection="column" gap={2}>
                   {WindowShown && <Toast message={infoMessage} />}
                 </Box>
               </div>
             </form>
           </Paper>
-        </div>
+        </Container>
       )}
     </div>
   );

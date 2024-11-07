@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
@@ -6,9 +7,9 @@ import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
-import { setLogin,setRole,setToken} from "./api/TokenService";
+import {  setToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
-import {classInfo} from "./MyParticles";
+import { classInfo } from "./MyParticles";
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Register(props) {
@@ -20,7 +21,7 @@ export default function Register(props) {
     gap: "1%",
     position: "relative",
     backgroundColor: "#FDF5E6",
-    textAlign: "center"
+    textAlign: "center",
   };
 
   const [name, setName] = useState("");
@@ -30,7 +31,7 @@ export default function Register(props) {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [psw, setPsw] = useState(false);
   const [errorMessage, seterrorMessage] = useState(false);
-  
+  const timeout = 3000;
   const handleShowPsw = () => setPsw((show) => !show);
   const handleHidePsw = (e) => {
     e.preventDefault();
@@ -38,120 +39,96 @@ export default function Register(props) {
   const classes = useStyles();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
-  const validateData =(e)=>
-  {
-
+  const navigate = useNavigate();
+  const validateData = () => {
     if (!email.includes("@")) {
       seterrorMessage("Podano zły adres email");
       seterrorInfoWindowShown(true);
       setTimeout(() => {
         seterrorInfoWindowShown(false);
-      }, 3000);
+      }, timeout);
       throw new Error(`Podano zły adres email!`);
     }
-    if (password!==passwordConfirm) {
+    if (password !== passwordConfirm) {
       seterrorMessage("Podane hasła różnią się");
       seterrorInfoWindowShown(true);
       setTimeout(() => {
         seterrorInfoWindowShown(false);
-      }, 3000);
+      }, timeout);
       throw new Error(`Podane hasła różnią się !`);
     }
-  }
+  };
   const register = (e) => {
-    
     e.preventDefault();
+    try {
+      validateData();
+    } catch (Error) {
+      return;
+    }
     classInfo.setmessage(false);
-  
-    
-    const role =
-      roles === 1
-        ? "TEACHER"
-        : "STUDENT";
-    const student = { name, email, password,role};
+    const role = roles === 1 ? "TEACHER" : "STUDENT";
+    const student = { name, email, password, role };
     const url = "http://localhost:8080/user/";
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student),
-    
-    }).then((response) => {
-      
-
-      
-      if (!response.ok) {
-        
-        const promise1 = Promise.resolve(response.body.getReader().read());
-
-        promise1.then((value) => {
-          const decoder = new TextDecoder("utf-8");
-          const text = decoder.decode(value.value);
-          seterrorMessage(text);
-        });
-        
-        setInfoWindowShown(false);
-        seterrorInfoWindowShown(true);
-        setTimeout(() => {
-          seterrorInfoWindowShown(false);
-        }, 3000);
-
-     
-      } else {
-      
-      
-        fetch("http://localhost:8080/user/authenticate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(student)
-        }).then((res) => {
-          if (res != null) {
-            if (res.status === 200) {
-            
-            const promise1 = Promise.resolve(res.body.getReader().read());
-    
-            promise1.then((value) => {
-              const decoder = new TextDecoder("utf-8");
-              const token = decoder.decode(value.value);
-              const token_dict = JSON.parse(token)
-              setToken(token_dict['jwtToken']);
-              console.log(token_dict['jwtToken']);
-            });
-          } else {
-            //TO DO error
-          }
-        }});
-        
-
-   
-        setInfoWindowShown(true);
-        setTimeout(() => {
+    })
+      .then((response) => {
+        if (!response.ok) {
+          const promise1 = Promise.resolve(response.body.getReader().read());
+          promise1.then((value) => {
+            const decoder = new TextDecoder("utf-8");
+            const text = decoder.decode(value.value);
+            seterrorMessage(text);
+          });
           setInfoWindowShown(false);
-            setLogin(email);
-   
-        if(roles === 1)
-        	setRole("Teacher");
-        else setRole("Student");
-          setName("");
-          setEmail("");
-          setPassword("");
-          setPasswordConfirm("");
-        
-        }, 3000);
-        
-      
-      }
-    }).catch((error)=>
-    {
-      console.log(error);
-    	classInfo.setmessage(false);
-    	seterrorMessage("Błąd połączenia");
+          seterrorInfoWindowShown(true);
+          setTimeout(() => {
+            seterrorInfoWindowShown(false);
+          }, timeout);
+        } else {
+          fetch("http://localhost:8080/user/authenticate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(student),
+          }).then((res) => {
+            if (!res.ok) {
+              seterrorMessage("Błąd rejestracji, spróbuj ponownie.");
+              setInfoWindowShown(false);
+              seterrorInfoWindowShown(true);
+              setTimeout(() => {
+                seterrorInfoWindowShown(false);
+              }, timeout);
+            } else {
+              const promise1 = Promise.resolve(res.body.getReader().read());
+              promise1.then((value) => {
+                const decoder = new TextDecoder("utf-8");
+                const token = decoder.decode(value.value);
+                const token_dict = JSON.parse(token);
+                setInfoWindowShown(true);
+                setTimeout(() => {
+                  setInfoWindowShown(false);     
+                  setToken(token_dict["jwtToken"]);
+                  navigate("/profil"); 
+                }, timeout);
+                
+              });
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        classInfo.setmessage(false);
+        seterrorMessage("Błąd połączenia");
         setInfoWindowShown(false);
         seterrorInfoWindowShown(true);
         setTimeout(() => {
           seterrorInfoWindowShown(false);
-        }, 3000);
-    });
-  };  
+        }, timeout);
+      });
+  };
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
@@ -162,7 +139,7 @@ export default function Register(props) {
       <div id="sthelse">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-            <div style = {{fontSize:"large"  ,marginBottom:"8%"}}>
+            <div style={{ fontSize: "large", marginBottom: "8%" }}>
               <img
                 src={"/logo.svg"}
                 alt="Logo"
@@ -180,14 +157,15 @@ export default function Register(props) {
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) =>{ setName(e.target.value);
-                	if(e.target.value!=='')
-                		classInfo.setmessage(true);
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (e.target.value !== "") classInfo.setmessage(true);
                 }}
-                sx={{ marginBottom: "16px", 
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'red' 
-                  }
+                sx={{
+                  marginBottom: "16px",
+                  "&.Mui-focused fieldset": {
+                    borderColor: "red",
+                  },
                 }}
               />
               <TextField
@@ -218,7 +196,7 @@ export default function Register(props) {
                   </InputAdornment>
                 }
               />
-                <FilledInput
+              <FilledInput
                 value={passwordConfirm}
                 placeholder="Potwierdzenie hasła"
                 onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -237,7 +215,9 @@ export default function Register(props) {
                   </InputAdornment>
                 }
               />
-              <div><p>Wybierz, jaką rolę będziesz pełnić:</p></div>
+              <div>
+                <p>Wybierz, jaką rolę będziesz pełnić:</p>
+              </div>
               <FormControl fullWidth>
                 <InputLabel id="role-label">Rola</InputLabel>
                 <Select
