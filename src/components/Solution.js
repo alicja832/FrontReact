@@ -119,8 +119,8 @@ export default function Solution({ task }) {
   };
 
   const save = () => {
-    var studentEmail = user.email;
-    const solution = { solutionContent, exercise, studentEmail, score, output };
+    var student = null;
+    const solution = { solutionContent, exercise, student, score, output };
     fetch("http://localhost:8080/exercise/solution", {
       method: "POST",
       headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"  },

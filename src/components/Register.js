@@ -110,7 +110,9 @@ export default function Register(props) {
                 setTimeout(() => {
                   setInfoWindowShown(false);     
                   setToken(token_dict["jwtToken"]);
-                  navigate("/profil"); 
+                }, timeout);
+                setTimeout(() => {
+                  navigate('/profil');    
                 }, timeout);
                 
               });

@@ -48,7 +48,7 @@ const StudentProfile = (user) => {
     navigate("/solutionRetake/:" + e.target.value);
   };
   const click=()=>{
-    fetch("http://localhost:8080/exercise/solutions/", {
+    fetch("http://localhost:8080/exercise/solutions", {
       headers: { Authorization:`Bearer ${getToken()}`},
       method: "GET"
     })

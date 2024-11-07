@@ -22,7 +22,7 @@ export default function Logout(){
       setToken(null);
     
     }
-    navigate("/register");
+    navigate("/");
   },[]);
   
   function Toast({ message }) {

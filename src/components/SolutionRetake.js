@@ -6,12 +6,14 @@ import {
   Typography,
   Button,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
 import MyParticles from "./MyParticles";
 import Font from "react-font";
+import { classInfo } from "./MyParticles";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -24,34 +26,22 @@ const useStyles = makeStyles({
   },
   textFieldContainer: {
     position: "relative",
-    width: "700px",
-    border: "4px",
+    width: "90%",
+    padding: " 2% 5%",
+    border: "1%",
     borderStyle: "solid",
-    borderColor: "blue",
-    height: "900px",
+    borderColor: "white",
     backgroundColor: "grey",
     display: "flex",
     fontWeight: "bold",
     alignItems: "center",
     gap: "1%",
   },
-
-  textFxx: {
-    position: "relative",
-    width: "600px",
-    border: "1px",
-    borderStyle: "solid",
-    borderColor: "blue",
-    height: "100px",
-    backgroundColor: "white",
-    color: "black",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
   textField: {
     position: "relative",
-    height: "70%",
+    height: "500px",
+    width: "100%",
+    marginLeft: "5%",
     backgroundColor: "#000",
     color: "#fff",
     "& .MuiInputBase-input": {
@@ -61,26 +51,29 @@ const useStyles = makeStyles({
       color: "#fff",
     },
   },
+  headerContainer: {
+    display: "flex",
+    alignItems: "center",
+    margin: "2%",
+    gap: "20px",
+    position: "relative",
+  },
   button: {
     position: "relative",
     color: "#fff",
     backgroundColor: "#000",
-    "&:hover": {
-      backgroundColor: "#333",
-    },
   },
   output: {
     position: "relative",
-    backgroundColor: "#000",
-    color: "#fff",
-    padding: "10px",
-    height: "30%",
+    backgroundColor: "#000 !important",
+    color: "#fff !important",
+    padding: "1%",
     width: "100%",
-    marginTop: "10px",
-    display: "flex",
-    alignItems: "center",
+    marginTop: "1%",
+    display: "block",
     justifyContent: "center",
-    textAlign: "center",
+    flexDirection: "row",
+    fontWeight: "lighter",
   },
 });
 
@@ -101,14 +94,16 @@ export default function SolutionRetake({ task }) {
   };
 
   const classes = useStyles();
+  const [isOutput, setisOutput] = useState(false);
   const [solution, setSolution] = useState(null);
   const [exercise, setExercise] = useState(null);
-  const [studentEmail, setStudentEmail] = useState(null);
   const [solutionContent, setSolutionContent] = useState("");
   const [output, setOutput] = useState("");
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
+  const [student, setStudent] = useState(null);
+  const [outputs, setOutputs] = useState([]);
 
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
@@ -133,19 +128,21 @@ export default function SolutionRetake({ task }) {
 
   const save = () => {
     const id = solution.id;
-    setStudentEmail(getToken());
     const updatesolution = {
       id,
       solutionContent,
       exercise,
-      studentEmail,
+      student,
       score,
       output,
     };
 
     fetch("http://localhost:8080/exercise/solution", {
       method: "PUT",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(updatesolution),
     })
       .then((res) => res.text())
@@ -155,55 +152,65 @@ export default function SolutionRetake({ task }) {
       })
       .catch((error) => {
         console.error("Error:", error);
-        setinfoMessage("Błąd!");
+        setinfoMessage("Błąd zapisu!");
       });
   };
-  const handleButtonClick = () => {
-    console.log(solutionContent);
+  const runCode = () => {
+    setisOutput(true);
+    classInfo.setmessage(false);
     fetch("http://localhost:8080/exercise/interpreter", {
       method: "POST",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
-      body: JSON.stringify(solutionContent),
+      headers: { "Content-Type": "application/json" },
+      body: solutionContent,
     })
       .then((res) => res.text())
       .then((result) => {
+        console.log(result);
         setOutput(result);
+        setOutputs(result.split("\n"));
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.log(error);
+        setOutput("Error occurred");
       });
   };
+
   const check = () => {
-    const solution = { solutionContent, exercise, studentEmail, score, output };
+    var student = null;
+    setisOutput(true);
+    const solution = { solutionContent, exercise, student, score, output };
+    console.log(outputs);
     fetch("http://localhost:8080/exercise/check", {
       method: "POST",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
     })
       .then((res) => res.text())
       .then((result) => {
         setScore(result);
-        setinfoMessage("Twój wynik to: " + result.toString());
+        setinfoMessage("Twój wynik to " + result.toString() + " pkt");
         setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3000);
+        return;
       })
       .catch((error) => {
         console.error("Error:", error);
-        setinfoMessage("Błąd !");
       });
-
-
   };
 
   useEffect(() => {
     fetch("http://localhost:8080/exercise/solution/" + task, {
       method: "GET",
-      headers: { Authorization:`Bearer ${getToken()}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((result) => {
         setSolution(result[0]);
         setExercise(result[0].exercise);
-        setStudentEmail(result[0].studentEmail);
+        setStudent(result[0].student);
+        setSolutionContent(result[0].solutionContent);
       })
       .catch((error) => console.error("Error fetching students:", error));
   }, []);
@@ -222,10 +229,15 @@ export default function SolutionRetake({ task }) {
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "flex-start",
-              padding: "10%",
+              padding: "3%",
             }}
           >
-            <div style={{ flexBasis: "60%", flexDirection: "column" }}>
+            {!exercise && (
+              <div>
+                <CircularProgress />
+              </div>
+            )}
+            <div style={{ flexBasis: "40%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
                 <Font family="tahoma">
@@ -233,52 +245,70 @@ export default function SolutionRetake({ task }) {
                 </Font>
               </Paper>
               <Paper elevation={3} style={paperStyle}>
-                <p>{exercise.content}</p>
-                <p>Maksymalna ilość punktów: {exercise.maxPoints}</p>
-                <p>Oczekiwane wyjście programu: {exercise.correctOutput}</p>
+                <Font family="sans-serif">
+                  <p>{exercise.content}</p>
+                </Font>
+                <h4>Maksymalna ilość punktów: </h4>
+                <p> {exercise.maxPoints} </p>
+                <h4>Oczekiwane wyjście programu:</h4>
+                <p> {exercise.correctOutput}</p>
               </Paper>
             </div>
             <div
               className={classes.textFieldContainer}
-              style={{ flexDirection: "column", flexBasis: "40%" }}
+              style={{
+                flexDirection: "column",
+                flexBasis: "60%",
+                marginTop: "2%",
+              }}
             >
-              <TextField
-                className={classes.textField}
-                variant="outlined"
-                defaultValue={solution.solutionContent}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                fullWidth
-                multiline
-                maxRows={15}
-              />
-              <IconButton
-                className={classes.button}
-                onClick={handleButtonClick}
-                aria-label="submit"
+              <h3>Konsola dla Python 2.7</h3>
+              <div
+                className={classes.textFieldContainer}
+                style={{
+                  flexDirection: "column",
+                  flexBasis: "55%",
+                  marginTop: "2%",
+                  backgroundColor: "black",
+                }}
               >
-                <div>
-                  <ArrowForwardIcon />
-                </div>
-              </IconButton>
-              <Paper className={classes.output}>
-                <Typography>{output}</Typography>
-              </Paper>
-              <Box display="flex" flexDirection="column" gap={2}>
+                <TextField
+                  className={classes.textField}
+                  InputProps={{
+                    disableUnderline: true,
+                  }}
+                  
+                  variant="standard"
+                  defaultValue={solution.solutionContent}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  fullWidth
+                  multiline
+                  maxRows={15}
+                />
+              </div>
+              <div className={classes.headerContainer}>
+                <Button
+                  style={{ backgroundColor: "#adff2f" }}
+                  variant="contained"
+                  color="secondary"
+                  onClick={runCode}
+                >
+                  Wykonaj kod
+                </Button>
+
                 <Button
                   style={{ backgroundColor: "#001f3f" }}
                   variant="contained"
                   color="secondary"
                   onClick={check}
                 >
-                  Sprawdz
+                  Sprawdź
                 </Button>
-              </Box>
-              <Box display="flex" flexDirection="column" gap={2}>
-                {infoWindowShown && <Toast message={infoMessage} />}
-              </Box>
-              <Box display="flex" flexDirection="column" gap={2}>
-                {getToken() === "Student" && (
+
+                <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
+
+                <Box display="inline" flexDirection="column" gap={2}>
                   <Button
                     style={{ backgroundColor: "#001f3f" }}
                     variant="contained"
@@ -287,8 +317,15 @@ export default function SolutionRetake({ task }) {
                   >
                     Zapisz rozwiązanie
                   </Button>
-                )}
-              </Box>
+                </Box>
+              </div>
+              {isOutput && (
+                <Paper multiline="true" className={classes.output}>
+                  {outputs.map((element, index) => (
+                    <p key={index}>{element}</p>
+                  ))}
+                </Paper>
+              )}
             </div>
           </div>
         }
