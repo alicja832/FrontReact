@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { Container, Button, Box } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
+import CircularProgress from "@mui/joy/CircularProgress";
+import studentlogo from "../student.jpeg";
 import Font from "react-font";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import Profile from "./Profile";
-
 const useStyles = makeStyles({
   points: {
     width: "30px",
@@ -39,98 +37,200 @@ const StudentProfile = (user) => {
     width: 600,
     margin: "20px auto",
     position: "relative",
+    textAlign: "center",
+  };
+  const paperStyleTwo = {
+    padding: "3% 3%",
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#FDF5E6",
+    borderRadius: "10px",
+    textAlign: "center",
+    textShadow: "1px 1px 2px black",
   };
   const buttonStyle = { backgroundColor: "#001f3f", color: "white" };
   const [exercisesWithScores, setExercisesWithScores] = useState([]);
-  const [buttonExercise, setbuttonExercise] = useState(true);
   const [student, setStudent] = useState(null);
   const retake = (e) => {
+    //tutaj jestem za tym zeby przeniesc rzeczy wszystkie pobrane jako propsy
     navigate("/solutionRetake/:" + e.target.value);
   };
-  const click=()=>{
+  const click = () => {
     fetch("http://localhost:8080/exercise/solutions", {
-      headers: { Authorization:`Bearer ${getToken()}`},
-      method: "GET"
+      headers: { Authorization: `Bearer ${getToken()}` },
+      method: "GET",
     })
       .then((res) => res.json())
-      .then((result) => { 
-        if (result.length !== 0) setbuttonExercise(false);
-        console.log("Fetched students:", result); // Dodaj t
+      .then((result) => {
+        console.log(result);
         setExercisesWithScores(result);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  }
-  
+  };
+
   useEffect(() => {
     setStudent(user.user);
-    console.log(user.user.name);
-   
-  });
-
-  if (!student) {
-    return <div>Loading...</div>;
-  }
+    console.log(user.user);
+    click();
+  }, [student]);
+  if (!student)
+    return (
+      <div>
+        <CircularProgress />
+      </div>
+    );
 
   return (
     <div>
-      <MyParticles></MyParticles>
-      <div id="sthelse">
-        <Container>
+      <div
+        className={classes.mainContainer}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          padding: "10%",
+        }}
+      >
+        <div
+          style={{ display: "flex", flexBasis: "60%", flexDirection: "column" }}
+        >
           <Paper elevation={1} style={paperStyle}>
-            <div>
-              <AccountBoxIcon sx={{ margin: "1px" }} />
-              <Font family="tahoma">
-                <h2>Profil ucznia</h2>
-                <p>{student.name}</p>
-              </Font>
-            </div>
-          </Paper>
-          <Paper elevation={1} style={paperStyle}>
-            <div>
-              <Font family="tahoma">
-                <h2>Twoje dane</h2>
-              </Font>
-              <p>{student.email}</p>
-              <Font family="tahoma">
-                <h2>Twój wynik</h2>
-              </Font>
-              <Box className={classes.points}>{student.score}</Box>
-            </div>
-            <button onClick = {click}></button>
-          </Paper>
-          {
-            <Paper elevation={1} style={paperStyle}>
-             
-              {exercisesWithScores.length!==0 && exercisesWithScores.map((exercise) => (
-                <Paper
-                  elevation={6}
-                  style={{ margin: "10px", padding: "15px", textAlign: "left" }}
-                  key={exercise.id}
-                >
-                  <div className={classes.headerContainer}>
-                    <h3> {exercise.name}</h3>
-                    <p>Twój wynik:</p>
-                    <Box className={classes.points}>{exercise.score}</Box>
-                  </div>
+            <div
+              className={classes.mainContainer}
+              style={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexBasis: "60%",
+                }}
+              >
+                <Font family="tahoma">
+                  <h2>Profil ucznia:</h2>
+                  <p>{student.name}</p>
+                  <p>{student.email}</p>
+                  <h4>Twój wynik:</h4>
+                  <p>{student.score}</p>
+                </Font>
+              </div>
 
-                  <div>
-                    <Box display="flex" flexDirection="column" gap={2}>
-                      <Button
-                        style={{ backgroundColor: "#001f3f" }}
-                        variant="contained"
-                        value={parseInt(exercise.id)}
-                        onClick={retake}
-                        color="secondary"
-                      >
-                        Wykonaj ponownie
-                      </Button>
-                    </Box>
-                  </div>
+              <div
+                className={classes.textFieldContainer}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexBasis: "40%",
+                }}
+              >
+                <Paper elevation={3}>
+                  <img
+                    src={studentlogo}
+                    alt="Logo"
+                    style={{
+                      height: "140px",
+                      width: "200px",
+                      verticalAlign: "middle",
+                      marginRight: "10px",
+                    }}
+                  />
                 </Paper>
-              ))}
-            </Paper>
-          }
-        </Container>
+              </div>
+            </div>
+          </Paper>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexBasis: "40%",
+          }}
+        >
+          <Paper elevation={1} style={paperStyleTwo}>
+            <Font family="sans-serif">
+              <h3>Jako uczeń możesz rozwiązywać zadania:</h3>
+              <h4>Na zadanie składa się:</h4>
+
+              <li>
+                Wstęp teoretyczny informujący, jakich zagadnień teoretycznych ma
+                dotyczyć zadanie (zarówno teoria samego języka programowania jak
+                i teoria z zagadnień algorytmicznych), który ma pomóc w
+                rozwiązaniu.
+              </li>
+              <li>Treść zadania, która informuje, co należy zrobić </li>
+              <li>Twoja propozycja rozwiązania</li>
+              <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
+              <h3>Możesz także poprawiać swoje rozwiązania</h3>
+            </Font>
+          </Paper>
+        </div>
+      </div>
+
+      <div>
+        {exercisesWithScores.length != 0 && (
+          <Paper elevation={1} style={paperStyle}>
+            <h3>Zadania, które rozwiązałeś:</h3>
+            {exercisesWithScores.map((solution, index) => (
+              <Paper
+                elevation={6}
+                style={{
+                  margin: "10px",
+                  padding: "15px",
+                  textAlign: "left",
+                }}
+                key={solution.id}
+              >
+                <div
+                  className={classes.headerContainer}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <p>{solution.name}</p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    <p>Twój wynik:</p>
+                  </div>
+                  <Box className={classes.points}>{solution.score}</Box>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      value={solution.id}
+                      color="inherit"
+                      onClick={retake}
+                    >
+                      Wykonaj ponownie
+                    </Button>
+                  </div>
+                </div>
+              </Paper>
+            ))}
+          </Paper>
+        )}
       </div>
     </div>
   );

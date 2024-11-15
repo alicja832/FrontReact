@@ -1,9 +1,8 @@
 import React from "react";
-import { useState } from "react";
-import { Container, Paper, Button, Box } from "@mui/material";
-import MyParticles from "./MyParticles";
+import { Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import Font from "react-font";
+import Console from "./semi-components/Console";
 
 export default function Home() {
   const paperStyle = {
@@ -17,15 +16,6 @@ export default function Home() {
     borderRadius: "10px",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
-  };
-  const paperSS = {
-    width: "60%",
-    margin: "1% auto",
-    height: "50%",
-    position: "relative",
-    backgroundColor: "#000",
-    textAlign: "left",
-    padding: "1%",
   };
 
   const paperStyleTwo = {
@@ -52,32 +42,28 @@ export default function Home() {
 
   return (
     <div>
-      <MyParticles></MyParticles>
-
       <div id="sthelse">
-      
-          <Paper elevation={3} style={paperStyle}>
-            <Font family="tahoma"></Font>
-            <h1>Lekcje podstaw algorytmiki w języku Python</h1>
-            <Font family="sans-serif">
-              <p>
-                Jako nauczyciel możesz dodawać zadania wraz z opisem
-                teoretycznym, jako uczeń możesz je rozwiązywać.
-                <br />
-                Możesz nauczyć się języka poprzez praktykę!
-              </p>
-            </Font>
+        <Paper elevation={3} style={paperStyle}>
+          <Font family="tahoma"></Font>
+          <h1>Lekcje podstaw algorytmiki w języku Python</h1>
+          <Font family="sans-serif">
+            <p>
+              Jako nauczyciel możesz dodawać zadania wraz z opisem teoretycznym,
+              jako uczeń możesz je rozwiązywać.
+              <br />
+              Możesz nauczyć się języka poprzez praktykę!
+            </p>
+          </Font>
 
-            <Button
-              component={Link}
-              to={"/register"}
-              variant="contained"
-              style={{ backgroundColor: "#001f3f" }}
-            >
-              Rozpocznij naukę
-            </Button>
-          </Paper>
-    
+          <Button
+            component={Link}
+            to={"/register"}
+            variant="contained"
+            style={{ backgroundColor: "#001f3f" }}
+          >
+            Rozpocznij naukę
+          </Button>
+        </Paper>
 
         <div className="right-container">
           <Paper elevation={3} style={paperStyleTwo}>
@@ -105,46 +91,11 @@ export default function Home() {
             </Button>
           </Paper>
           <Paper elevation={3} style={paperStyleThree}>
-            <Paper elevation={3} style={paperSS}>
-              <span style={{ color: "#6495ed" }}>def </span>
-              <span style={{ color: "#FFF59D" }}>fun</span>
-              <span style={{ color: "#FFD600" }}>()</span>
-              <span style={{ color: "white" }}>:</span>
-
-              <br />
-              <span style={{ color: "#FFF59D", paddingLeft: "6%" }}>print</span>
-              <span style={{ color: "#FFD600" }}>(</span>
-              <span style={{ color: "orange" }}>"Hello world"</span>
-              <span style={{ color: "#FFD600" }}>)</span>
-              <br />
-              <span style={{ color: "#6495ed" }}>class </span>
-              <span style={{ color: "#32cd32" }}>Wektor:</span>
-              <br />
-              <span style={{ color: "#6495ed", paddingLeft: "6%" }}>def </span>
-              <span style={{ color: "#FFF59D" }}>__init__</span>
-              <span style={{ color: "#FFD600" }}>(</span>
-              <span style={{ color: "#87cefa" }}>self,x,y</span>
-              <span style={{ color: "#FFD600" }}>):</span>
-
-              <br />
-              <span style={{ color: "#6495ed", paddingLeft: "12%" }}>self</span>
-              <span style={{ color: "white" }}>.x=x</span>
-              <br />
-              <span style={{ color: "#6495ed", paddingLeft: "12%" }}>self</span>
-              <span style={{ color: "white" }}>.y=y</span>
-              <br />
-              <span style={{ color: "white" }}>fun</span>
-              <span style={{ color: "#FFD600" }}>()</span>
-              <br />
-              <span style={{ color: "white" }}>wektor = Wektor</span>
-              <span style={{ color: "#FFD600" }}>(</span>
-              <span style={{ color: "#FFF59D" }}>1,2</span>
-              <span style={{ color: "#FFD600" }}>)</span>
-            </Paper>
-
+            <Console />
             <Font family="tahoma">
               <h1> Zdobądź wiedzę i rozwiązuj zadania z łatwością! </h1>
             </Font>
+
             <Font family="sans-serif">
               <p>
                 Każde zadanie w aplikacji zaczyna się od wprowadzenia

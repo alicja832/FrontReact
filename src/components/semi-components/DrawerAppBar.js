@@ -14,8 +14,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import { getToken } from "./api/TokenService";
-import AccountBoxIcon from "@mui/icons-material/AccountBox"; //import logo from '/logo.svg';
+import { getToken } from "../api/TokenService";
+import AccountBoxIcon from "@mui/icons-material/AccountBox"; 
 import Font from "react-font";
 
 export default function DrawerAppBar(register, props) {

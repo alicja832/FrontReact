@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { Paper, Button, Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { getToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
-import CircularProgress from "@mui/joy/CircularProgress"
+import CircularProgress from "@mui/joy/CircularProgress";
+import "./Exercise.css";
+
 const useStyles = makeStyles({
   points: {
     width: "30px",
@@ -27,11 +28,15 @@ const useStyles = makeStyles({
     gap: "20px",
     position: "relative",
   },
+  check:{
+    display : "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginLeft: "auto",
+  },
 });
 
 export default function Exercise() {
-  
- 
   const paperStyle = {
     top: "4em",
     padding: "4% 4%",
@@ -40,79 +45,61 @@ export default function Exercise() {
     gap: "1%",
     position: "relative",
     backgroundColor: "#FDF5E6",
-    textAlign: "center"
+    textAlign: "center",
   };
   const classes = useStyles();
   const [exercises, setExercises] = useState([]);
-  const [isExercises, setisExercises] = useState(false); 
+  const [isExercises, setisExercises] = useState(false);
   const navigate = useNavigate();
   const openSolution = (e) => {
     navigate("/solution/:" + e.target.value);
   };
-//teraz endpointy nie beda wymagac emaila jako pathvariable - wystarczy tylko wziac dane z tokenu
   useEffect(() => {
-   
     if (getToken()) {
-      fetch("http://localhost:8080/exercise/" ,{
+      fetch("http://localhost:8080/exercise/", {
         method: "GET",
-        headers: { Authorization:`Bearer ${getToken()}`},
-      })  
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
         .then((res) => res.json())
         .then((result) => {
-          console.log("Fetched students:", result);
+          console.log(result);
           setExercises(result);
-          if (result.length !== 0) setisExercises(true);
         })
         .catch((error) => console.error("Error:", error));
     } else {
-      fetch("http://localhost:8080/exercise/"
-      )
+      fetch("http://localhost:8080/exercise/")
         .then((res) => res.json())
         .then((result) => {
           setExercises(result);
           console.log(result);
-          if (result.length !== 0)  
-          setisExercises(true);
-        }).catch((error) => console.error("Error:", error));
+          if (result.length !== 0) setisExercises(true);
+        })
+        .catch((error) => console.error("Error:", error));
     }
   }, []);
 
   return (
     <div>
-      <MyParticles></MyParticles>
       <div className={classes.container}>
-      <Paper style={paperStyle}>
-      <div >
-        {!isExercises && (<CircularProgress/>)}
-        {isExercises && (
-      
-            exercises.map((exercise) => (
-              <Paper
-                elevation={6}
-                style={{ padding: "15px", textAlign: "left" }}
-                key={exercise.key.id}
-              >
-                <div
-                  className={classes.headerContainer}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
+        <Paper style={paperStyle}>
+          <div>
+            {!exercises.length && <CircularProgress />}
+            {exercises.length>0 &&
+              exercises.map((exercise) => (
+                <Paper
+                  elevation={6}
+                  style={{ padding: "15px", textAlign: "left" }}
+                  key={exercise.key.id}
                 >
-                  <h3>{exercise.key.name}</h3>
-                   <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft: "auto",
-                      }}
-                    >
-                  <p>Punkty do zdobycia:</p>
-                  </div>
-                  <Box className={classes.points}>{exercise.key.maxPoints}</Box>
-                  {exercise.value ? (
+                  <div
+                    className={classes.headerContainer}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <h3>{exercise.key.name}</h3>
                     <div
                       style={{
                         display: "flex",
@@ -121,30 +108,35 @@ export default function Exercise() {
                         marginLeft: "auto",
                       }}
                     >
-                      <CheckIcon />
-                      <span>Zrobione</span>
+                      <p>Punkty do zdobycia:</p>
                     </div>
-                  ) : null}
-                </div>
-		
-                <div>
-                  <Box display="flex" flexDirection="column" gap={2}>
-                    <Button
-                      variant="contained"
-                      value={exercise.key.id}
-                      style={{ backgroundColor: "#001f3f" }}
-                      onClick={openSolution}
-                    >
-                      Wykonaj
-                    </Button>
-                  </Box>
-                </div>
-              </Paper>
-            ))
-        
-        )}
-      </div>
-      </Paper>
+                    <Box className={classes.points}>
+                      {exercise.key.maxPoints}
+                    </Box>
+                    {exercise.value ? (
+                      <div className={classes.check}>
+                        <CheckIcon />
+                        <span>Zrobione</span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <Box display="flex" flexDirection="column" gap={2}>
+                      <Button
+                        variant="contained"
+                        value={exercise.key.id}
+                        style={{ backgroundColor: "#001f3f" }}
+                        onClick={openSolution}
+                      >
+                        Wykonaj
+                      </Button>
+                    </Box>
+                  </div>
+                </Paper>
+              ))}
+          </div>
+        </Paper>
       </div>
     </div>
   );

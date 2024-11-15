@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { TextField, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
 import Font from "react-font";
-import { classInfo } from "./MyParticles";
+import { classInfo } from "./semi-components/MyParticles";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -212,7 +211,6 @@ export default function Solution({ task }) {
 
   return (
     <div>
-      <MyParticles></MyParticles>
       <div>
         {
           <div
@@ -298,7 +296,7 @@ export default function Solution({ task }) {
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
 
                 <Box display="inline" flexDirection="column" gap={2}>
-                  {(user && user.role==="STUDENT") && (
+                  {(user && user.score>=0) && (
                     <Button
                       style={{ backgroundColor: "#001f3f" }}
                       variant="contained"

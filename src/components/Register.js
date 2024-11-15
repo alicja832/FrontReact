@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
@@ -7,11 +7,10 @@ import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
-import {  setToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
-import { classInfo } from "./MyParticles";
-const useStyles = makeStyles((theme) => ({}));
+import {  setToken,setRefreshToken,setExpirationDate ,getToken} from "./api/TokenService";
+import { classInfo } from "./semi-components/MyParticles";
 
+const useStyles = makeStyles((theme) => ({}));
 export default function Register(props) {
   const paperStyle = {
     top: "4em",
@@ -59,6 +58,7 @@ export default function Register(props) {
     }
   };
   const register = (e) => {
+    
     e.preventDefault();
     try {
       validateData();
@@ -106,15 +106,16 @@ export default function Register(props) {
                 const decoder = new TextDecoder("utf-8");
                 const token = decoder.decode(value.value);
                 const token_dict = JSON.parse(token);
+                console.log(token_dict["jwtExpirationDate"]);
                 setInfoWindowShown(true);
                 setTimeout(() => {
                   setInfoWindowShown(false);     
                   setToken(token_dict["jwtToken"]);
+                  setRefreshToken(token_dict["refreshToken"]);
+                  setExpirationDate(token_dict["jwtExpirationDate"]);
+                 
                 }, timeout);
-                setTimeout(() => {
-                  navigate('/profil');    
-                }, timeout);
-                
+                navigate('/profil');
               });
             }
           });
@@ -123,7 +124,7 @@ export default function Register(props) {
       .catch((error) => {
         console.log(error);
         classInfo.setmessage(false);
-        seterrorMessage("Błąd połączenia");
+        seterrorMessage("Błąd połączenia z serwerem");
         setInfoWindowShown(false);
         seterrorInfoWindowShown(true);
         setTimeout(() => {
@@ -131,13 +132,14 @@ export default function Register(props) {
         }, timeout);
       });
   };
+
+  
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
 
   return (
     <div>
-      <MyParticles></MyParticles>
       <div id="sthelse">
         <Container>
           <Paper elevation={3} style={paperStyle}>

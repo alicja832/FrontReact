@@ -1,11 +1,8 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Container, Paper, Button, Box } from "@mui/material";
-import MyParticles from "./MyParticles";
-import Register from "./Register";
-import { Link } from "react-router-dom";
+import {  Paper, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import Font, { Text } from "react-font";
+import Font from "react-font";
 
 const useStyles = makeStyles({
   points: {
@@ -65,7 +62,6 @@ export default function Ranking() {
 
   return (
     <div>
-      <MyParticles></MyParticles>
       <div id="#sthelse">
         {isPersons && (
           <Paper elevation={3} style={paperStyle}>

@@ -277,7 +277,7 @@ const MyParticles = (props) => {
             }
           }
         } else {
-          //tutaj mozna zrobic tak ze one sie tak xd wymieniają   ctx.bezierCurveTo(150, 50, 350, 350, 400, 200); tą funkcją
+          
           context.strokeStyle = "#6495ED";
           context.beginPath();
           context.moveTo(halfwidth - between, halfheight*2 - frameCount);

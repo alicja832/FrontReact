@@ -5,9 +5,9 @@ import { Container, Paper, Button, Box } from "@mui/material";
 import { FormControl } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { getToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
 import Font from "react-font";
-import { classInfo } from "./MyParticles";
+import { classInfo } from "./semi-components/MyParticles";
+import teacherlogo from '../teacher.jpeg'; 
 
 const useStyles = makeStyles((theme) => ({
   points: {
@@ -41,7 +41,23 @@ const TeacherProfile = (user) => {
     margin: "3% auto",
     position: "relative",
     textAlign: "center",
-  };
+  };  
+  const paperStyleX = {
+    backgroundColor: "#FDF5E6",
+    padding: "2%",
+    width: "90%",
+    margin: "3% auto",
+    position: "relative",
+    textAlign: "center",
+  };  
+  const paperStyleThree = {
+    backgroundColor: "#FDF5E6",
+    padding: "2%",
+    width: "60%",
+    margin: "3% auto",
+    position: "relative",
+    textAlign: "center",
+  };  
   const paperStyleTwo = {
     padding: "3% 3%",
     width: "100%",
@@ -211,8 +227,8 @@ const TeacherProfile = (user) => {
   };
 
   useEffect(() => {
+  
     setTeacher(user.user);
-
     fetch("http://localhost:8080/user/exercises/", {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -224,9 +240,7 @@ const TeacherProfile = (user) => {
         console.log(result);
       });
   }, []);
-  function handleChange(event) {
-    setFile(event.target.files[0]);
-  }
+ 
 
   if (!teacher) {
     return <div>Loading...</div>;
@@ -236,7 +250,6 @@ const TeacherProfile = (user) => {
   }
   return (
     <div>
-      <MyParticles></MyParticles>
 
       <div
         className={classes.mainContainer}
@@ -280,8 +293,18 @@ const TeacherProfile = (user) => {
                   flexBasis: "40%",
                 }}
               >
-                <img src={"/userIcon.svg"} />
-                <h1>Dodaj zdjęcie</h1>
+                <Paper elevation={3}>
+               <img
+                src={teacherlogo}
+                alt="Logo"
+                style={{
+                  height: "140px",
+                  width: "200px",
+                  verticalAlign: "middle",
+                  marginRight: "10px",
+                }}
+              />
+              </Paper>
               </div>
             </div>
             <Box
@@ -331,7 +354,7 @@ const TeacherProfile = (user) => {
 
       <div>
       {isFormVisible && (
-        <Paper elevation={1} style={paperStyle}>
+        <Paper elevation={1} style={paperStyleThree}>
           <h3>Dodaj zadanie</h3>
           <form className={classes.root} noValidate autoComplete="off">
             <TextField
@@ -343,15 +366,19 @@ const TeacherProfile = (user) => {
               onChange={(e) => setName(e.target.value)}
             />
 
-            <TextField
+          <Textarea 
               id="outlined-basic"
+              minRows={2}
               label="Wstęp teoretyczny"
+              placeholder="Wstęp teoretyczny"
               fullWidth
+              variant="outlined"
               value={introduction}
               onChange={(e) => setIntroduction(e.target.value)}
             />
-            <TextField
+             <Textarea
               id="outlined-basic"
+              minRows={2}
               label="Treść"
               variant="outlined"
               fullWidth
@@ -359,7 +386,7 @@ const TeacherProfile = (user) => {
               onChange={(e) => setContent(e.target.value)}
             />
             <Textarea
-              sx={{ backgroundColor: "#FDF5E6" }}
+              sx={{ backgroundColor: "black", color:"white" }}
               minRows={2}
               id="outlined-basic"
               label="Poprawne rozwiązanie"
@@ -413,7 +440,7 @@ const TeacherProfile = (user) => {
         </Paper>
       )}
         {isExercises && (
-          <Paper elevation={1} style={paperStyle}>
+          <Paper elevation={1} style={paperStyleX}>
             <h3>Twoje zadania:</h3>
             {exercises.map((exercise, index) => (
               <Paper
@@ -476,7 +503,7 @@ const TeacherProfile = (user) => {
      
       {isFormTwoVisible && (
         <Container>
-          <Paper elevation={1} style={paperStyle}>
+          <Paper elevation={1} style={paperStyleX}>
             <form className={classes.root} noValidate autoComplete="off">
               <h3>Edytuj zadanie</h3>
               <TextField
@@ -488,19 +515,21 @@ const TeacherProfile = (user) => {
                 onChange={(e) => setName(e.target.value)}
               />
 
-              <TextField
+              <Textarea
                 id="outlined-basic"
-                label="Treść"
+                label="Wstęp teoretyczny"
                 variant="outlined"
+                placeholder="Wstęp teoretyczny"
                 fullWidth
                 defaultValue={exercises[indexofExercise].content}
                 onChange={(e) => setContent(e.target.value)}
               />
 
-              <TextField
+              <Textarea
                 id="outlined-basic"
-                label="Wstęp teoretyczny"
                 variant="outlined"
+                label="Treść"
+                placeholder="Treść"
                 fullWidth
                 defaultValue={exercises[indexofExercise].introduction}
                 onChange={(e) => setIntroduction(e.target.value)}

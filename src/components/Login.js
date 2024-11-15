@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
 import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { MenuItem } from "@mui/material";
-import { Select, InputLabel, FormControl } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MyParticles from "./MyParticles";
 import { NavLink } from "react-router-dom";
-import { classInfo } from "./MyParticles";
-import {  setToken } from "./api/TokenService";
+import { classInfo } from "./semi-components/MyParticles";
+import {  setToken,setRefreshToken,setExpirationDate,getToken} from "./api/TokenService";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -28,19 +25,19 @@ export default function Login() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
   const [password, setPassword] = useState([]);
   const [psw, setPsw] = useState(false);
   const [errorMessage, seterrorMessage] = useState(false);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
-
+  const timeout = 3000;
   const handleShowPsw = () => setPsw((show) => !show);
   const handleHidePsw = (e) => {
     e.preventDefault();
   };
   const classes = useStyles();
   const navigate = useNavigate();
+
   const validateData = () => {
     if (!email.includes("@")) {
       seterrorMessage("Podano zły adres email");
@@ -78,29 +75,38 @@ export default function Login() {
           const token = decoder.decode(value.value);
           const token_dict = JSON.parse(token)
         
-         
           setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
             setToken(token_dict['jwtToken']);
-            navigate("/profil");
-          }, 3000);
-         
-        
+            setInfoWindowShown(false);     
+            setToken(token_dict["jwtToken"]);
+            setRefreshToken(token_dict["refreshToken"]);
+            setExpirationDate(token_dict["jwtExpirationDate"]);
+            navigate('/profil');
+          }, timeout);
         });
-      } else {
-        seterrorMessage("Dane logowania niepoprawne!");
-        seterrorInfoWindowShown(true);
-        setTimeout(() => {
-          seterrorInfoWindowShown(false);
-        }, 3000);
+        
+      } else  {
+          const promise1 = Promise.resolve(res.body.getReader().read());
+          console.log(promise1);
+          promise1.then((value) => {
+            const decoder = new TextDecoder("utf-8");
+            const text = decoder.decode(value.value);
+            console.log(text);
+            seterrorMessage(text);
+            seterrorInfoWindowShown(true);
+            setTimeout(() => {
+              seterrorInfoWindowShown(false);
+            }, 3000);
+          });
       }
        
     });
+    
   };
   return (
     <div>
-      <MyParticles></MyParticles>
       <div id="sthelse">
         <Container>
           <Paper elevation={3} style={paperStyle}>

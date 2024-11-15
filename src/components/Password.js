@@ -1,7 +1,6 @@
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
 import { Container, Paper, Button, Box } from "@mui/material";
-import MyParticles from "./MyParticles";
 import React, { useState } from "react";
 import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
@@ -52,15 +51,15 @@ export default function PasswordReminder() {
     };
   function send()
   {
-    const url = "http://localhost:8080/user/remindPassword/";
+    const url = "http://localhost:8080/user/code";
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:email,
+        body:email
       })
       .then((response) => {
         
-        if (!response.ok) {
+        if (!(response.status===200)) {
           
           const promise1 = Promise.resolve(response.body.getReader().read());
           promise1.then((value) => {
@@ -84,7 +83,15 @@ export default function PasswordReminder() {
           }, 3000);
           showCodeForm();
         }
-      });
+      }).catch((error) =>
+        {
+          seterrorMessage("Błąd");
+          setInfoWindowShown(false);
+          seterrorInfoWindowShown(true);
+          setTimeout(() => {
+            seterrorInfoWindowShown(false);
+          }, 3000);
+        });
   };
   function verificationCode()
   {
@@ -115,7 +122,10 @@ export default function PasswordReminder() {
           closeCodeForm();
           showForm();
         }
-      });
+      }).catch((error) =>
+        {
+          console.log(error);
+        });
   }
   function changePassword()
   {
@@ -131,6 +141,7 @@ export default function PasswordReminder() {
         promise1.then((value) => {
           const decoder = new TextDecoder('utf-8');
           const text = decoder.decode(value.value);
+          console.log(text);
           seterrorMessage(text);
         })
         setInfoWindowShown(false);
@@ -148,6 +159,9 @@ export default function PasswordReminder() {
         }, 3000);
       }
      
+    }).catch((error) =>
+    {
+      console.log(error);
     })
   }
   
@@ -157,7 +171,6 @@ export default function PasswordReminder() {
 
   return (
     <div>
-    <MyParticles></MyParticles>
     <div id= "sthelse">
     {(emailFormShow)&&
     <Container>

@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   TextField,
-  IconButton,
   Paper,
-  Typography,
   Button,
   Box,
   CircularProgress,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-import MyParticles from "./MyParticles";
 import Font from "react-font";
-import { classInfo } from "./MyParticles";
+import { classInfo } from "./semi-components/MyParticles";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -220,7 +216,6 @@ export default function SolutionRetake({ task }) {
 
   return (
     <div>
-      <MyParticles></MyParticles>
       <div>
         {
           <div
