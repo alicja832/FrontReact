@@ -48,44 +48,67 @@ export default function Exercise() {
     textAlign: "center",
   };
   const classes = useStyles();
-  const [exercises, setExercises] = useState([]);
-  const [isExercises, setisExercises] = useState(false);
+  const [longExercises, setLongExercises] = useState(false);
+  const [shortExercises, setShortExercises] = useState(false);
   const navigate = useNavigate();
   const openSolution = (e) => {
-    navigate("/solution/:" + e.target.value);
+    navigate("/solution/" + e.target.value);
+  };
+  const openSolutionAbc = (e) => {
+    navigate("/solutionabc/" + e.target.value);
   };
   useEffect(() => {
     if (getToken()) {
-      fetch("http://localhost:8080/exercise/", {
+      fetch("http://localhost:8080/exercise/programming", {
         method: "GET",
         headers: { Authorization: `Bearer ${getToken()}` },
       })
         .then((res) => res.json())
         .then((result) => {
           console.log(result);
-          setExercises(result);
+          setLongExercises(result);
         })
         .catch((error) => console.error("Error:", error));
+        fetch("http://localhost:8080/exercise/abc", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${getToken()}` },
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            console.log(result);
+            setShortExercises(result);
+          })
+          .catch((error) => console.error("Error:", error));
     } else {
-      fetch("http://localhost:8080/exercise/")
+      fetch("http://localhost:8080/exercise/programming")
         .then((res) => res.json())
         .then((result) => {
-          setExercises(result);
+          setLongExercises(result);
           console.log(result);
-          if (result.length !== 0) setisExercises(true);
+          
+        })
+        .catch((error) => console.error("Error:", error));
+        fetch("http://localhost:8080/exercise/abc")
+        .then((res) => res.json())
+        .then((result) => {
+          setShortExercises(result);
+          console.log(result);
         })
         .catch((error) => console.error("Error:", error));
     }
+  
   }, []);
 
   return (
     <div>
       <div className={classes.container}>
         <Paper style={paperStyle}>
+          
           <div>
-            {!exercises.length && <CircularProgress />}
-            {exercises.length>0 &&
-              exercises.map((exercise) => (
+            {!longExercises.length && !shortExercises.length  && <CircularProgress />}
+            {longExercises.length>0 && (<h3>Zadania programistyczne</h3>)}
+            {longExercises.length>0 &&
+              longExercises.map((exercise) => (
                 <Paper
                   elevation={6}
                   style={{ padding: "15px", textAlign: "left" }}
@@ -134,6 +157,60 @@ export default function Exercise() {
                     </Box>
                   </div>
                 </Paper>
+                
+              ))}
+              {shortExercises.length>0 && (<h3>Zadania teoretyczne</h3>)}
+               {shortExercises.length>0 &&
+             shortExercises.map((exercise) => (
+                <Paper
+                  elevation={6}
+                  style={{ padding: "15px", textAlign: "left" }}
+                  key={exercise.key.id}
+                >
+                  <div
+                    className={classes.headerContainer}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <h3>{exercise.key.name}</h3>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      <p>Punkty do zdobycia:</p>
+                    </div>
+                    <Box className={classes.points}>
+                      {exercise.key.maxPoints}
+                    </Box>
+                    {exercise.value ? (
+                      <div className={classes.check}>
+                        <CheckIcon />
+                        <span>Zrobione</span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <Box display="flex" flexDirection="column" gap={2}>
+                      <Button
+                        variant="contained"
+                        value={exercise.key.id}
+                        style={{ backgroundColor: "#001f3f" }}
+                        onClick={openSolutionAbc}
+                      >
+                        Wykonaj
+                      </Button>
+                    </Box>
+                  </div>
+                </Paper>
+                
               ))}
           </div>
         </Paper>

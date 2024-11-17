@@ -83,7 +83,7 @@ export default function Login() {
             setToken(token_dict["jwtToken"]);
             setRefreshToken(token_dict["refreshToken"]);
             setExpirationDate(token_dict["jwtExpirationDate"]);
-            navigate('/profil');
+            
           }, timeout);
         });
         
@@ -101,9 +101,12 @@ export default function Login() {
             }, 3000);
           });
       }
-       
+      
     });
-    
+    if(getToken())
+      {
+       navigate('/profil');
+      }
   };
   return (
     <div>

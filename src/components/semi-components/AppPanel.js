@@ -12,6 +12,7 @@ import Login from "../Login";
 import TeacherProfile from "../TeacherProfile";
 import StudentProfile from "../StudentProfile";
 import Solution from "../Solution";
+import SolutionAbc from "../SolutionAbc";
 import SolutionRetake from "../SolutionRetake";
 import PasswordReminder from "../Password";
 import Ranking from "../Ranking";
@@ -22,12 +23,16 @@ function AppPanel() {
   function SolutionWrapper() {
 
     const { id } = useParams();
-    return <Solution task={id.charAt(1)} />;
+    return <Solution task={id} />;
   }
+  function SolutionAbcWrapper() {
 
+    const { id } = useParams();
+    return <SolutionAbc task={id} />;
+  }
   function SolutionRetakeWrapper() {
     const { id } = useParams();
-    return <SolutionRetake task={id.charAt(1)} />;
+    return <SolutionRetake task={id} />;
   }
   return (
     <Routes>
@@ -40,6 +45,7 @@ function AppPanel() {
       <Route path="/teacherprofil" element={<TeacherProfile />} />
       <Route path="/studentprofil" element={<StudentProfile />} />
       <Route path="/solution/:id" element={<SolutionWrapper />} />
+      <Route path="/solutionabc/:id" element={<SolutionAbcWrapper />} />
       <Route path="/password" element={<PasswordReminder />} />
       <Route path="/solutionRetake/:id" element={<SolutionRetakeWrapper />} />
       <Route path="/logout" element={<Logout />} />

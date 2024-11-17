@@ -4,6 +4,7 @@ import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
 import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
+import CircularProgress from "@mui/joy/CircularProgress";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -12,12 +13,12 @@ const useStyles = makeStyles({
     position: "relative",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px",
+    gap: "1%",
   },
   textFieldContainer: {
     position: "relative",
     width: "90%",
-    padding: " 2% 5%",
+    padding: " 1% 1%",
     border: "1%",
     borderStyle: "solid",
     borderColor: "white",
@@ -31,7 +32,6 @@ const useStyles = makeStyles({
     position: "relative",
     height: "500px",
     width: "100%",
-    marginLeft:"5%",
     backgroundColor: "#000",
     color: "#fff",
     "& .MuiInputBase-input": {
@@ -40,6 +40,7 @@ const useStyles = makeStyles({
     "& .MuiFormLabel-root": {
       color: "#fff",
     },
+    
   },
   headerContainer: {
     display: "flex",
@@ -70,17 +71,15 @@ const useStyles = makeStyles({
 export default function Solution({ task }) {
   const paperStyle = {
     backgroundColor: "#FDF5E6",
-    padding: "50px 20px",
-    width: 600,
-    margin: "20px auto",
+    margin: "2%",
+    padding: "1%",
     textAlign: "center",
   };
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
-    padding: "50px 20px",
-    width: 600,
-    margin: "20px auto",
+    margin: "2%",
+    padding: "1%",
     textAlign: "center",
   };
 
@@ -120,7 +119,7 @@ export default function Solution({ task }) {
   const save = () => {
     var student = null;
     const solution = { solutionContent, exercise, student, score, output };
-    fetch("http://localhost:8080/exercise/solution", {
+    fetch("http://localhost:8080/exercise/solution/programming", {
       method: "POST",
       headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"  },
       body: JSON.stringify(solution),
@@ -136,6 +135,7 @@ export default function Solution({ task }) {
   };
   const runCode = () => {
     setisOutput(true);
+    setOutputs([]);
     classInfo.setmessage(false);
     fetch("http://localhost:8080/exercise/interpreter", {
       method: "POST",
@@ -158,13 +158,14 @@ export default function Solution({ task }) {
     setisOutput(true);
     const solution = { solutionContent, exercise, student, score, output };
     console.log(outputs);
-    fetch("http://localhost:8080/exercise/check", {
+    fetch("http://localhost:8080/exercise/programming/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
     })
       .then((res) => res.text())
       .then((result) => {
+        console.log(result);
         setScore(result);
         setinfoMessage("Twój wynik to " + result.toString() +" pkt");
         setInfoWindowShown(true);
@@ -180,7 +181,7 @@ export default function Solution({ task }) {
 
   useEffect(() => {
   
-    fetch("http://localhost:8080/exercise/one/" + task, {
+    fetch("http://localhost:8080/exercise/one/programming/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -219,10 +220,10 @@ export default function Solution({ task }) {
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "flex-start",
-              padding: "3%",
+              padding: "3% 1%",
             }}
           >
-            <div style={{ flexBasis: "40%", flexDirection: "column" }}>
+            <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
                 <Font family="tahoma">
@@ -243,7 +244,7 @@ export default function Solution({ task }) {
               className={classes.textFieldContainer}
               style={{
                 flexDirection: "column",
-                flexBasis: "60%",
+                flexBasis: "50%",
                 marginTop: "2%",
               }}
             >
@@ -308,12 +309,15 @@ export default function Solution({ task }) {
                   )}
                 </Box>
               </div>
-              {isOutput && (
+              {isOutput && outputs.length>0 &&(
                 <Paper multiline="true" className={classes.output}>
                   {outputs.map((element, index) => (
                     <p key={index}>{element}</p>
                   ))}
                 </Paper>
+              )}
+               {isOutput && !outputs.length &&(
+                <CircularProgress />
               )}
             </div>
           </div>

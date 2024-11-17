@@ -51,11 +51,12 @@ const StudentProfile = (user) => {
   const buttonStyle = { backgroundColor: "#001f3f", color: "white" };
   const [exercisesWithScores, setExercisesWithScores] = useState([]);
   const [student, setStudent] = useState(null);
+  const [position, setPosition] = useState(null);
+  const [quantity, setQuantity] = useState(null);
   const retake = (e) => {
-    //tutaj jestem za tym zeby przeniesc rzeczy wszystkie pobrane jako propsy
-    navigate("/solutionRetake/:" + e.target.value);
+    navigate("/solutionRetake/" + e.target.value);
   };
-  const click = () => {
+  const getInfo = () => {
     fetch("http://localhost:8080/exercise/solutions", {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
@@ -66,12 +67,24 @@ const StudentProfile = (user) => {
         setExercisesWithScores(result);
       })
       .catch((error) => console.error("Error fetching students:", error));
+
+    fetch("http://localhost:8080/user/position", {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        setPosition(result.key);
+        setQuantity(result.value);
+      })
+      .catch((error) => console.error("Error fetching students:", error));
   };
 
   useEffect(() => {
     setStudent(user.user);
     console.log(user.user);
-    click();
+    getInfo();
   }, [student]);
   if (!student)
     return (
@@ -114,8 +127,9 @@ const StudentProfile = (user) => {
                   <h2>Profil ucznia:</h2>
                   <p>{student.name}</p>
                   <p>{student.email}</p>
-                  <h4>Twój wynik:</h4>
-                  <p>{student.score}</p>
+                  <h4>Twój wynik: {student.score} pkt</h4>
+                  <p>Pozycja w rankingu: {position}</p>
+                  <p>Liczba osób biorących udział w rywalizacji:{quantity}</p>
                 </Font>
               </div>
 

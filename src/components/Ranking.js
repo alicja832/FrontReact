@@ -84,27 +84,26 @@ export default function Ranking() {
                     alignItems: "center",
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginRight: "auto",
-                    }}
-                  >
-                    <h3>{index + 1}</h3>
-                    <h3>{person.name}</h3>
+                    <h3>{index+1}.{person.name}</h3>
+                   <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      <p>Osiągnięty wynik:</p>
+                    </div>
+                    <Box className={classes.points}>
+                      {person.score}
+                    </Box>
+                   
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginRight: "auto",
-                    }}
-                  ><p>Osiągnięty wynik:</p></div>
-                  <Box className={classes.points}>{person.score}</Box>
-                </div>
+
+                
+
+
               </Paper>
             ))}
           </Paper>

@@ -115,7 +115,7 @@ export default function Register(props) {
                   setExpirationDate(token_dict["jwtExpirationDate"]);
                  
                 }, timeout);
-                navigate('/profil');
+                
               });
             }
           });
@@ -131,6 +131,10 @@ export default function Register(props) {
           seterrorInfoWindowShown(false);
         }, timeout);
       });
+      if(getToken())
+      {
+        navigate('/profil');
+      }
   };
 
   

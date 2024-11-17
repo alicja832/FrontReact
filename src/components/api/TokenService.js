@@ -1,7 +1,7 @@
-import Home from "../Home";
 export function getToken() {
-  const token = window.localStorage.getItem("token");
+  var token = window.localStorage.getItem("token");
   console.log(token);
+  console.log(window.localStorage.getItem("refresh-token"));
   console.log( new Date(window.localStorage.getItem("expiration-date")))
   if (
     token &&
@@ -16,15 +16,15 @@ export function getToken() {
     }).then((res) => {
       if (!res.ok) {
        setToken(null);
-        return <Home/>;
       } else {
         const promise1 = Promise.resolve(res.body.getReader().read());
         promise1.then((value) => {
           const decoder = new TextDecoder("utf-8");
-          const token = decoder.decode(value.value);
-          const token_dict = JSON.parse(token);
+          const tokenvalue = decoder.decode(value.value);
+          const token_dict = JSON.parse(tokenvalue);
+          token = token_dict["jwtToken"];
           console.log(token);
-          setToken(token_dict["jwtToken"]);
+          window.localStorage.setItem("token", token);
         });
       }
     }).catch((error)=>{
