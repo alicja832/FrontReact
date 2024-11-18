@@ -5,6 +5,7 @@ import { getToken } from "./api/TokenService";
 import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
 import CircularProgress from "@mui/joy/CircularProgress";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -40,7 +41,6 @@ const useStyles = makeStyles({
     "& .MuiFormLabel-root": {
       color: "#fff",
     },
-    
   },
   headerContainer: {
     display: "flex",
@@ -99,7 +99,6 @@ export default function Solution({ task }) {
   };
 
   const handleKeyDown = (e) => {
- 
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
@@ -121,7 +120,10 @@ export default function Solution({ task }) {
     const solution = { solutionContent, exercise, student, score, output };
     fetch("http://localhost:8080/exercise/solution/programming", {
       method: "POST",
-      headers: { Authorization:`Bearer ${getToken()}`,"Content-Type": "application/json"  },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(solution),
     })
       .then((res) => res.text())
@@ -156,7 +158,7 @@ export default function Solution({ task }) {
   const check = () => {
     var student = null;
     setisOutput(true);
-    const solution = { solutionContent, exercise, student, score, output };
+    const solution = { exercise,solutionContent,student, score, output };
     console.log(outputs);
     fetch("http://localhost:8080/exercise/programming/check", {
       method: "POST",
@@ -167,7 +169,7 @@ export default function Solution({ task }) {
       .then((result) => {
         console.log(result);
         setScore(result);
-        setinfoMessage("Twój wynik to " + result.toString() +" pkt");
+        setinfoMessage("Twój wynik to " + result.toString() + " pkt");
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -180,17 +182,17 @@ export default function Solution({ task }) {
   };
 
   useEffect(() => {
-  
     fetch("http://localhost:8080/exercise/one/programming/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
       .then((result) => {
+        console.log(result);
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
-
+    if (getToken()) {
       fetch("http://localhost:8080/user/", {
         headers: { Authorization: `Bearer ${getToken()}` },
         method: "GET",
@@ -200,20 +202,25 @@ export default function Solution({ task }) {
           console.log(result);
           setUser(result[0]);
         });
+    }
   }, []);
 
-  if (!exercise) {
-    return <div>Loading...</div>;
-  }
-
+ 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
 
   return (
-    <div>
-      <div>
-        {
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
+        {exercise && 
           <div
             className={classes.mainContainer}
             style={{
@@ -223,6 +230,7 @@ export default function Solution({ task }) {
               padding: "3% 1%",
             }}
           >
+            
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
@@ -248,10 +256,8 @@ export default function Solution({ task }) {
                 marginTop: "2%",
               }}
             >
-              
-            
-                <h3>Konsola dla Python 2.7</h3>
-                <div
+              <h3>Konsola dla Python 2.7</h3>
+              <div
                 className={classes.textFieldContainer}
                 style={{
                   flexDirection: "column",
@@ -297,7 +303,7 @@ export default function Solution({ task }) {
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
 
                 <Box display="inline" flexDirection="column" gap={2}>
-                  {(user && user.score>=0) && (
+                  {user && user.score >= 0 && (
                     <Button
                       style={{ backgroundColor: "#001f3f" }}
                       variant="contained"
@@ -309,19 +315,20 @@ export default function Solution({ task }) {
                   )}
                 </Box>
               </div>
-              {isOutput && outputs.length>0 &&(
+              {isOutput && outputs.length > 0 && (
                 <Paper multiline="true" className={classes.output}>
                   {outputs.map((element, index) => (
                     <p key={index}>{element}</p>
                   ))}
                 </Paper>
               )}
-               {isOutput && !outputs.length &&(
-                <CircularProgress />
-              )}
+              {isOutput && !outputs.length && <CircularProgress />}
             </div>
           </div>
         }
+      </div>
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

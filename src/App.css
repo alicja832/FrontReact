@@ -13,6 +13,20 @@
   }
 }
 
+.points {
+  width: "40px";
+  height: "30px";
+  display: "flex";
+  align-items: "center";
+  border: "3px";
+  border-style: "solid";
+  border-color: "blue";
+  border-radius: "5px";
+  background-color: "#6495ED";
+  justify-content: "center";
+  text-align: "center";
+  position: "relative";
+}
 
 
 .App-link {
@@ -20,7 +34,7 @@
 }
 
 .toast {
-  display: inline-block; /* Pozwala ustawić szerokość i wysokość oraz utrzymuje elementy w linii */
+  display: inline-block; 
   padding: 8px 16px; 
   background-color: #6495ED; 
   color:white; 
@@ -29,7 +43,7 @@
   text-align: center; 
   margin-top: 1px; 
   height: "50%";
-  vertical-align: middle; /* Wyrównanie do środka względem innych elementów */
+  vertical-align: middle; 
 
 }
 
@@ -38,13 +52,26 @@
 
   margin-left: 15%; 
   margin-right: 15%;
-  transform: translate(0%, 140%);
-  position: relative;
+  top: 75%;
+  position: absolute;
   width: 70%;
   display: flex; 
   flex-wrap: wrap;
   align-items: center;
  }
+ 
+.footer-container{
+  top: 150%;
+  position: absolute;
+  width: 100%;
+  display: flex; 
+  flex-wrap: wrap;
+  align-items: center;
+ }
+ 
+
+
+ 
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -78,3 +105,6 @@
   background-color: "#FDF5E6";
   text-align: "center";
 };
+.main{
+ height: 100%;
+}

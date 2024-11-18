@@ -10,6 +10,7 @@ import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
 import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -18,12 +19,12 @@ const useStyles = makeStyles({
     position: "relative",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px",
+    gap: "1%",
   },
   textFieldContainer: {
     position: "relative",
     width: "90%",
-    padding: " 2% 5%",
+    padding: " 1% 1%",
     border: "1%",
     borderStyle: "solid",
     borderColor: "white",
@@ -37,7 +38,6 @@ const useStyles = makeStyles({
     position: "relative",
     height: "500px",
     width: "100%",
-    marginLeft: "5%",
     backgroundColor: "#000",
     color: "#fff",
     "& .MuiInputBase-input": {
@@ -77,17 +77,21 @@ function Toast({ message }) {
   return <div className="toast">{message}</div>;
 }
 export default function SolutionRetake({ task }) {
-  //dlaczego na sztywno to jest ustawione
-  const paperStyle = { padding: "50px 20px", width: 600, margin: "20px auto" };
-
+  
+  const paperStyle = {
+    backgroundColor: "#FDF5E6",
+    margin: "2%",
+    padding: "1%",
+    textAlign: "center",
+  };
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
-    padding: "50px 20px",
-    width: 600,
-    margin: "20px auto",
+    margin: "2%",
+    padding: "1%",
     textAlign: "center",
   };
+
 
   const classes = useStyles();
   const [isOutput, setisOutput] = useState(false);
@@ -176,7 +180,7 @@ export default function SolutionRetake({ task }) {
     setisOutput(true);
     const solution = { solutionContent, exercise, student, score, output };
     console.log(outputs);
-    fetch("http://localhost:8080/exercise/check", {
+    fetch("http://localhost:8080/exercise/programming/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
@@ -215,7 +219,15 @@ export default function SolutionRetake({ task }) {
   }
 
   return (
-    <div>
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}></div>
       <div>
         {
           <div
@@ -314,16 +326,20 @@ export default function SolutionRetake({ task }) {
                   </Button>
                 </Box>
               </div>
-              {isOutput && (
+              {isOutput &&  outputs.length>0 && (
                 <Paper multiline="true" className={classes.output}>
                   {outputs.map((element, index) => (
                     <p key={index}>{element}</p>
                   ))}
                 </Paper>
               )}
+              {isOutput && !outputs.length && <CircularProgress />}
             </div>
           </div>
         }
+      </div>
+      <div style={{flex: 3, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

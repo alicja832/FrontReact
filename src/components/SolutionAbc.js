@@ -4,9 +4,11 @@ import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
 import Font from "react-font";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import FormControl from "@mui/material/FormControl";
 import { Checkbox } from "@mui/material";
 import CircularProgress from "@mui/joy/CircularProgress";
-
+import Footer from "./semi-components/Footer";
 const useStyles = makeStyles({
   position: "relative",
   container: {
@@ -16,6 +18,7 @@ const useStyles = makeStyles({
     alignItems: "center",
     gap: "1%",
   },
+  
   textFieldContainer: {
     position: "relative",
     width: "90%",
@@ -75,6 +78,12 @@ export default function SolutionAbc({ task }) {
     padding: "1%",
     textAlign: "center",
   };
+  const buttonStyle = {
+    backgroundColor: "#001f3f",
+    color: "white",
+    width: "40%",
+    margin: "1%",
+  };
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -86,24 +95,44 @@ export default function SolutionAbc({ task }) {
   };
 
   const classes = useStyles();
-  const [output, setOutput] = useState("");
+  const [checkedA, setCheckedA] = useState(false);
+  const [checkedB, setCheckedB] = useState(false);
+  const [checkedC, setCheckedC] = useState(false);
+  const [checkedD, setCheckedD] = useState(false);
   const [answer, setAnswer] = useState("");
   const [exercise, setExercise] = useState(null);
   const [score, setScore] = useState(0);
+  const [sent, setSent] = useState(false);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
   const [user, setUser] = useState(null);
   const handlechangeA = () => {
-    setAnswer("A");
+    setCheckedA(true);
+    setCheckedD(false);
+    setCheckedC(false);
+    setCheckedB(false);
+    setAnswer('A');
   };
   const handlechangeB = () => {
-    setAnswer("B");
+    setCheckedA(false);
+    setCheckedD(false);
+    setCheckedC(false);
+    setCheckedB(true);
+    setAnswer('B');
   };
   const handlechangeC = () => {
-    setAnswer("C");
+    setCheckedA(false);
+    setCheckedD(false);
+    setCheckedC(true);
+    setCheckedB(false);
+    setAnswer('C');
   };
   const handlechangeD = () => {
-    setAnswer("D");
+    setCheckedA(false);
+    setCheckedD(true);
+    setCheckedC(false);
+    setCheckedB(false);
+    setAnswer('D');
   };
   const save = () => {
     var student = null;
@@ -126,7 +155,7 @@ export default function SolutionAbc({ task }) {
       });
   };
   const check = () => {
-    console.log(answer);
+    setSent(true);
     var student = null;
     const solution = { exercise, student, score, answer };
     fetch("http://localhost:8080/exercise/abc/check", {
@@ -148,6 +177,7 @@ export default function SolutionAbc({ task }) {
       .catch((error) => {
         console.error("Error:", error);
       });
+      setSent(false);
   };
 
   useEffect(() => {
@@ -182,7 +212,15 @@ export default function SolutionAbc({ task }) {
   }
 
   return (
-    <div>
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}></div>
       <div
         className={classes.mainContainer}
         style={{
@@ -212,53 +250,70 @@ export default function SolutionAbc({ task }) {
           <Paper elevation={3} style={paperStyleTwo}>
             <h4>{exercise.content}</h4>
             <h4>Wybierz jedną odpowiedź: </h4>
+            <FormControl fullWidth>
+            <FormGroup>
             <FormControlLabel
-              label={exercise.firstOption}
+              requeired={true}
+              label={"A. "+ exercise.firstOption}
               value={exercise.firstOption}
               control={
                 <Checkbox
                   onChange={handlechangeA}
-                  inputProps={{ "aria-label": "controlled" }}
+                  checked={checkedA}
                 />
               }
             />
             <FormControlLabel
-              label={exercise.secondOption}
+              label={"B. "+exercise.secondOption}
               control={
                 <Checkbox
-                  onChange={handlechangeA}
-                  inputProps={{ "aria-label": "controlled" }}
+                  onChange={handlechangeB}
+                  checked={checkedB}
                 />
               }
             />
             <FormControlLabel
-              label={exercise.thirdOption}
+              label={"C. "+exercise.thirdOption}
               control={
                 <Checkbox
                   onChange={handlechangeC}
-                  inputProps={{ "aria-label": "controlled" }}
+                  checked={checkedC}
                 />
               }
             />
             {exercise.fourthOption && (
               <FormControlLabel
-                label={exercise.fourthOption}
+                label={"D. "+exercise.fourthOption}
                 control={
                   <Checkbox
                     onChange={handlechangeD}
-                    inputProps={{ "aria-label": "controlled" }}
+                    checked={checkedD}
                   />
                 }
               />
             )}
-            <Button
-              style={{ backgroundColor: "#001f3f" }}
-              variant="contained"
-              color="secondary"
-              onClick={check}
+             </FormGroup>
+             <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
             >
-              Sprawdź
-            </Button>
+              <Button
+                style={buttonStyle}
+                variant="contained"
+                color="secondary"
+                onClick={check}
+              >
+                Sprawdź
+              </Button>
+            </Box>
+            </FormControl>
+            <Box>  {(!infoWindowShown && sent) && (
+              
+                <CircularProgress />
+              
+            )}</Box>
             <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
             <Box display="inline" flexDirection="column" gap={2}>
               {user && user.score >= 0 && (
@@ -274,6 +329,9 @@ export default function SolutionAbc({ task }) {
             </Box>
           </Paper>
         </div>
+      </div>
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

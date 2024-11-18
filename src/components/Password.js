@@ -4,6 +4,7 @@ import { Container, Paper, Button, Box } from "@mui/material";
 import React, { useState } from "react";
 import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -170,8 +171,15 @@ export default function PasswordReminder() {
   }
 
   return (
-    <div>
-    <div id= "sthelse">
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
     {(emailFormShow)&&
     <Container>
           <Paper elevation={3} style={paperStyle}>
@@ -323,8 +331,12 @@ export default function PasswordReminder() {
               </div>
             </form>
           </Paper>
+          
         </Container>}
     </div>
+    <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
+      </div>
     </div>
   );
 }

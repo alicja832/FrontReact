@@ -5,7 +5,7 @@ import { Paper, Button, Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
-import "./Exercise.css";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles({
   points: {
@@ -100,8 +100,16 @@ export default function Exercise() {
   }, []);
 
   return (
-    <div>
-      <div className={classes.container}>
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+         <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
+    
         <Paper style={paperStyle}>
           
           <div>
@@ -214,6 +222,10 @@ export default function Exercise() {
               ))}
           </div>
         </Paper>
+      </div>
+    
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

@@ -2,17 +2,17 @@ import React from "react";
 import { Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import Font from "react-font";
-import Console from "./semi-components/Console";
-
+import ExampleConsole from "./semi-components/ExampleConsole";
+import { useEffect } from "react";
+import Footer from "./semi-components/Footer";
 export default function Home() {
   const paperStyle = {
     padding: "3% 3%",
     width: "70%",
     position: "absolute",
     backgroundColor: "#FDF5E6",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    top: "40%",
+    left: "15%",
     borderRadius: "10px",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
@@ -41,9 +41,9 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <div id="sthelse">
-        <Paper elevation={3} style={paperStyle}>
+    <div sx={{display:"flex"}}>
+      <div>
+        <Paper elevation={2} style={paperStyle}>
           <Font family="tahoma"></Font>
           <h1>Lekcje podstaw algorytmiki w języku Python</h1>
           <Font family="sans-serif">
@@ -54,7 +54,6 @@ export default function Home() {
               Możesz nauczyć się języka poprzez praktykę!
             </p>
           </Font>
-
           <Button
             component={Link}
             to={"/register"}
@@ -66,7 +65,7 @@ export default function Home() {
         </Paper>
 
         <div className="right-container">
-          <Paper elevation={3} style={paperStyleTwo}>
+          <Paper elevation={2} style={paperStyleTwo}>
             <Font family="tahoma">
               <h1>Walka o Szczyt: Zbieraj Punkty i Rywalizuj z Innymi!</h1>
             </Font>
@@ -90,8 +89,8 @@ export default function Home() {
               Zobacz ranking
             </Button>
           </Paper>
-          <Paper elevation={3} style={paperStyleThree}>
-            <Console />
+          <Paper elevation={2} style={paperStyleThree}>
+            <ExampleConsole />
             <Font family="tahoma">
               <h1> Zdobądź wiedzę i rozwiązuj zadania z łatwością! </h1>
             </Font>
@@ -100,10 +99,11 @@ export default function Home() {
               <p>
                 Każde zadanie w aplikacji zaczyna się od wprowadzenia
                 teoretycznego, które pozwoli Ci zgłębić istotne aspekty języka
-                programowania. Dodatkowo, znajdziesz praktyczne wskazówki, które
-                pomogą Ci skutecznie rozwiązać zadanie. Poznaj teorię,
-                wykorzystaj nasze wskazówki i rozwijaj swoje umiejętności
-                programistyczne w sposób efektywny i inspirujący!
+                programowania oraz zagagdnień algorytmicznych. Dodatkowo,
+                znajdziesz praktyczne wskazówki, które pomogą Ci skutecznie
+                rozwiązać zadanie. Poznaj teorię, wykorzystaj nasze wskazówki i
+                rozwijaj swoje umiejętności programistyczne w sposób efektywny i
+                inspirujący!
               </p>
             </Font>
             <Button
@@ -116,6 +116,9 @@ export default function Home() {
             </Button>
           </Paper>
         </div>
+        <div className="footer-container">
+      <Footer/>
+      </div>
       </div>
     </div>
   );

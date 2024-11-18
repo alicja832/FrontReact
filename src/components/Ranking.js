@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {  Paper, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import Font from "react-font";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles({
   points: {
@@ -38,9 +39,8 @@ export default function Ranking() {
     gap: "1%",
     position: "absolute",
     backgroundColor: "#FDF5E6",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)", 
+    top: "40%",
+    left: "15%",
     borderRadius: "10px",
     textAlign: "center",
     textShadow: "1px 1px 2px black",
@@ -61,8 +61,15 @@ export default function Ranking() {
   }, []);
 
   return (
-    <div>
-      <div id="#sthelse">
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
         {isPersons && (
           <Paper elevation={3} style={paperStyle}>
             <Font family="sans-serif">
@@ -108,6 +115,9 @@ export default function Ranking() {
             ))}
           </Paper>
         )}
+      </div>
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

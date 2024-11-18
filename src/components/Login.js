@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
@@ -7,8 +7,13 @@ import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { classInfo } from "./semi-components/MyParticles";
-import {  setToken,setRefreshToken,setExpirationDate,getToken} from "./api/TokenService";
-
+import {
+  setToken,
+  setRefreshToken,
+  setExpirationDate,
+  getToken,
+} from "./api/TokenService";
+import Footer from "./semi-components/Footer";
 const useStyles = makeStyles((theme) => ({}));
 
 export default function Login() {
@@ -64,53 +69,54 @@ export default function Login() {
     fetch("http://localhost:8080/user/authenticate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(student)
+      body: JSON.stringify(student),
     }).then((res) => {
-      if (res.ok)  {
-        
+      if (res.ok) {
         const promise1 = Promise.resolve(res.body.getReader().read());
 
         promise1.then((value) => {
           const decoder = new TextDecoder("utf-8");
           const token = decoder.decode(value.value);
-          const token_dict = JSON.parse(token)
-        
+          const token_dict = JSON.parse(token);
+
           setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
-            setToken(token_dict['jwtToken']);
-            setInfoWindowShown(false);     
+            setToken(token_dict["jwtToken"]);
+            setInfoWindowShown(false);
             setToken(token_dict["jwtToken"]);
             setRefreshToken(token_dict["refreshToken"]);
             setExpirationDate(token_dict["jwtExpirationDate"]);
-            
           }, timeout);
         });
-        
-      } else  {
-          const promise1 = Promise.resolve(res.body.getReader().read());
-          console.log(promise1);
-          promise1.then((value) => {
-            const decoder = new TextDecoder("utf-8");
-            const text = decoder.decode(value.value);
-            console.log(text);
-            seterrorMessage(text);
-            seterrorInfoWindowShown(true);
-            setTimeout(() => {
-              seterrorInfoWindowShown(false);
-            }, 3000);
-          });
+      } else {
+        const promise1 = Promise.resolve(res.body.getReader().read());
+        console.log(promise1);
+        promise1.then((value) => {
+          const decoder = new TextDecoder("utf-8");
+          const text = decoder.decode(value.value);
+          console.log(text);
+          seterrorMessage(text);
+          seterrorInfoWindowShown(true);
+          setTimeout(() => {
+            seterrorInfoWindowShown(false);
+          }, 3000);
+        });
       }
-      
     });
-    if(getToken())
-      {
-       navigate('/profil');
-      }
+    if (getToken()) {
+      navigate("/profil");
+    }
   };
   return (
-    <div>
-      <div id="sthelse">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 8, display: "flex", flexDirection: "column" }}>
         <Container>
           <Paper elevation={3} style={paperStyle}>
             <div style={{ fontSize: "large", marginBottom: "8%" }}>
@@ -209,6 +215,9 @@ export default function Login() {
             </form>
           </Paper>
         </Container>
+      </div>
+      <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );

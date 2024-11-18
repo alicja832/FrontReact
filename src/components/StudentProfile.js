@@ -7,6 +7,7 @@ import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import studentlogo from "../student.jpeg";
 import Font from "react-font";
+import Footer from "./semi-components/Footer";
 const useStyles = makeStyles({
   points: {
     width: "30px",
@@ -57,7 +58,7 @@ const StudentProfile = (user) => {
     navigate("/solutionRetake/" + e.target.value);
   };
   const getInfo = () => {
-    fetch("http://localhost:8080/exercise/solutions", {
+    fetch("http://localhost:8080/exercise/solutions/programming", {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
@@ -94,7 +95,15 @@ const StudentProfile = (user) => {
     );
 
   return (
-    <div>
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+           <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
       <div
         className={classes.mainContainer}
         style={{
@@ -179,6 +188,7 @@ const StudentProfile = (user) => {
               <li>Twoja propozycja rozwiązania</li>
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
               <h3>Możesz także poprawiać swoje rozwiązania</h3>
+              <p>Uwaga! Ale tylko programistyczne!</p>
             </Font>
           </Paper>
         </div>
@@ -245,6 +255,10 @@ const StudentProfile = (user) => {
             ))}
           </Paper>
         )}
+      </div>
+      </div>
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );

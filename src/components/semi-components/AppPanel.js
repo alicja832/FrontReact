@@ -1,6 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Route,
+import {Route,
   Routes,
   useParams,
 } from "react-router-dom";
@@ -34,6 +32,9 @@ function AppPanel() {
     const { id } = useParams();
     return <SolutionRetake task={id} />;
   }
+  
+
+
   return (
     <Routes>
       <Route exact path="/" element={<Home />} />

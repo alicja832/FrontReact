@@ -9,6 +9,7 @@ import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
 import teacherlogo from "../teacher.jpeg";
 import CircularProgress from "@mui/joy/CircularProgress";
+import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles((theme) => ({
   points: {
@@ -95,6 +96,7 @@ const TeacherProfile = (user) => {
   const [thirdOption, setThirdOption] = useState(null);
   const [fourthOption, setFourthOption] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
+  const [clicked, setClicked] = useState(false);
   const [teacher, setTeacher] = useState(null);
 
   const handleKeyDown = (e) => {
@@ -113,6 +115,7 @@ const TeacherProfile = (user) => {
       }, 0);
     }
   };
+
   const clearData = () => {
     setName("");
     setContent("");
@@ -142,7 +145,7 @@ const TeacherProfile = (user) => {
     closeFormTwo();
     setIsFormCloseVisible(false);
     setIsFormVisible(true);
-  }; 
+  };
   const showFormClose = () => {
     classInfo.setmessage(true);
     closeFormTwo();
@@ -160,28 +163,30 @@ const TeacherProfile = (user) => {
     setContent(found.content);
     setName(found.name);
     setIntroduction(found.introduction);
-      setCorrectAnswer(found.correctAnswer);
-      setFirstOption(found.firstOption);
-      setSecondOption(found.secondOption);
-      setThirdOption(found.thirdOption);
+    setCorrectAnswer(found.correctAnswer);
+    setFirstOption(found.firstOption);
+    setSecondOption(found.secondOption);
+    setThirdOption(found.thirdOption);
     setcorrectSolution(found.correctSolution);
     setmaxPoints(found.maxPoints);
     setIsFormTwoVisible(true);
   };
 
- 
-
   const deleteExercise = (e) => {
-    const url = "http://localhost:8080/exercise/programming" + e.target.value;
+    setClicked(true);
+    console.log(e.target.value);
+    const url = "http://localhost:8080/exercise/" + e.target.value;
     fetch(url, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
     }).then(() => {
       window.location.reload();
     });
+    setClicked(false);
   };
 
   const editExercise = (e) => {
+    setClicked(true);
     const exercise = {
       name,
       introduction,
@@ -199,23 +204,78 @@ const TeacherProfile = (user) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(exercise),
-    }).then(() => {
-      closeFormTwo();
-      window.location.reload();
+    }).then((response) => {
+      if (response.ok) {
+        closeFormTwo();
+        setName("");
+        setContent("");
+        setmaxPoints("");
+        setcorrectSolution("");
+        setMessage("Zmieniono zadanie");
+        setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3000);
+        window.location.reload();
+      } else {
+        setMessage("Nie udało się zmienić zadania");
+        setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3000);
+      }
     });
+    setClicked(false);
+  };
+  const editCloseExercise = (e) => {
+    setClicked(true);
+    const exercise = {
+      name,
+      introduction,
+      content,
+      teacher,
+      maxPoints,
+      firstOption,
+      secondOption,
+      thirdOption,
+      fourthOption,
+      correctAnswer,
+    };
+    console.log(correctAnswer);
+    const url = "http://localhost:8080/exercise/abc";
 
-    closeForm();
-    setName("");
-    setContent("");
-    setmaxPoints("");
-    setcorrectSolution("");
-    setMessage("Zmieniono zadanie.");
-    setInfoWindowShown(true);
-    setTimeout(() => {
-      setInfoWindowShown(false);
-    }, 3000);
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(exercise),
+    }).then((response) => {
+      if (response.ok) {
+        closeFormTwo();
+        setName("");
+        setContent("");
+        setmaxPoints("");
+        setcorrectSolution("");
+        setMessage("Zmieniono zadanie");
+        setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3000);
+        window.location.reload();
+      } else {
+        setMessage("Nie udało się zmienić zadania");
+        setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3000);
+      }
+    });
+    setClicked(false);
   };
   const addExercise = (e) => {
+    setClicked(true);
     e.preventDefault();
     if (isNaN(parseInt(maxPoints))) {
       setInfoWindowShown(true);
@@ -242,26 +302,32 @@ const TeacherProfile = (user) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(exercise),
-    }).then((res) => {
-      if (!res.ok) {
-        setInfoWindowShown(true);
-        setMessage("Niepoprawny kod pythona");
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-        return;
-      } else {
-        window.location.reload();
-        closeForm();
-        setName("");
-        setContent("");
-        setmaxPoints("");
-        setcorrectSolution("");
-      }
-    });
+    })
+      .then((res) => {
+        if (!res.ok) {
+          setInfoWindowShown(true);
+          setMessage("Niepoprawny kod pythona");
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+          return;
+        } else {
+          window.location.reload();
+          closeForm();
+          setName("");
+          setContent("");
+          setmaxPoints("");
+          setcorrectSolution("");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setClicked(false);
   };
   const addCloseExercise = (e) => {
     e.preventDefault();
+    setClicked(true);
     if (isNaN(parseInt(maxPoints))) {
       setInfoWindowShown(true);
       setMessage("Wprowadzono złe dane.");
@@ -303,6 +369,7 @@ const TeacherProfile = (user) => {
         closeFormClose();
       }
     });
+    setClicked(false);
   };
   useEffect(() => {
     setTeacher(user.user);
@@ -318,9 +385,7 @@ const TeacherProfile = (user) => {
         console.log(result);
       });
   }, []);
-  useEffect(() => {
-   
-  }, [indexofExercise]);
+  useEffect(() => {}, [indexofExercise]);
   if (!teacher) {
     return <div>Loading...</div>;
   }
@@ -485,74 +550,77 @@ const TeacherProfile = (user) => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
-             {(isFormVisible)&& <Textarea
-                sx={{ backgroundColor: "black", color: "white" }}
-                minRows={2}
-                id="outlined-basic"
-                label="Poprawne rozwiązanie"
-                placeholder="Poprawne rozwiązanie"
-                variant="outlined"
-                fullWidth
-                value={correctSolution}
-                onChange={(e) => setcorrectSolution(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />}
-              {
-
-                (isFormCloseVisible)&&(<div>
+              {isFormVisible && (
+                <Textarea
+                  sx={{ backgroundColor: "black", color: "white" }}
+                  minRows={2}
+                  id="outlined-basic"
+                  label="Poprawne rozwiązanie"
+                  placeholder="Poprawne rozwiązanie"
+                  variant="outlined"
+                  fullWidth
+                  value={correctSolution}
+                  onChange={(e) => setcorrectSolution(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              )}
+              {isFormCloseVisible && (
+                <div>
                   <Textarea
-                minRows={2}
-                id="outlined-basic"
-                label="Odpowiedź a"
-                placeholder="Odpowiedź a"
-                variant="outlined"
-                fullWidth
-                value={firstOption}
-                onChange={(e) => setFirstOption(e.target.value)}
-              />
-              <Textarea
-                minRows={2}
-                id="outlined-basic"
-                label="Odpowiedź b"
-                placeholder="Odpowiedź b"
-                variant="outlined"
-                fullWidth
-                value={secondOption}
-                onChange={(e) => setSecondOption(e.target.value)}
-              />
-              <Textarea
-                minRows={2}
-                id="outlined-basic"
-                label="Odpowiedź c"
-                placeholder="Odpowiedź c"
-                variant="outlined"
-                fullWidth
-                value={thirdOption}
-                onChange={(e) => setThirdOption(e.target.value)}
-              />
-              <Textarea
-                minRows={2}
-                id="outlined-basic"
-                label="Odpowiedź d (opcjonalna)"
-                placeholder="Odpowiedź d (opcjonalna)"
-                variant="outlined"
-                fullWidth
-                value={fourthOption}
-                onChange={(e) => setFourthOption(e.target.value)}
-              />
-              <TextField
-                sx={{ backgroundColor: "white" }}
-                id="outlined-basic"
-                label="poprawna odpowiedź"
-                variant="outlined"
-                fullWidth
-                value={correctAnswer}
-                onChange={(e) => setCorrectAnswer(e.target.value)}
-              />
-
-
-                </div>)
-              }
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź a"
+                    placeholder="Odpowiedź a"
+                    variant="outlined"
+                    fullWidth
+                    value={firstOption}
+                    onChange={(e) => setFirstOption(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź b"
+                    placeholder="Odpowiedź b"
+                    variant="outlined"
+                    fullWidth
+                    value={secondOption}
+                    onChange={(e) => setSecondOption(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź c"
+                    placeholder="Odpowiedź c"
+                    variant="outlined"
+                    fullWidth
+                    value={thirdOption}
+                    onChange={(e) => setThirdOption(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź d (opcjonalna)"
+                    placeholder="Odpowiedź d (opcjonalna)"
+                    variant="outlined"
+                    fullWidth
+                    value={fourthOption}
+                    onChange={(e) => setFourthOption(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <TextField
+                    sx={{ backgroundColor: "white" }}
+                    id="outlined-basic"
+                    label="poprawna odpowiedź"
+                    variant="outlined"
+                    fullWidth
+                    value={correctAnswer}
+                    onChange={(e) => setCorrectAnswer(e.target.value)}
+                  />
+                </div>
+              )}
               <TextField
                 id="outlined-basic"
                 sx={{ backgroundColor: "white" }}
@@ -597,7 +665,6 @@ const TeacherProfile = (user) => {
           </Paper>
         )}
 
-        
         {isExercises && (
           <Paper elevation={1} style={paperStyleX}>
             <h3>Twoje zadania:</h3>
@@ -665,7 +732,7 @@ const TeacherProfile = (user) => {
         )}
       </div>
 
-      {isFormTwoVisible  && (
+      {isFormTwoVisible && (
         <Container>
           <Paper elevation={1} style={paperStyleX}>
             <form className={classes.root} noValidate autoComplete="off">
@@ -686,13 +753,11 @@ const TeacherProfile = (user) => {
                 variant="outlined"
                 placeholder="Wstęp teoretyczny"
                 fullWidth
-                
                 defaultValue={exercises[indexofExercise].introduction}
                 onChange={(e) => setIntroduction(e.target.value)}
               />
 
               <Textarea
-             
                 id="outlined-basic"
                 variant="outlined"
                 label="Treść"
@@ -703,7 +768,6 @@ const TeacherProfile = (user) => {
               />
               {exercises[indexofExercise].correctSolution && (
                 <Textarea
-                
                   minRows={2}
                   id="outlined-basic"
                   label="Poprawne rozwiązanie"
@@ -716,7 +780,6 @@ const TeacherProfile = (user) => {
               )}
               {exercises[indexofExercise].firstOption && (
                 <Textarea
-               
                   minRows={2}
                   id="outlined-basic"
                   label="Odpowiedź A"
@@ -729,7 +792,6 @@ const TeacherProfile = (user) => {
               )}
               {exercises[indexofExercise].secondOption && (
                 <Textarea
-               
                   minRows={2}
                   id="outlined-basic"
                   label="Odpowiedź B"
@@ -740,7 +802,6 @@ const TeacherProfile = (user) => {
               )}
               {exercises[indexofExercise].thirdOption && (
                 <Textarea
-                
                   minRows={2}
                   id="outlined-basic"
                   variant="outlined"
@@ -749,24 +810,23 @@ const TeacherProfile = (user) => {
                   onChange={(e) => setThirdOption(e.target.value)}
                 />
               )}
-              {exercises[indexofExercise].fourthOption && (
+              {
                 <Textarea
-                
                   minRows={2}
                   id="outlined-basic"
                   variant="outlined"
+                  placeholder="Odpowiedź d(opcjonalna)"
                   fullWidth
                   defaultValue={exercises[indexofExercise].fourthOption}
                   onChange={(e) => setFourthOption(e.target.value)}
                 />
-              )}
+              }
               {exercises[indexofExercise].correctAnswer && (
-                <Textarea
-                 
-                  minRows={2}
+                <TextField
                   id="outlined-basic"
                   variant="outlined"
                   fullWidth
+                  sx={{ backgroundColor: "white" }}
                   defaultValue={exercises[indexofExercise].correctAnswer}
                   onChange={(e) => setCorrectAnswer(e.target.value)}
                 />
@@ -789,24 +849,43 @@ const TeacherProfile = (user) => {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    value={indexofExercise}
-                    onClick={editExercise}
-                  >
-                    Zmień
-                  </Button>
+                  {exercises[indexofExercise].correctSolution && (
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      value={indexofExercise}
+                      onClick={editExercise}
+                    >
+                      Zmień
+                    </Button>
+                  )}
+                  {exercises[indexofExercise].correctAnswer && (
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      value={indexofExercise}
+                      onClick={editCloseExercise}
+                    >
+                      Zmień
+                    </Button>
+                  )}
                 </Box>
                 <Box display="flex" flexDirection="column" gap={2}>
                   {WindowShown && <Toast message={infoMessage} />}
                 </Box>
+              
               </div>
             </form>
           </Paper>
         </Container>
       )}
+        <div
+                  style={{ flex: 2, display: "flex", flexDirection: "column" }}
+                >
+                  <Footer />
+                </div>
     </div>
   );
 };

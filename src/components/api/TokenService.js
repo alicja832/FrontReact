@@ -1,8 +1,5 @@
 export function getToken() {
   var token = window.localStorage.getItem("token");
-  console.log(token);
-  console.log(window.localStorage.getItem("refresh-token"));
-  console.log( new Date(window.localStorage.getItem("expiration-date")))
   if (
     token &&
     new Date().getTime() >=

@@ -9,7 +9,7 @@ import { MenuItem } from "@mui/material";
 import { Select, InputLabel, FormControl } from "@mui/material";
 import {  setToken,setRefreshToken,setExpirationDate ,getToken} from "./api/TokenService";
 import { classInfo } from "./semi-components/MyParticles";
-
+import Footer from "./semi-components/Footer";
 const useStyles = makeStyles((theme) => ({}));
 export default function Register(props) {
   const paperStyle = {
@@ -143,8 +143,15 @@ export default function Register(props) {
   }
 
   return (
-    <div>
-      <div id="sthelse">
+    <div
+           
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+    }}
+  >
+       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
         <Container>
           <Paper elevation={3} style={paperStyle}>
             <div style={{ fontSize: "large", marginBottom: "8%" }}>
@@ -270,6 +277,9 @@ export default function Register(props) {
             </form>
           </Paper>
         </Container>
+      </div>
+      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <Footer />
       </div>
     </div>
   );
