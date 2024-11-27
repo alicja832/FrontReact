@@ -2,7 +2,8 @@ import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
 import { Container, Paper, Button, Box } from "@mui/material";
 import React, { useState } from "react";
-import { FilledInput, IconButton, InputAdornment } from "@mui/material";
+import { FilledInput, IconButton, InputAdornment } 
+from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import Footer from "./semi-components/Footer";
 
@@ -52,7 +53,8 @@ export default function PasswordReminder() {
     };
   function send()
   {
-    const url = "http://localhost:8080/user/code";
+    
+    const url = "https://naukapythona.azurewebsites.net/user/code";
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,7 +80,7 @@ export default function PasswordReminder() {
         else
         {
           setEmail("");
-          setInfoWindowShown(true);
+           setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
           }, 3000);
@@ -97,7 +99,7 @@ export default function PasswordReminder() {
   function verificationCode()
   {
     const verification = {email,code,password};
-    const url = "http://localhost:8080/user/CodeVerification";
+    const url = "https://naukapythona.azurewebsites.net/user/CodeVerification";
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,7 +133,7 @@ export default function PasswordReminder() {
   function changePassword()
   {
     const verification = {email,code,password};
-    fetch("http://localhost:8080/user/changePassword",
+    fetch("http://naukapythona.azurewebsites.net/user/changePassword",
     {
       method: "PUT",
       headers : { "Content-Type": "application/json" },
@@ -201,7 +203,7 @@ export default function PasswordReminder() {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: "16px", // Add space below the first div
+                  marginBottom: "16px",
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>

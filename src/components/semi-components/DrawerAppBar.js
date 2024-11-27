@@ -16,7 +16,7 @@ import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { getToken } from "../api/TokenService";
 import AccountBoxIcon from "@mui/icons-material/AccountBox"; 
-import Font from "react-font";
+
 
 export default function DrawerAppBar(register, props) {
   
@@ -82,9 +82,9 @@ export default function DrawerAppBar(register, props) {
               to={purposes[index]}
               sx={{ textAlign: "center" }}
             >
-              <Font family="sans-serif">
+              <p>
                 <ListItemText primary={item} />
-              </Font>
+              </p>
             </ListItemButton>
           </ListItem>
         ))}
@@ -120,7 +120,7 @@ export default function DrawerAppBar(register, props) {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            <Font family="tahoma">
+          
               <img
                 src={"/logo.svg"}
                 alt="Logo"
@@ -131,7 +131,7 @@ export default function DrawerAppBar(register, props) {
                 }}
               />
               Nauka Pythona
-            </Font>
+          
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {navItems.map((item, index) => (
@@ -141,7 +141,7 @@ export default function DrawerAppBar(register, props) {
                 to={purposes[index]}
                 sx={{ color: "#fff", fontSize: "1.075em" }}
               >
-                <Font family="sans-serif">{item}</Font>
+                <p>{item}</p>
                 {item === profile && <AccountBoxIcon sx={{ margin: "1px" }} />}
               </Button>
             ))}

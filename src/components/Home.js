@@ -1,7 +1,6 @@
 import React from "react";
 import { Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import Font from "react-font";
 import ExampleConsole from "./semi-components/ExampleConsole";
 import { useEffect } from "react";
 import Footer from "./semi-components/Footer";
@@ -44,16 +43,16 @@ export default function Home() {
     <div sx={{display:"flex"}}>
       <div>
         <Paper elevation={2} style={paperStyle}>
-          <Font family="tahoma"></Font>
+          {/* <Font family="tahoma"></Font> */}
           <h1>Lekcje podstaw algorytmiki w języku Python</h1>
-          <Font family="sans-serif">
+          {/* <Font family="sans-serif"> */}
             <p>
               Jako nauczyciel możesz dodawać zadania wraz z opisem teoretycznym,
               jako uczeń możesz je rozwiązywać.
               <br />
               Możesz nauczyć się języka poprzez praktykę!
             </p>
-          </Font>
+          {/* </Font> */}
           <Button
             component={Link}
             to={"/register"}
@@ -66,10 +65,10 @@ export default function Home() {
 
         <div className="right-container">
           <Paper elevation={2} style={paperStyleTwo}>
-            <Font family="tahoma">
+            {/* <Font family="tahoma"> */}
               <h1>Walka o Szczyt: Zbieraj Punkty i Rywalizuj z Innymi!</h1>
-            </Font>
-            <Font family="sans-serif">
+            {/* </Font> */}
+            {/* <Font family="sans-serif"> */}
               <p>
                 Wyzwania kodowania są doskonałą okazją do rozwijania swoich
                 umiejętności programistycznych oraz pogłębiania wiedzy
@@ -79,7 +78,7 @@ export default function Home() {
                 Ty jesteś najlepszy. Pokaż, na co Cię stać, i sprawdź, jak
                 wypadasz w tej pasjonującej grze o kodowanie!
               </p>
-            </Font>
+            {/* </Font> */}
             <Button
               component={Link}
               to={"/ranking"}
@@ -91,11 +90,11 @@ export default function Home() {
           </Paper>
           <Paper elevation={2} style={paperStyleThree}>
             <ExampleConsole />
-            <Font family="tahoma">
+            {/* <Font family="tahoma"> */}
               <h1> Zdobądź wiedzę i rozwiązuj zadania z łatwością! </h1>
-            </Font>
+            {/* </Font> */}
 
-            <Font family="sans-serif">
+            {/* <Font family="sans-serif"> */}
               <p>
                 Każde zadanie w aplikacji zaczyna się od wprowadzenia
                 teoretycznego, które pozwoli Ci zgłębić istotne aspekty języka
@@ -105,7 +104,7 @@ export default function Home() {
                 rozwijaj swoje umiejętności programistyczne w sposób efektywny i
                 inspirujący!
               </p>
-            </Font>
+            {/* </Font> */}
             <Button
               component={Link}
               to={"/tasks"}

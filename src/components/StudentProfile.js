@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import studentlogo from "../student.jpeg";
-import Font from "react-font";
 import Footer from "./semi-components/Footer";
 const useStyles = makeStyles({
   points: {
@@ -33,10 +32,20 @@ const StudentProfile = (user) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const paperStyle = {
+   
     backgroundColor: "#FDF5E6",
     padding: "50px 20px",
-    width: 600,
-    margin: "20px auto",
+    width:"50%",
+    margin: "2% auto",
+    position: "relative",
+    textAlign: "center",
+  };
+  const paperStyleFirst = {
+    top: "4em",
+    backgroundColor: "#FDF5E6",
+    padding: "3% 2%",
+    width:"90%",
+    margin: "2% auto",
     position: "relative",
     textAlign: "center",
   };
@@ -57,8 +66,12 @@ const StudentProfile = (user) => {
   const retake = (e) => {
     navigate("/solutionRetake/" + e.target.value);
   };
+  const show = (e) => {
+    navigate("/solutionAbcRetake/" + e.target.value);
+  };
   const getInfo = () => {
-    fetch("http://localhost:8080/exercise/solutions/programming", {
+    
+    fetch("http://localhost:8080/solution/programming", {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
@@ -76,7 +89,7 @@ const StudentProfile = (user) => {
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
-        setPosition(result.key);
+        setPosition(result.key+1);
         setQuantity(result.value);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -84,15 +97,8 @@ const StudentProfile = (user) => {
 
   useEffect(() => {
     setStudent(user.user);
-    console.log(user.user);
     getInfo();
-  }, [student]);
-  if (!student)
-    return (
-      <div>
-        <CircularProgress />
-      </div>
-    );
+  },[user.user]);
 
   return (
     <div
@@ -103,7 +109,7 @@ const StudentProfile = (user) => {
       height: "100vh",
     }}
   >
-           <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
+           <div style={{ flex: 9, display: "flex", flexDirection: "column"  }}>
       <div
         className={classes.mainContainer}
         style={{
@@ -116,7 +122,7 @@ const StudentProfile = (user) => {
         <div
           style={{ display: "flex", flexBasis: "60%", flexDirection: "column" }}
         >
-          <Paper elevation={1} style={paperStyle}>
+          <Paper elevation={1} style={paperStyleFirst}>
             <div
               className={classes.mainContainer}
               style={{
@@ -125,6 +131,12 @@ const StudentProfile = (user) => {
                 alignItems: "flex-start",
               }}
             >
+              {!student&&(
+                 <div>
+                 <CircularProgress />
+               </div>
+              )}
+              {(student)&&
               <div
                 style={{
                   display: "flex",
@@ -132,16 +144,16 @@ const StudentProfile = (user) => {
                   flexBasis: "60%",
                 }}
               >
-                <Font family="tahoma">
+          
                   <h2>Profil ucznia:</h2>
                   <p>{student.name}</p>
                   <p>{student.email}</p>
                   <h4>Twój wynik: {student.score} pkt</h4>
                   <p>Pozycja w rankingu: {position}</p>
                   <p>Liczba osób biorących udział w rywalizacji:{quantity}</p>
-                </Font>
+              
               </div>
-
+                }
               <div
                 className={classes.textFieldContainer}
                 style={{
@@ -163,7 +175,9 @@ const StudentProfile = (user) => {
                   />
                 </Paper>
               </div>
+           
             </div>
+           
           </Paper>
         </div>
         <div
@@ -174,7 +188,7 @@ const StudentProfile = (user) => {
           }}
         >
           <Paper elevation={1} style={paperStyleTwo}>
-            <Font family="sans-serif">
+          
               <h3>Jako uczeń możesz rozwiązywać zadania:</h3>
               <h4>Na zadanie składa się:</h4>
 
@@ -189,16 +203,16 @@ const StudentProfile = (user) => {
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
               <h3>Możesz także poprawiać swoje rozwiązania</h3>
               <p>Uwaga! Ale tylko programistyczne!</p>
-            </Font>
+           
           </Paper>
         </div>
       </div>
 
       <div>
-        {exercisesWithScores.length != 0 && (
+        {exercisesWithScores.length !== 0 && (
           <Paper elevation={1} style={paperStyle}>
             <h3>Zadania, które rozwiązałeś:</h3>
-            {exercisesWithScores.map((solution, index) => (
+            {exercisesWithScores.map((solution) => (
               <Paper
                 elevation={6}
                 style={{
@@ -240,7 +254,7 @@ const StudentProfile = (user) => {
                       marginLeft: "auto",
                     }}
                   >
-                    <Button
+                    {(solution.retakeposibility==="true") && <Button
                       style={buttonStyle}
                       variant="contained"
                       value={solution.id}
@@ -248,7 +262,16 @@ const StudentProfile = (user) => {
                       onClick={retake}
                     >
                       Wykonaj ponownie
-                    </Button>
+                    </Button>}
+                   {(solution.retakeposibility==="false") &&  <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      value={solution.id}
+                      color="inherit"
+                      onClick={show}
+                    >
+                     Zobacz
+                    </Button>}
                   </div>
                 </div>
               </Paper>
@@ -257,7 +280,7 @@ const StudentProfile = (user) => {
         )}
       </div>
       </div>
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
+      <div style={{flex: 1, display: "flex", flexDirection: "column" }}>
       <Footer />
       </div>
     </div>

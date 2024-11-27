@@ -1,6 +1,6 @@
-import { Paper, Button } from "@mui/material";
+import { Paper } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import Font from "react-font";
+// import Font from "react-font";
 import { Link } from "react-router-dom";
 const Footer = () => {
   const paperStyle = {
@@ -14,7 +14,7 @@ const Footer = () => {
     <div
       style={{
         width: "100%",  
-        height: "25%",
+        height: "40%",
         fontSize: "5px",
       }}
     >
@@ -23,7 +23,7 @@ const Footer = () => {
           component="div"
           sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
         >
-          <Font family="tahoma">
+          
             <img
               src={"/logo.svg"}
               alt="Logo"
@@ -33,25 +33,25 @@ const Footer = () => {
                 marginRight: "10px",
               }}
             />
-            Copyright © 2023 Nauka Pythona
-          </Font>
+            Copyright © 2024 Nauka Pythona
+         
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            style={{ display: "flex", flexDirection: "column", gap: "10px"}}
           >
-            <li>
-              <Link to={"/profil"}>Profil</Link>
+            <li  >
+              <Link style={{color:"white"}} to={"/profil"}>Profil</Link>
             </li>
             <li>
-              <Link to={"/tasks"}>Zadania</Link>
+              <Link style={{color:"white"}} to={"/tasks"}>Zadania</Link>
             </li>
             <li>
-              <Link to={"/"}>Główna</Link>
+              <Link style={{color:"white"}}  to={"/"}>Główna</Link>
             </li>
             <li>
-              <Link to={"/ranking"}>Ranking</Link>
+              <Link style={{color:"white"}}  to={"/ranking"}>Ranking</Link>
             </li>
             <li>
-              <Link to={"/logout"}>Wyloguj</Link>
+              <Link style={{color:"white"}}  to={"/logout"}>Wyloguj</Link>
             </li>
           </div>
         </Typography>

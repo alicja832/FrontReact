@@ -6,10 +6,8 @@ export function getToken() {
       new Date(window.localStorage.getItem("expiration-date")).getTime()
   ) {
     console.log("halo");
-    const refreshToken = window.localStorage.getItem("refresh-token");
-    fetch("http://localhost:8080/user/refresh-token", {
-      headers: { Authorization: `Bearer ${refreshToken}` },
-      method: "GET",
+    fetch("http://localhost:8080/user/token", {
+      method: "GET"
     }).then((res) => {
       if (!res.ok) {
        setToken(null);
@@ -19,7 +17,7 @@ export function getToken() {
           const decoder = new TextDecoder("utf-8");
           const tokenvalue = decoder.decode(value.value);
           const token_dict = JSON.parse(tokenvalue);
-          token = token_dict["jwtToken"];
+          token = token_dict["token"];
           console.log(token);
           window.localStorage.setItem("token", token);
         });
@@ -36,10 +34,10 @@ export function setToken(token) {
 
   if (token !== null) {
     window.localStorage.setItem("token", token);
-    window.location.reload();
+    //window.location.reload();
   } else {
-    window.localStorage.removeItem("token");
     setExpirationDate(null);
+    setRefreshToken(null);
     window.location.reload();
   }
 
@@ -50,6 +48,7 @@ export function getRefreshToken() {
 }
 
 export function setRefreshToken(refreshToken) {
+
   window.localStorage.removeItem("refresh-token");
 
   if (refreshToken !== null) {

@@ -5,7 +5,6 @@ import { Container, Paper, Button, Box } from "@mui/material";
 import { FormControl } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { getToken } from "./api/TokenService";
-import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
 import teacherlogo from "../teacher.jpeg";
 import CircularProgress from "@mui/joy/CircularProgress";
@@ -42,21 +41,24 @@ const TeacherProfile = (user) => {
     width: "90%",
     margin: "3% auto",
     position: "relative",
+  
     textAlign: "center",
   };
-  const paperStyleX = {
+  const paperStyleForm = {
     backgroundColor: "#FDF5E6",
     padding: "2%",
     width: "90%",
     margin: "3% auto",
     position: "relative",
     textAlign: "center",
+    spaceBetween: "2%"
   };
-  const paperStyleThree = {
+  const paperStyleA = {
     backgroundColor: "#FDF5E6",
     padding: "2%",
     width: "60%",
     margin: "3% auto",
+    gap: "4%",
     position: "relative",
     textAlign: "center",
   };
@@ -80,7 +82,7 @@ const TeacherProfile = (user) => {
   const [indexofExercise, setIndexofExercise] = useState(0);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
-  const [maxPoints, setmaxPoints] = useState("");
+  const [maxPoints, setMaxPoints] = useState("");
   const [correctSolution, setcorrectSolution] = useState("");
   const [introduction, setIntroduction] = useState("");
   const [exercises, setExercises] = useState([]);
@@ -89,7 +91,6 @@ const TeacherProfile = (user) => {
   const [isFormTwoVisible, setIsFormTwoVisible] = useState(false);
   const [isExercises, setisExercises] = useState(false);
   const [WindowShown, setInfoWindowShown] = useState(false);
-  const [WindowTwoShown, setInfoWindowTwoShown] = useState(false);
   const [infoMessage, setMessage] = useState(false);
   const [firstOption, setFirstOption] = useState(null);
   const [secondOption, setSecondOption] = useState(null);
@@ -97,8 +98,12 @@ const TeacherProfile = (user) => {
   const [fourthOption, setFourthOption] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
   const [clicked, setClicked] = useState(false);
+  const [solutionpart, setSolutionPart] = useState("");
   const [teacher, setTeacher] = useState(null);
-
+  const [solutionParts, setSolutionParts] = useState([]);
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const [isLoading,setIsLoading] = useState(false);
+  
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -119,7 +124,7 @@ const TeacherProfile = (user) => {
   const clearData = () => {
     setName("");
     setContent("");
-    setmaxPoints("");
+    setMaxPoints("");
     setIntroduction("");
     setcorrectSolution("");
     setFirstOption("");
@@ -128,38 +133,65 @@ const TeacherProfile = (user) => {
     setFourthOption("");
     setCorrectAnswer("");
   };
+  
   const closeFormTwo = () => {
     clearData();
     setIsFormTwoVisible(false);
   };
+  
   const closeForm = () => {
     setIsFormVisible(false);
     console.log(correctSolution);
   };
+  
   const closeFormClose = () => {
     setIsFormCloseVisible(false);
     console.log(correctSolution);
   };
-  const showForm = () => {
+  
+  const showForm = async () => {
+    setSolutionPart("");
+    await setClicked(false);
+    await setIsFormFilled(false);
+    setSolutionParts([]);
     classInfo.setmessage(true);
     closeFormTwo();
     setIsFormCloseVisible(false);
     setIsFormVisible(true);
   };
+  
   const showFormClose = () => {
+   
     classInfo.setmessage(true);
     closeFormTwo();
     setIsFormVisible(false);
     setIsFormCloseVisible(true);
   };
+ 
   const showFormTwo = async (e) => {
+    setClicked(false)
+    setSolutionPart("");
+    setIsFormFilled(true);
     await closeFormTwo();
     classInfo.setmessage(true);
     setIsFormVisible(false);
     setIsFormCloseVisible(false);
     setIndexofExercise(e.target.value);
-    console.log(e.target.value);
+
     const found = exercises[e.target.value];
+    if (found.correctSolution) {
+      const url = "http://localhost:8080/solution/parts/" + found.id;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const parts = await response.json();
+      await setSolutionParts(parts);
+      console.log(parts);
+    }
     setContent(found.content);
     setName(found.name);
     setIntroduction(found.introduction);
@@ -167,36 +199,63 @@ const TeacherProfile = (user) => {
     setFirstOption(found.firstOption);
     setSecondOption(found.secondOption);
     setThirdOption(found.thirdOption);
-    setcorrectSolution(found.correctSolution);
-    setmaxPoints(found.maxPoints);
+    setMaxPoints(found.maxPoints);
     setIsFormTwoVisible(true);
   };
 
   const deleteExercise = (e) => {
-    setClicked(true);
-    console.log(e.target.value);
-    const url = "http://localhost:8080/exercise/" + e.target.value;
+    setIsLoading(true);
+    const url =
+      "http://localhost:8080/exercise/" + e.target.value;
     fetch(url, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
-    }).then(() => {
-      window.location.reload();
-    });
-    setClicked(false);
+    })
+      .then(() => {
+        setIsLoading(false);
+        setInfoWindowShown(true);
+        setMessage("Usunięto");
+        setTimeout(() => {
+          setInfoWindowShown(false);
+          getExercises();
+        }, 3000);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const editExercise = (e) => {
-    setClicked(true);
+   
+    if(maxPoints>solutionParts.length)
+    {
+      setClicked(true);
+      return;
+    }
+
+    setIsLoading(true);
+    const correctSolutions = [];
+    for(let i=0;i<maxPoints;i++)
+    {
+      if(solutionParts[i].correctSolutionPart)
+        correctSolutions.push(solutionParts[i].correctSolutionPart);
+      else
+        correctSolutions.push(solutionParts[i]);
+    }
+    console.log(correctSolutions);
+    const id = exercises[indexofExercise].id;
+    console.log(id);
     const exercise = {
+      id,
       name,
       introduction,
       content,
       teacher,
       maxPoints,
-      correctSolution,
+      correctSolutions,
     };
+    console.log(exercise.id);
     const url = "http://localhost:8080/exercise/programming";
-
     fetch(url, {
       method: "PUT",
       headers: {
@@ -204,32 +263,41 @@ const TeacherProfile = (user) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(exercise),
-    }).then((response) => {
-      if (response.ok) {
-        closeFormTwo();
-        setName("");
-        setContent("");
-        setmaxPoints("");
-        setcorrectSolution("");
-        setMessage("Zmieniono zadanie");
-        setInfoWindowShown(true);
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-        window.location.reload();
-      } else {
-        setMessage("Nie udało się zmienić zadania");
-        setInfoWindowShown(true);
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-      }
-    });
-    setClicked(false);
+    })
+      .then((response) => {
+        if (response.ok) {
+          clearData();
+          setIsLoading(false);
+          setMessage("Zmieniono zadanie");
+          setInfoWindowShown(true);
+          clearData();
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+          setTimeout(() => {
+            closeFormTwo();
+            getExercises();
+          }, 3000);
+        } else {
+          setMessage("Nie udało się zmienić zadania");
+          setIsLoading(false);
+          setInfoWindowShown(true);
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  
   };
+
   const editCloseExercise = (e) => {
-    setClicked(true);
+    setIsLoading(true);
+    const id = exercises[indexofExercise].id;
     const exercise = {
+      id,
       name,
       introduction,
       content,
@@ -241,7 +309,7 @@ const TeacherProfile = (user) => {
       fourthOption,
       correctAnswer,
     };
-    console.log(correctAnswer);
+
     const url = "http://localhost:8080/exercise/abc";
 
     fetch(url, {
@@ -253,18 +321,20 @@ const TeacherProfile = (user) => {
       body: JSON.stringify(exercise),
     }).then((response) => {
       if (response.ok) {
-        closeFormTwo();
-        setName("");
-        setContent("");
-        setmaxPoints("");
-        setcorrectSolution("");
+        
+        clearData();
+        setIsLoading(false);
         setMessage("Zmieniono zadanie");
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
         }, 3000);
-        window.location.reload();
+        setTimeout(() => {
+          closeFormTwo();
+          getExercises();
+        }, 3000);
       } else {
+        setIsLoading(false);
         setMessage("Nie udało się zmienić zadania");
         setInfoWindowShown(true);
         setTimeout(() => {
@@ -272,12 +342,27 @@ const TeacherProfile = (user) => {
         }, 3000);
       }
     });
-    setClicked(false);
+  };
+
+  const showSolutionsField = (e) => {
+    if (e.target.value) {
+      solutionParts.push(e.target.value);
+    }
+   
+    if (solutionParts.length === parseInt(maxPoints)) {
+      console.log(solutionParts);
+      setClicked(false);
+      setIsFormFilled(true);
+      return;
+    }
+    setSolutionPart("");
+    setClicked(true);
   };
   const addExercise = (e) => {
-    setClicked(true);
-    e.preventDefault();
+    
+    setIsLoading(true);
     if (isNaN(parseInt(maxPoints))) {
+      setIsLoading(false);
       setInfoWindowShown(true);
       setMessage("Wprowadzono złe dane.");
       setTimeout(() => {
@@ -285,16 +370,19 @@ const TeacherProfile = (user) => {
       }, 3000);
       return;
     }
+    const correctSolutions = solutionParts;
     const exercise = {
       name,
       introduction,
       content,
       maxPoints,
-      correctSolution,
+      correctSolutions,
       teacher,
     };
 
+    //const url = "https://naukapythona.azurewebsites.net/exercise/programming";
     const url = "http://localhost:8080/exercise/programming";
+
     fetch(url, {
       method: "POST",
       headers: {
@@ -307,27 +395,53 @@ const TeacherProfile = (user) => {
         if (!res.ok) {
           setInfoWindowShown(true);
           setMessage("Niepoprawny kod pythona");
+          setIsLoading(false);
           setTimeout(() => {
             setInfoWindowShown(false);
           }, 3000);
+          setTimeout(() => {
+            clearData();
+            closeForm();
+           
+          }, 3000);
           return;
         } else {
-          window.location.reload();
-          closeForm();
-          setName("");
-          setContent("");
-          setmaxPoints("");
-          setcorrectSolution("");
+
+          setIsLoading(false);
+          setInfoWindowShown(true);
+          setMessage("Dodano zadanie");
+          setIsLoading(false);
+          setTimeout(() => {
+            closeForm();
+            clearData();
+            setInfoWindowShown(false);
+            getExercises();
+          }, 3000);
+        
         }
       })
       .catch((error) => {
         console.log(error);
-      });
-    setClicked(false);
+      })
   };
+  const getExercises = ()=>{
+    fetch("http://localhost:8080/user/exercises", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        setExercises(result);
+        if (result.length !== 0) setisExercises(true);
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   const addCloseExercise = (e) => {
-    e.preventDefault();
-    setClicked(true);
+    setIsLoading(true);
     if (isNaN(parseInt(maxPoints))) {
       setInfoWindowShown(true);
       setMessage("Wprowadzono złe dane.");
@@ -356,177 +470,199 @@ const TeacherProfile = (user) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(exercise),
-    }).then((res) => {
-      if (!res.ok) {
-        setInfoWindowShown(true);
-        setMessage("Nie udało się dodać zadania");
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-        return;
-      } else {
-        window.location.reload();
-        closeFormClose();
-      }
-    });
-    setClicked(false);
+    })
+      .then((res) => {
+        if (!res.ok) {
+          setInfoWindowShown(true);
+          setMessage("Nie udało się dodać zadania");
+          setIsLoading(false);
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+          return;
+        } else {
+          setInfoWindowShown(true);
+          setMessage("Udało się dodać zadanie");
+          setIsLoading(false);
+          clearData();
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+          setTimeout(() => {
+            closeFormClose();
+            getExercises();
+          }, 3000);
+         
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    
   };
   useEffect(() => {
     setTeacher(user.user);
-    fetch("http://localhost:8080/user/exercises", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${getToken()}` },
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-        setExercises(result);
-        if (result.length !== 0) setisExercises(true);
-        console.log(result);
-      });
+    getExercises();
   }, []);
-  useEffect(() => {}, [indexofExercise]);
-  if (!teacher) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {}, [indexofExercise, solutionParts]);
+
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
   return (
-    <div>
-      <div
-        className={classes.mainContainer}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          padding: "10%",
-        }}
-      >
-        {!teacher && (
-          <Paper style={paperStyle}>
-            <CircularProgress />
-          </Paper>
-        )}
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
         <div
-          style={{ display: "flex", flexBasis: "60%", flexDirection: "column" }}
-        >
-          <Paper elevation={1} style={paperStyle}>
-            <div
-              className={classes.mainContainer}
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "flex-start",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexBasis: "60%",
-                }}
-              >
-                <Font family="tahoma">
-                  <h2>Profil nauczyciela</h2>
-                  <p>{teacher.name}</p>
-                  <p>{teacher.email}</p>
-                </Font>
-              </div>
-              <div
-                className={classes.textFieldContainer}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexBasis: "40%",
-                }}
-              >
-                <Paper elevation={3}>
-                  <img
-                    src={teacherlogo}
-                    alt="Logo"
-                    style={{
-                      height: "50%",
-                      width: "50%",
-                      verticalAlign: "middle",
-                      marginRight: "10px",
-                    }}
-                  />
-                </Paper>
-              </div>
-            </div>
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Button
-                style={buttonStyle}
-                variant="contained"
-                color="secondary"
-                onClick={showForm}
-              >
-                Dodaj zadanie otwarte
-              </Button>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Button
-                style={buttonStyle}
-                variant="contained"
-                color="secondary"
-                onClick={showFormClose}
-              >
-                Dodaj zadanie zamknięte
-              </Button>
-            </Box>
-          </Paper>
-        </div>
-        <div
+          className={classes.mainContainer}
           style={{
             display: "flex",
-            flexDirection: "column",
-            flexBasis: "40%",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            padding: "10%",
           }}
         >
-          <Paper elevation={1} style={paperStyleTwo}>
-            <Font family="sans-serif">
+          {!teacher && (
+            <Paper style={paperStyle}>
+              <CircularProgress />
+            </Paper>
+          )}
+          {teacher && (
+            <div
+              style={{
+                display: "flex",
+                flexBasis: "60%",
+                flexDirection: "column",
+              }}
+            >
+              <Paper elevation={1} style={paperStyle}>
+                <div
+                  className={classes.mainContainer}
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flexBasis: "60%",
+                    }}
+                  >
+                    <h2>Profil nauczyciela</h2>
+                    <p>{teacher.name}</p>
+                    <p>{teacher.email}</p>
+                  </div>
+                  <div
+                    className={classes.textFieldContainer}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flexBasis: "40%",
+                    }}
+                  >
+                    <Paper elevation={3}>
+                      <img
+                        src={teacherlogo}
+                        alt="Logo"
+                        style={{
+                          height: "50%",
+                          width: "50%",
+                          verticalAlign: "middle",
+                          marginRight: "10px",
+                        }}
+                      />
+                    </Paper>
+                  </div>
+                </div>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    onClick={showForm}
+                  >
+                    Dodaj zadanie otwarte
+                  </Button>
+                </Box>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    onClick={showFormClose}
+                  >
+                    Dodaj zadanie zamknięte
+                  </Button>
+                </Box>
+              </Paper>
+            </div>
+          )}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flexBasis: "40%",
+            }}
+          >
+            <Paper elevation={1} style={paperStyleTwo}>
               <h3>Jako nauczyciel możesz dodawać zadania:</h3>
-              <h4>Na zadanie składa się:</h4>
+              <h4>Na zadanie otwarte składa się:</h4>
 
               <li>
                 {" "}
                 Wstęp teoretyczny informujący, jakich zagadnień teoretycznych ma
-                dotyczyć zadanie (zarówno teoria samego języka programowania jak
-                i teoria z zagadnień algorytmicznych), który ma pomóc w
-                rozwiązaniu.
+                dotyczyć zadanie (teoria z zagadnień algorytmicznych), który ma
+                pomóc w rozwiązaniu.
               </li>
-              <li>Treść zadania, która informuje, co należy zrobić </li>
-              <li>Twoja propozycja rozwiązania</li>
+              <li>
+                Treść zadania, która informuje, co ma robić kod użytkownika{" "}
+              </li>
+              <li>Twoja propozycja rozwiązania podzielona na części, liczba części - maksymalna ilość punktów za zadanie</li>
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
-            </Font>
-          </Paper>
-        </div>
-      </div>
+              <h4>Na zadanie zamknięte składa się:</h4>
 
-      <div>
+              <li>
+                {" "}
+                Wstęp teoretyczny informujący, jakich zagadnień ze składni
+                Pythona ma dotyczyć zadanie, który ma pomóc w rozwiązaniu.
+              </li>
+              <li>Treść zadania </li>
+              <li>Trzy lub cztery propozycje rozwiązania(A,B,C,D)</li>
+              <li>Prawidłowa odpowiedź: A/B/C/D</li>
+              <li>Maksymalną ilość punktów do zdobycia za zadanie</li>
+            </Paper>
+          </div>
+        </div>
+
         {(isFormVisible || isFormCloseVisible) && (
-          <Paper elevation={1} style={paperStyleThree}>
+          <Paper elevation={1} style={paperStyleA} >
             <h3>Dodaj zadanie</h3>
-            <form className={classes.root} noValidate autoComplete="off">
+            <form className={classes.root} style={{gap:"4%"}} noValidate autoComplete="off">
               <TextField
                 id="outlined-basic"
                 label="Nazwa"
                 variant="outlined"
                 fullWidth
                 value={name}
-                sx={{ backgroundColor: "white" }}
+                sx={{ backgroundColor: "white", marginBottom:"2%"}}
                 onChange={(e) => setName(e.target.value)}
               />
 
@@ -538,6 +674,7 @@ const TeacherProfile = (user) => {
                 fullWidth
                 variant="outlined"
                 value={introduction}
+                sx={{ marginBottom:"2%"}}
                 onChange={(e) => setIntroduction(e.target.value)}
               />
               <Textarea
@@ -548,22 +685,64 @@ const TeacherProfile = (user) => {
                 variant="outlined"
                 fullWidth
                 value={content}
+                sx={{ marginBottom:"2%"}}
                 onChange={(e) => setContent(e.target.value)}
               />
-              {isFormVisible && (
-                <Textarea
-                  sx={{ backgroundColor: "black", color: "white" }}
-                  minRows={2}
-                  id="outlined-basic"
-                  label="Poprawne rozwiązanie"
-                  placeholder="Poprawne rozwiązanie"
-                  variant="outlined"
-                  fullWidth
-                  value={correctSolution}
-                  onChange={(e) => setcorrectSolution(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
+              <TextField
+                id="outlined-basic"
+                sx={{ backgroundColor: "white",marginBottom:"2%" }}
+                label="max ilość punktów"
+                variant="outlined"
+                fullWidth
+           
+                value={maxPoints}
+                onChange={(e) => {
+                  setMaxPoints(e.target.value);
+                }}
+              />
+                <div>
+                    {solutionParts.map((solutionPart, index) => (
+                      <Textarea
+                        minRows={2}
+                        id={index}
+                        label="Fragment poprawnego rozwiązania"
+                        placeholder="Fragment poprawnego rozwiązania"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ backgroundColor: "#000", color: "white",marginBottom:"2%" }}
+                        defaultValue={solutionPart}
+                      />
+                    ))}
+                  </div>
+               {clicked && !isFormCloseVisible && (<Paper elevation={1} style={paperStyleA}>
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Fragment rozwiązania"
+                    placeholder="fragment rozwiązania"
+                    sx={{ backgroundColor: "#000", color: "white",marginBottom:"2%"  }}
+                    variant="outlined"
+                    fullWidth
+                    value={solutionpart}
+                    onChange={(e) => setSolutionPart(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    value={solutionpart}
+                    onClick={(e) => {
+                      showSolutionsField(e);
+                    }}
+                  >
+                    Dalej
+                  </Button>
+                  
+                </Paper>
               )}
+              
               {isFormCloseVisible && (
                 <div>
                   <Textarea
@@ -573,6 +752,7 @@ const TeacherProfile = (user) => {
                     placeholder="Odpowiedź a"
                     variant="outlined"
                     fullWidth
+                    sx={{ marginBottom:"2%"}}
                     value={firstOption}
                     onChange={(e) => setFirstOption(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -584,6 +764,7 @@ const TeacherProfile = (user) => {
                     placeholder="Odpowiedź b"
                     variant="outlined"
                     fullWidth
+                    sx={{ marginBottom:"2%"}}
                     value={secondOption}
                     onChange={(e) => setSecondOption(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -595,6 +776,7 @@ const TeacherProfile = (user) => {
                     placeholder="Odpowiedź c"
                     variant="outlined"
                     fullWidth
+                    sx={{ marginBottom:"2%"}}
                     value={thirdOption}
                     onChange={(e) => setThirdOption(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -606,14 +788,15 @@ const TeacherProfile = (user) => {
                     placeholder="Odpowiedź d (opcjonalna)"
                     variant="outlined"
                     fullWidth
+                    sx={{ marginBottom:"2%"}}
                     value={fourthOption}
                     onChange={(e) => setFourthOption(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
                   <TextField
-                    sx={{ backgroundColor: "white" }}
+                    sx={{ backgroundColor: "white",marginBottom:"2%" }}
                     id="outlined-basic"
-                    label="poprawna odpowiedź"
+                    label="Poprawna odpowiedź (A/B/C/D)"
                     variant="outlined"
                     fullWidth
                     value={correctAnswer}
@@ -621,15 +804,6 @@ const TeacherProfile = (user) => {
                   />
                 </div>
               )}
-              <TextField
-                id="outlined-basic"
-                sx={{ backgroundColor: "white" }}
-                label="max ilość punktów"
-                variant="outlined"
-                fullWidth
-                value={maxPoints}
-                onChange={(e) => setmaxPoints(e.target.value)}
-              />
 
               <FormControl fullWidth></FormControl>
               <div
@@ -639,17 +813,47 @@ const TeacherProfile = (user) => {
                   alignItems: "center",
                 }}
               >
+                {!isFormFilled && !clicked && !isFormCloseVisible && (
+                 
+                   <div>
+                    
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      onClick={showSolutionsField}
+                    >
+                        Dalej
+                    </Button>
+                    </div>
+              
+                )}
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    onClick={addExercise}
-                  >
-                    Dodaj
-                  </Button>
+                {isLoading&&<CircularProgress/>}
+                  {isFormFilled && !isFormCloseVisible && !isLoading &&(
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      onClick={addExercise}
+                    >
+                      Dodaj
+                    </Button>
+                  )}
+               
+                  {isFormCloseVisible && (
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      onClick={addCloseExercise}
+                    >
+                      Dodaj
+                    </Button>
+                  )}
                 </Box>
               </div>
+
               <div
                 style={{
                   display: "flex",
@@ -664,9 +868,8 @@ const TeacherProfile = (user) => {
             </form>
           </Paper>
         )}
-
         {isExercises && (
-          <Paper elevation={1} style={paperStyleX}>
+          <Paper elevation={1} style={paperStyleForm}>
             <h3>Twoje zadania:</h3>
             {exercises.map((exercise, index) => (
               <Paper
@@ -685,207 +888,266 @@ const TeacherProfile = (user) => {
                     justifyContent: "space-between",
                     alignItems: "center",
                     flexDirection: "row",
+                    left: "auto"
                   }}
                 >
                   <h3>{exercise.name}</h3>
                   <p>{exercise.content}</p>
+                  <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                        }}
+                      >
                   <p>Ilość rozwiązań:</p>
                   <Box className={classes.points}>{exercise.quantity}</Box>
                   <p>Najczęściej osiągany wynik:</p>
                   <Box className={classes.points}>
                     {exercise.score}/{exercise.maxPoints}
                   </Box>
-                  <div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft: "auto",
-                      }}
+                 
+                  <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                        }}
+                      >
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      value={exercise.id}
+                      color="inherit"
+                      onClick={deleteExercise}
                     >
-                      <Button
-                        style={buttonStyle}
-                        variant="contained"
-                        value={exercise.id}
-                        color="inherit"
-                        onClick={deleteExercise}
-                      >
-                        Usuń
-                      </Button>
+                      
+                      Usun
+                    </Button>
 
-                      <Button
-                        style={buttonStyle}
-                        variant="contained"
-                        value={index}
-                        color="inherit"
-                        onClick={showFormTwo}
-                      >
-                        Edytuj
-                      </Button>
-                    </div>
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      value={index}
+                      color="inherit"
+                      onClick={showFormTwo}
+                    >
+                     Edytuj
+                    </Button>
+                  </div>
                   </div>
                 </div>
               </Paper>
             ))}
           </Paper>
         )}
-      </div>
 
-      {isFormTwoVisible && (
-        <Container>
-          <Paper elevation={1} style={paperStyleX}>
-            <form className={classes.root} noValidate autoComplete="off">
-              <h3>Edytuj zadanie</h3>
-              <TextField
-                id="outlined-basic"
-                label="Nazwa"
-                fullWidth
-                variant="outlined"
-                sx={{ backgroundColor: "white" }}
-                defaultValue={exercises[indexofExercise].name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <Textarea
-                id="outlined-basic"
-                label="Wstęp teoretyczny"
-                variant="outlined"
-                placeholder="Wstęp teoretyczny"
-                fullWidth
-                defaultValue={exercises[indexofExercise].introduction}
-                onChange={(e) => setIntroduction(e.target.value)}
-              />
-
-              <Textarea
-                id="outlined-basic"
-                variant="outlined"
-                label="Treść"
-                placeholder="Treść"
-                fullWidth
-                defaultValue={exercises[indexofExercise].content}
-                onChange={(e) => setContent(e.target.value)}
-              />
-              {exercises[indexofExercise].correctSolution && (
-                <Textarea
-                  minRows={2}
-                  id="outlined-basic"
-                  label="Poprawne rozwiązanie"
-                  placeholder="Poprawne rozwiązanie"
-                  variant="outlined"
-                  fullWidth
-                  defaultValue={exercises[indexofExercise].correctSolution}
-                  onChange={(e) => setcorrectSolution(e.target.value)}
-                />
-              )}
-              {exercises[indexofExercise].firstOption && (
-                <Textarea
-                  minRows={2}
-                  id="outlined-basic"
-                  label="Odpowiedź A"
-                  placeholder="Odpowiedź A"
-                  variant="outlined"
-                  fullWidth
-                  defaultValue={exercises[indexofExercise].firstOption}
-                  onChange={(e) => setFirstOption(e.target.value)}
-                />
-              )}
-              {exercises[indexofExercise].secondOption && (
-                <Textarea
-                  minRows={2}
-                  id="outlined-basic"
-                  label="Odpowiedź B"
-                  fullWidth
-                  defaultValue={exercises[indexofExercise].secondOption}
-                  onChange={(e) => setSecondOption(e.target.value)}
-                />
-              )}
-              {exercises[indexofExercise].thirdOption && (
-                <Textarea
-                  minRows={2}
-                  id="outlined-basic"
-                  variant="outlined"
-                  fullWidth
-                  defaultValue={exercises[indexofExercise].thirdOption}
-                  onChange={(e) => setThirdOption(e.target.value)}
-                />
-              )}
-              {
-                <Textarea
-                  minRows={2}
-                  id="outlined-basic"
-                  variant="outlined"
-                  placeholder="Odpowiedź d(opcjonalna)"
-                  fullWidth
-                  defaultValue={exercises[indexofExercise].fourthOption}
-                  onChange={(e) => setFourthOption(e.target.value)}
-                />
-              }
-              {exercises[indexofExercise].correctAnswer && (
+        {isFormTwoVisible && (
+          <Container>
+            <Paper elevation={1} style={paperStyleForm}>
+              <form className={classes.root} noValidate autoComplete="off">
+                <h3>Edytuj zadanie</h3>
                 <TextField
                   id="outlined-basic"
+                  label="Nazwa"
+                  sx={{ backgroundColor: "white",marginBottom:"2%" }}
+                  fullWidth
+                  variant="outlined"
+              
+                  defaultValue={exercises[indexofExercise].name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+
+                <Textarea
+                  id="outlined-basic"
+                  label="Wstęp teoretyczny"
+                  variant="outlined"
+                  placeholder="Wstęp teoretyczny"
+                  sx={{ marginBottom:"2%" }}
+                  fullWidth
+                  defaultValue={exercises[indexofExercise].introduction}
+                  onChange={(e) => setIntroduction(e.target.value)}
+                />
+
+                <Textarea
+                  id="outlined-basic"
+                  variant="outlined"
+                  label="Treść"
+                  placeholder="Treść"
+                  fullWidth
+                  sx={{ marginBottom:"2%" }}
+                  defaultValue={exercises[indexofExercise].content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+                {exercises[indexofExercise].correctSolution && (
+                  <div>
+                    {solutionParts.map((solutionPart, index) => (
+                      <Textarea
+                        minRows={2}
+                        id={index}
+                        label="Fragment poprawnego rozwiązania"
+                        placeholder="Fragment poprawnego rozwiązania"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ backgroundColor: "#000", color: "white",marginBottom:"2%" }}
+                        defaultValue={solutionPart.correctSolutionPart? solutionPart.correctSolutionPart: solutionPart}
+                        onChange={(e) => (solutionPart.correctSolutionPart = e.target.value)}
+                      />
+                    ))}
+                  </div>
+                )}
+                {exercises[indexofExercise].firstOption && (
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź A"
+                    placeholder="Odpowiedź A"
+                    variant="outlined"
+                    sx={{ marginBottom:"2%" }}
+                    fullWidth
+                    defaultValue={exercises[indexofExercise].firstOption}
+                    onChange={(e) => setFirstOption(e.target.value)}
+                  />
+                )}
+                {exercises[indexofExercise].secondOption && (
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Odpowiedź B"
+                    sx={{ marginBottom:"2%" }}
+                    fullWidth
+                    defaultValue={exercises[indexofExercise].secondOption}
+                    onChange={(e) => setSecondOption(e.target.value)}
+                  />
+                )}
+                {exercises[indexofExercise].thirdOption && (
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    variant="outlined"
+                    sx={{ marginBottom:"2%" }}
+                    fullWidth
+                    defaultValue={exercises[indexofExercise].thirdOption}
+                    onChange={(e) => setThirdOption(e.target.value)}
+                  />
+                )}
+                {exercises[indexofExercise].fourthOption && (
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    variant="outlined"
+                    placeholder="Odpowiedź d(opcjonalna)"
+                    sx={{ marginBottom:"2%" }}
+                    fullWidth
+                    defaultValue={exercises[indexofExercise].fourthOption}
+                    onChange={(e) => setFourthOption(e.target.value)}
+                  />
+                )}
+                {exercises[indexofExercise].correctAnswer && (
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    fullWidth
+                    sx={{ backgroundColor: "white",marginBottom:"2%" }}
+                    defaultValue={exercises[indexofExercise].correctAnswer}
+                    onChange={(e) => setCorrectAnswer(e.target.value)}
+                  />
+                )}
+                <TextField
+                  id="outlined-basic"
+                  label="max ilość punktów"
                   variant="outlined"
                   fullWidth
-                  sx={{ backgroundColor: "white" }}
-                  defaultValue={exercises[indexofExercise].correctAnswer}
-                  onChange={(e) => setCorrectAnswer(e.target.value)}
+                  sx={{ backgroundColor: "white",marginBottom:"2%" }}
+                  defaultValue={exercises[indexofExercise].maxPoints}
+                  onChange={(e) => setMaxPoints(e.target.value)}
                 />
+                    {clicked && !isFormCloseVisible && (<Paper elevation={1} style={paperStyleA}>
+                  <Textarea
+                    minRows={2}
+                    id="outlined-basic"
+                    label="Fragment rozwiązania"
+                    placeholder="fragment rozwiązania"
+                    sx={{ backgroundColor: "#000", color: "white",marginBottom:"2%"  }}
+                    variant="outlined"
+                    fullWidth
+                    value={solutionpart}
+                    onChange={(e) => setSolutionPart(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    value={solutionpart}
+                    onClick={(e) => {
+                      showSolutionsField(e);
+                    }}
+                  >
+                    Dalej
+                  </Button>
+                  
+                </Paper>
               )}
-              <TextField
-                id="outlined-basic"
-                label="max ilość punktów"
-                variant="outlined"
-                fullWidth
-                sx={{ backgroundColor: "white" }}
-                defaultValue={exercises[indexofExercise].maxPoints}
-                onChange={(e) => setmaxPoints(e.target.value)}
-              />
-              <FormControl fullWidth></FormControl>
+                <FormControl fullWidth></FormControl>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box display="flex" flexDirection="column" gap={2}>
+                     {isLoading&&<CircularProgress/>}
+                    {exercises[indexofExercise].correctSolution && (
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        color="secondary"
+                        value={indexofExercise}
+                        onClick={editExercise}
+                      >
+                       
+                         Zmień
+                      </Button>
+                    )}
+                    {exercises[indexofExercise].correctAnswer && (
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        color="secondary"
+                        value={indexofExercise}
+                        onClick={editCloseExercise}
+                      >
+                    Zmień
+                      </Button>
+                    )}
+                  </Box>
+                </div>
+              </form>
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "center", 
                   alignItems: "center",
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                  {exercises[indexofExercise].correctSolution && (
-                    <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      color="secondary"
-                      value={indexofExercise}
-                      onClick={editExercise}
-                    >
-                      Zmień
-                    </Button>
-                  )}
-                  {exercises[indexofExercise].correctAnswer && (
-                    <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      color="secondary"
-                      value={indexofExercise}
-                      onClick={editCloseExercise}
-                    >
-                      Zmień
-                    </Button>
-                  )}
+                  <Box display="flex" flexDirection="column" gap={2}>
+                    {WindowShown && <Toast message={infoMessage} />}
+                  </Box>
                 </Box>
-                <Box display="flex" flexDirection="column" gap={2}>
-                  {WindowShown && <Toast message={infoMessage} />}
-                </Box>
-              
               </div>
-            </form>
-          </Paper>
-        </Container>
-      )}
-        <div
-                  style={{ flex: 2, display: "flex", flexDirection: "column" }}
-                >
-                  <Footer />
-                </div>
+            </Paper>
+          </Container>
+        )}
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Footer />
+      </div>
     </div>
   );
 };

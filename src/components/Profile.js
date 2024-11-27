@@ -8,7 +8,8 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   
   useEffect(() => {
-    fetch("http://localhost:8080/user/", {
+    //fetch("https://naukapythona.azurewebsites.net/user/"
+    fetch("http://localhost:8080/user/",{
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
@@ -16,6 +17,8 @@ const Profile = () => {
       .then((result) => {
         console.log(result);
         setUser(result[0]);
+      }).catch((error)=>{
+        console.log(error);
       });
   },[]);
 

@@ -1,19 +1,27 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { makeStyles } from "@mui/styles";
-import TextField from "@mui/material/TextField";
-import { Container, Paper, Button, Box } from "@mui/material";
-import { FilledInput, IconButton, InputAdornment } from "@mui/material";
+import {
+  TextField,
+  Container,
+  Paper,
+  Button,
+  Box,
+  FilledInput,
+  IconButton,
+  InputAdornment,
+  CircularProgress,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { MenuItem } from "@mui/material";
-import { Select, InputLabel, FormControl } from "@mui/material";
-import {  setToken,setRefreshToken,setExpirationDate ,getToken} from "./api/TokenService";
-import { classInfo } from "./semi-components/MyParticles";
 import Footer from "./semi-components/Footer";
-const useStyles = makeStyles((theme) => ({}));
-export default function Register(props) {
+import { setToken, setExpirationDate } from "./api/TokenService";
+
+export default function Register() {
   const paperStyle = {
-    top: "4em",
+    top: "5em",
     padding: "4% 4%",
     width: "40%",
     margin: "1% auto",
@@ -28,185 +36,153 @@ export default function Register(props) {
   const [roles, setRoles] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [psw, setPsw] = useState(false);
-  const [errorMessage, seterrorMessage] = useState(false);
-  const timeout = 3000;
-  const handleShowPsw = () => setPsw((show) => !show);
-  const handleHidePsw = (e) => {
-    e.preventDefault();
-  };
-  const classes = useStyles();
-  const [infoWindowShown, setInfoWindowShown] = useState(false);
-  const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
+  const [pswVisible, setPswVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const navigate = useNavigate();
+
+  const timeout = 3000;
+
+  const handleShowPsw = () => setPswVisible((prev) => !prev);
+
   const validateData = () => {
     if (!email.includes("@")) {
-      seterrorMessage("Podano zły adres email");
-      seterrorInfoWindowShown(true);
-      setTimeout(() => {
-        seterrorInfoWindowShown(false);
-      }, timeout);
-      throw new Error(`Podano zły adres email!`);
+      throw new Error("Podano zły adres email");
+    }
+    if (password.length<8) {
+      throw new Error("Hasło powinno mieć 8 znaków minimum");
     }
     if (password !== passwordConfirm) {
-      seterrorMessage("Podane hasła różnią się");
-      seterrorInfoWindowShown(true);
-      setTimeout(() => {
-        seterrorInfoWindowShown(false);
-      }, timeout);
-      throw new Error(`Podane hasła różnią się !`);
+      throw new Error("Podane hasła różnią się");
     }
   };
-  const register = (e) => {
-    
+
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
     try {
       validateData();
-    } catch (Error) {
-      return;
-    }
-    classInfo.setmessage(false);
-    const role = roles === 1 ? "TEACHER" : "STUDENT";
-    const student = { name, email, password, role };
-    const url = "http://localhost:8080/user/";
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(student),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          const promise1 = Promise.resolve(response.body.getReader().read());
-          promise1.then((value) => {
-            const decoder = new TextDecoder("utf-8");
-            const text = decoder.decode(value.value);
-            seterrorMessage(text);
-          });
-          setInfoWindowShown(false);
-          seterrorInfoWindowShown(true);
-          setTimeout(() => {
-            seterrorInfoWindowShown(false);
-          }, timeout);
-        } else {
-          fetch("http://localhost:8080/user/authenticate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(student),
-          }).then((res) => {
-            if (!res.ok) {
-              seterrorMessage("Błąd rejestracji, spróbuj ponownie.");
-              setInfoWindowShown(false);
-              seterrorInfoWindowShown(true);
-              setTimeout(() => {
-                seterrorInfoWindowShown(false);
-              }, timeout);
-            } else {
-              const promise1 = Promise.resolve(res.body.getReader().read());
-              promise1.then((value) => {
-                const decoder = new TextDecoder("utf-8");
-                const token = decoder.decode(value.value);
-                const token_dict = JSON.parse(token);
-                console.log(token_dict["jwtExpirationDate"]);
-                setInfoWindowShown(true);
-                setTimeout(() => {
-                  setInfoWindowShown(false);     
-                  setToken(token_dict["jwtToken"]);
-                  setRefreshToken(token_dict["refreshToken"]);
-                  setExpirationDate(token_dict["jwtExpirationDate"]);
-                 
-                }, timeout);
-                
-              });
-            }
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        classInfo.setmessage(false);
-        seterrorMessage("Błąd połączenia z serwerem");
-        setInfoWindowShown(false);
-        seterrorInfoWindowShown(true);
-        setTimeout(() => {
-          seterrorInfoWindowShown(false);
-        }, timeout);
-      });
-      if(getToken())
-      {
-        navigate('/profil');
-      }
-  };
+      const role = roles === 1 ? "TEACHER" : "STUDENT";
+      const student = { name, email, password, role };
 
-  
+      const registerResponse = await fetch("http://localhost:8080/user/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(student),
+      });
+
+      if (!registerResponse.ok) {
+        const errorText = await registerResponse.text();
+        throw new Error(errorText || "Rejestracja nie powiodła się");
+      }
+
+      const authResponse = await fetch(
+        "http://localhost:8080/user/authenticate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, password }),
+        }
+      );
+
+      if (!authResponse.ok) {
+        throw new Error("Błąd logowania po rejestracji. Spróbuj ponownie.");
+      }
+
+      const authData = await authResponse.json();
+      setToken(authData.token);
+      setExpirationDate(authData.jwtExpirationDate);
+      console.log(authData.jwtExpirationDate);
+      const url = "http://localhost:8080/user/refreshtoken";
+      // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
+      const refreshToken = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      if (!refreshToken.ok) {
+        throw new Error("Błąd logowania po rejestracji. Spróbuj ponownie.");
+      }
+      console.log(refreshToken);
+      setSuccessMessage("Zarejestrowano!");
+      window.location.reload();
+      setTimeout(() => {
+        navigate("/profil");
+      }, timeout);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 2*timeout);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   function Toast({ message }) {
+  
     return <div className="toast">{message}</div>;
   }
-
   return (
-    <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
         <Container>
           <Paper elevation={3} style={paperStyle}>
             <div style={{ fontSize: "large", marginBottom: "8%" }}>
               <img
-                src={"/logo.svg"}
+                src="/logo.svg"
                 alt="Logo"
-                style={{
-                  height: "3%",
-                  verticalAlign: "middle",
-                }}
+                style={{ height: "3%", verticalAlign: "middle" }}
               />
               Nauka Pythona
             </div>
-            <form className={classes.root} noValidate autoComplete="off">
+            <form onSubmit={handleRegister}>
               <TextField
-                id="outlined-basic"
                 label="Nazwa użytkownika"
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (e.target.value !== "") classInfo.setmessage(true);
-                }}
-                sx={{
-                  marginBottom: "16px",
-                  "&.Mui-focused fieldset": {
-                    borderColor: "red",
-                  },
-                }}
+                onChange={(e) => setName(e.target.value)}
+                sx={{ marginBottom: "16px" }}
               />
               <TextField
-                id="outlined-basic"
                 label="Adres e-mail"
                 variant="outlined"
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 sx={{ marginBottom: "16px" }}
+                error={!!errorMessage && !email.includes("@")}
+                helperText={
+                  !!errorMessage && !email.includes("@")
+                    ? "Podano zły adres email"
+                    : ""
+                }
               />
               <FilledInput
                 value={password}
                 placeholder="Hasło"
                 onChange={(e) => setPassword(e.target.value)}
-                type={psw ? "text" : "password"}
+                type={pswVisible ? "text" : "password"}
                 fullWidth
                 sx={{ marginBottom: "16px" }}
+                error={!!errorMessage && password.length<8}
+                helperText={
+                  !!errorMessage && !password.length<8
+                    ? "Hasło powinno mieć długość minimum 8 znaków"
+                    : ""
+                }
                 endAdornment={
                   <InputAdornment position="start">
-                    <IconButton
-                      onClick={handleShowPsw}
-                      onMouseDown={handleHidePsw}
-                      edge="end"
-                    >
-                      {psw ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
+                    <IconButton onClick={handleShowPsw}>
+                      {pswVisible ? (
+                        <VisibilityOffOutlined />
+                      ) : (
+                        <VisibilityOutlined />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 }
@@ -215,30 +191,14 @@ export default function Register(props) {
                 value={passwordConfirm}
                 placeholder="Potwierdzenie hasła"
                 onChange={(e) => setPasswordConfirm(e.target.value)}
-                type={psw ? "text" : "password"}
+                type={pswVisible ? "text" : "password"}
                 fullWidth
                 sx={{ marginBottom: "16px" }}
-                endAdornment={
-                  <InputAdornment position="start">
-                    <IconButton
-                      onClick={handleShowPsw}
-                      onMouseDown={handleHidePsw}
-                      edge="end"
-                    >
-                      {psw ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                    </IconButton>
-                  </InputAdornment>
-                }
               />
-              <div>
-                <p>Wybierz, jaką rolę będziesz pełnić:</p>
-              </div>
-              <FormControl fullWidth>
-                <InputLabel id="role-label">Rola</InputLabel>
+              <FormControl fullWidth sx={{ marginBottom: "16px" }}>
+                <InputLabel>Rola</InputLabel>
                 <Select
-                  labelId="role-label"
                   value={roles}
-                  sx={{ marginBottom: "16px" }}
                   onChange={(e) => setRoles(e.target.value)}
                 >
                   <MenuItem value={0}>Uczeń</MenuItem>
@@ -253,33 +213,32 @@ export default function Register(props) {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
+                 {(!successMessage)&&
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#001f3f" }}
-                    onClick={register}
+                    type="submit"
+                    disabled={isLoading}
                   >
-                    Zarejestruj
+                    {isLoading ? <CircularProgress size={24} /> : "Zarejestruj"}
                   </Button>
-                </Box>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Box display="flex" flexDirection="column" gap={2}>
-                  {infoWindowShown && <Toast message="Zarejestrowano!" />}
-                  {errorWindowShown && <Toast message={errorMessage} />}
+                  } 
+                  <Box>
+                  {successMessage && (
+                   <Toast message={successMessage}/>
+                  )}
+                  {errorMessage && (
+                    <Toast sx={{backgroundColor:"red"}} message={errorMessage}/>
+                  )}
+                  </Box>
                 </Box>
               </div>
             </form>
           </Paper>
         </Container>
       </div>
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 1 }}>
+        <Footer />
       </div>
     </div>
   );

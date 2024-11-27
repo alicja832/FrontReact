@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { TextField, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-import Font from "react-font";
-import { classInfo } from "./semi-components/MyParticles";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
+import { Textarea } from "@mui/joy";
 
 const useStyles = makeStyles({
   position: "relative",
@@ -58,9 +57,20 @@ const useStyles = makeStyles({
     position: "relative",
     backgroundColor: "#000 !important",
     color: "#fff !important",
-    padding: "1%",
-    width: "100%",
+    width: "90%",
     marginTop: "1%",
+    display: "block",
+    padding: "1%",
+    justifyContent: "center",
+    flexDirection: "row",
+    fontWeight: "lighter",
+  },
+  ExpectedOutput: {
+    position: "relative",
+    backgroundColor: "#000 !important",
+    color: "#fff !important",
+    width: "90%",
+    marginLeft: "5%",
     display: "block",
     justifyContent: "center",
     flexDirection: "row",
@@ -79,21 +89,24 @@ export default function Solution({ task }) {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
     margin: "2%",
+    marginTop: "3%",
     padding: "1%",
     textAlign: "center",
+    alignItems: "center",
   };
 
   const classes = useStyles();
   const [solutionContent, setSolutionContent] = useState("");
   const [output, setOutput] = useState("");
   const [isOutput, setisOutput] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [outputs, setOutputs] = useState([]);
   const [exercise, setExercise] = useState(null);
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
   const [user, setUser] = useState(null);
-
+  const timeout = 4000;
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
@@ -116,9 +129,11 @@ export default function Solution({ task }) {
   };
 
   const save = () => {
+    setIsLoading(true);
     var student = null;
+    console.log(score);
     const solution = { solutionContent, exercise, student, score, output };
-    fetch("http://localhost:8080/exercise/solution/programming", {
+    fetch("http://localhost:8080/solution/programming", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -126,26 +141,26 @@ export default function Solution({ task }) {
       },
       body: JSON.stringify(solution),
     })
-      .then((res) => res.text())
-      .then((result) => {
-        setinfoMessage("Zapisano");
-        setInfoWindowShown(true);
+      .then((res) => {
+        if (res.ok) {
+          setinfoMessage("Zapisano");
+          setInfoWindowShown(true);
+          setIsLoading(false);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   };
   const runCode = () => {
-    setisOutput(true);
-    setOutputs([]);
-    classInfo.setmessage(false);
-    fetch("http://localhost:8080/exercise/interpreter", {
+    console.log(solutionContent);
+    fetch("http://localhost:8080/exercise/out", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: solutionContent,
     })
       .then((res) => res.text())
       .then((result) => {
+        setisOutput(true);
         console.log(result);
         setOutput(result);
         setOutputs(result.split("\n"));
@@ -158,9 +173,9 @@ export default function Solution({ task }) {
   const check = () => {
     var student = null;
     setisOutput(true);
-    const solution = { exercise,solutionContent,student, score, output };
+    const solution = { exercise, solutionContent, student, score, output };
     console.log(outputs);
-    fetch("http://localhost:8080/exercise/programming/check", {
+    fetch("http://localhost:8080/solution/programming/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
@@ -169,11 +184,11 @@ export default function Solution({ task }) {
       .then((result) => {
         console.log(result);
         setScore(result);
-        setinfoMessage("Twój wynik to " + result.toString() + " pkt");
+        setinfoMessage("Twój wynik:" + result.toString() + " pkt");
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
-        }, 3000);
+        }, 2 * timeout);
         return;
       })
       .catch((error) => {
@@ -203,24 +218,22 @@ export default function Solution({ task }) {
           setUser(result[0]);
         });
     }
-  }, []);
+  }, [task]);
 
- 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
 
   return (
     <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
-        {exercise && 
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+        {exercise && (
           <div
             className={classes.mainContainer}
             style={{
@@ -230,22 +243,22 @@ export default function Solution({ task }) {
               padding: "3% 1%",
             }}
           >
-            
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
-                <Font family="tahoma">
-                  <p>{exercise.introduction}</p>
-                </Font>
+
+                <Textarea defaultValue={exercise.introduction}></Textarea>
               </Paper>
               <Paper elevation={3} style={paperStyle}>
-                <Font family="sans-serif">
-                  <p>{exercise.content}</p>
-                </Font>
+                <p>{exercise.content}</p>
                 <h4>Maksymalna ilość punktów: </h4>
                 <p> {exercise.maxPoints} </p>
                 <h4>Oczekiwane wyjście programu:</h4>
-                <p> {exercise.correctOutput}</p>
+                <Paper multiline="true" className={classes.ExpectedOutput}>
+                  {exercise.correctOutput.split("\n").map((element, index) => (
+                    <p key={index}>{element}</p>
+                  ))}
+                </Paper>
               </Paper>
             </div>
             <div
@@ -282,38 +295,51 @@ export default function Solution({ task }) {
                 />
               </div>
               <div className={classes.headerContainer}>
-                <Button
-                  style={{ backgroundColor: "#adff2f" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={runCode}
-                >
-                  Wykonaj kod
-                </Button>
-
-                <Button
-                  style={{ backgroundColor: "#001f3f" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={check}
-                >
-                  Sprawdź
-                </Button>
-
-                <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
-
-                <Box display="inline" flexDirection="column" gap={2}>
-                  {user && user.score >= 0 && (
+                {!infoWindowShown && !isLoading && (
+                  <div>
                     <Button
-                      style={{ backgroundColor: "#001f3f" }}
+                      style={{
+                        backgroundColor: "#adff2f",
+                        color: "black",
+                        margin: "5px",
+                      }}
                       variant="contained"
                       color="secondary"
-                      onClick={save}
+                      onClick={runCode}
                     >
-                      Zapisz rozwiązanie
+                      Wykonaj kod
                     </Button>
-                  )}
-                </Box>
+                    {!isLoading && (
+                      <Box display="inline" flexDirection="column" gap={2}>
+                        {user && user.score >= 0 && (
+                          <Button
+                            style={{
+                              backgroundColor: "#001f3f",
+                              margin: "5px",
+                            }}
+                            variant="contained"
+                            color="secondary"
+                            onClick={save}
+                          >
+                            Zapisz rozwiązanie
+                          </Button>
+                        )}
+                        {(!user || !user.score) && (
+                          <Button
+                            style={{ backgroundColor: "#001f3f" }}
+                            variant="contained"
+                            color="secondary"
+                            onClick={check}
+                          >
+                            Sprawdź
+                          </Button>
+                        )}
+                      </Box>
+                    )}
+                  </div>
+                )}
+                   <Box>{isLoading && <CircularProgress/>}</Box>
+                <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
               </div>
               {isOutput && outputs.length > 0 && (
                 <Paper multiline="true" className={classes.output}>
@@ -325,10 +351,10 @@ export default function Solution({ task }) {
               {isOutput && !outputs.length && <CircularProgress />}
             </div>
           </div>
-        }
+        )}
       </div>
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );

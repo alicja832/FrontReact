@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/a9a8d2da-2a72-47fc-8009-643d81cb3106/resourceGroups/pythonfront_group/providers/Microsoft.Web/sites/pythonfront",
+    "appService.deploySubpath": "."
+}

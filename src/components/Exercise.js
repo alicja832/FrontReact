@@ -28,8 +28,8 @@ const useStyles = makeStyles({
     gap: "20px",
     position: "relative",
   },
-  check:{
-    display : "flex",
+  check: {
+    display: "flex",
     flexDirection: "column",
     alignItems: "center",
     marginLeft: "auto",
@@ -52,180 +52,169 @@ export default function Exercise() {
   const [shortExercises, setShortExercises] = useState(false);
   const navigate = useNavigate();
   const openSolution = (e) => {
-    navigate("/solution/" + e.target.value);
+    if (longExercises[e.target.value].value) {
+      navigate("/solutionRetake/" + longExercises[e.target.value].key.id);
+    } else navigate("/solution/" + longExercises[e.target.value].key.id);
   };
   const openSolutionAbc = (e) => {
-    navigate("/solutionabc/" + e.target.value);
+    if (shortExercises[e.target.value].value) {
+      navigate("/solutionAbcRetake/" + shortExercises[e.target.value].key.id);
+    } else navigate("/solutionabc/" + shortExercises[e.target.value].key.id);
   };
   useEffect(() => {
-    if (getToken()) {
-      fetch("http://localhost:8080/exercise/programming", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${getToken()}` },
+    fetch("http://localhost:8080/exercise/programming", {
+      method: "GET",
+      headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setLongExercises(result);
       })
-        .then((res) => res.json())
-        .then((result) => {
-          console.log(result);
-          setLongExercises(result);
-        })
-        .catch((error) => console.error("Error:", error));
-        fetch("http://localhost:8080/exercise/abc", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${getToken()}` },
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log(result);
-            setShortExercises(result);
-          })
-          .catch((error) => console.error("Error:", error));
-    } else {
-      fetch("http://localhost:8080/exercise/programming")
-        .then((res) => res.json())
-        .then((result) => {
-          setLongExercises(result);
-          console.log(result);
-          
-        })
-        .catch((error) => console.error("Error:", error));
-        fetch("http://localhost:8080/exercise/abc")
-        .then((res) => res.json())
-        .then((result) => {
-          setShortExercises(result);
-          console.log(result);
-        })
-        .catch((error) => console.error("Error:", error));
-    }
-  
+      .catch((error) => console.error("Error:", error));
+    fetch("http://localhost:8080/exercise/abc", {
+      method: "GET",
+      headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setShortExercises(result);
+      })
+      .catch((error) => console.error("Error:", error));
   }, []);
 
   return (
     <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-         <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
-    
-        <Paper style={paperStyle}>
-          
-          <div>
-            {!longExercises.length && !shortExercises.length  && <CircularProgress />}
-            {longExercises.length>0 && (<h3>Zadania programistyczne</h3>)}
-            {longExercises.length>0 &&
-              longExercises.map((exercise) => (
-                <Paper
-                  elevation={6}
-                  style={{ padding: "15px", textAlign: "left" }}
-                  key={exercise.key.id}
-                >
-                  <div
-                    className={classes.headerContainer}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+        <div
+          className={classes.mainContainer}
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            padding: "3% 1%",
+          }}
+        >
+          <Paper style={paperStyle}>
+            <div>
+              {!longExercises.length && !shortExercises.length && (
+                <CircularProgress />
+              )}
+              {longExercises.length > 0 && <h3>Zadania programistyczne</h3>}
+              {longExercises.length > 0 &&
+                longExercises.map((exercise, index) => (
+                  <Paper
+                    elevation={6}
+                    style={{ padding: "15px", textAlign: "left" }}
+                    key={index}
                   >
-                    <h3>{exercise.key.name}</h3>
                     <div
+                      className={classes.headerContainer}
                       style={{
                         display: "flex",
-                        flexDirection: "column",
+                        justifyContent: "space-between",
                         alignItems: "center",
-                        marginLeft: "auto",
                       }}
                     >
-                      <p>Punkty do zdobycia:</p>
-                    </div>
-                    <Box className={classes.points}>
-                      {exercise.key.maxPoints}
-                    </Box>
-                    {exercise.value ? (
-                      <div className={classes.check}>
-                        <CheckIcon />
-                        <span>Zrobione</span>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <Box display="flex" flexDirection="column" gap={2}>
-                      <Button
-                        variant="contained"
-                        value={exercise.key.id}
-                        style={{ backgroundColor: "#001f3f" }}
-                        onClick={openSolution}
+                      <h3>{exercise.key.name}</h3>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                        }}
                       >
-                        Wykonaj
-                      </Button>
-                    </Box>
-                  </div>
-                </Paper>
-                
-              ))}
-              {shortExercises.length>0 && (<h3>Zadania teoretyczne</h3>)}
-               {shortExercises.length>0 &&
-             shortExercises.map((exercise) => (
-                <Paper
-                  elevation={6}
-                  style={{ padding: "15px", textAlign: "left" }}
-                  key={exercise.key.id}
-                >
-                  <div
-                    className={classes.headerContainer}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
+                        <p>Punkty do zdobycia:</p>
+                      </div>
+                      <Box className={classes.points}>
+                        {exercise.key.maxPoints}
+                      </Box>
+                      {exercise.value ? (
+                        <div className={classes.check}>
+                          <CheckIcon />
+                          <span>Zrobione</span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div>
+                      <Box display="flex" flexDirection="column" gap={2}>
+                        <Button
+                          variant="contained"
+                          value={index}
+                          style={{ backgroundColor: "#001f3f" }}
+                          onClick={openSolution}
+                        >
+                          Wykonaj
+                        </Button>
+                      </Box>
+                    </div>
+                  </Paper>
+                ))}
+              {shortExercises.length > 0 && <h3>Zadania teoretyczne</h3>}
+              {shortExercises.length > 0 &&
+                shortExercises.map((exercise, index) => (
+                  <Paper
+                    elevation={6}
+                    style={{ padding: "15px", textAlign: "left" }}
+                    key={index}
                   >
-                    <h3>{exercise.key.name}</h3>
                     <div
+                      className={classes.headerContainer}
                       style={{
                         display: "flex",
-                        flexDirection: "column",
+                        justifyContent: "space-between",
                         alignItems: "center",
-                        marginLeft: "auto",
                       }}
                     >
-                      <p>Punkty do zdobycia:</p>
-                    </div>
-                    <Box className={classes.points}>
-                      {exercise.key.maxPoints}
-                    </Box>
-                    {exercise.value ? (
-                      <div className={classes.check}>
-                        <CheckIcon />
-                        <span>Zrobione</span>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <Box display="flex" flexDirection="column" gap={2}>
-                      <Button
-                        variant="contained"
-                        value={exercise.key.id}
-                        style={{ backgroundColor: "#001f3f" }}
-                        onClick={openSolutionAbc}
+                      <h3>{exercise.key.name}</h3>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          marginLeft: "auto",
+                        }}
                       >
-                        Wykonaj
-                      </Button>
-                    </Box>
-                  </div>
-                </Paper>
-                
-              ))}
-          </div>
-        </Paper>
+                        <p>Punkty do zdobycia:</p>
+                      </div>
+                      <Box className={classes.points}>
+                        {exercise.key.maxPoints}
+                      </Box>
+                      {exercise.value ? (
+                        <div className={classes.check}>
+                          <CheckIcon />
+                          <span>Zrobione</span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div>
+                      <Box display="flex" flexDirection="column" gap={2}>
+                        <Button
+                          variant="contained"
+                          value={index}
+                          style={{ backgroundColor: "#001f3f" }}
+                          onClick={openSolutionAbc}
+                        >
+                          Wykonaj
+                        </Button>
+                      </Box>
+                    </div>
+                  </Paper>
+                ))}
+            </div>
+          </Paper>
+        </div>
       </div>
-    
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );

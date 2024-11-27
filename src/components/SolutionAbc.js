@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-import Font from "react-font";
+// import Font from "react-font";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import FormControl from "@mui/material/FormControl";
 import { Checkbox } from "@mui/material";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
+import { Textarea } from "@mui/joy";
 const useStyles = makeStyles({
   position: "relative",
   container: {
@@ -18,8 +19,9 @@ const useStyles = makeStyles({
     alignItems: "center",
     gap: "1%",
   },
-  
+
   textFieldContainer: {
+    
     position: "relative",
     width: "90%",
     padding: " 1% 1%",
@@ -91,6 +93,7 @@ export default function SolutionAbc({ task }) {
     padding: "1%",
     textAlign: "center",
     display: "flex",
+    marginTop: "3%",
     flexDirection: "column",
   };
 
@@ -111,33 +114,33 @@ export default function SolutionAbc({ task }) {
     setCheckedD(false);
     setCheckedC(false);
     setCheckedB(false);
-    setAnswer('A');
+    setAnswer("A");
   };
   const handlechangeB = () => {
     setCheckedA(false);
     setCheckedD(false);
     setCheckedC(false);
     setCheckedB(true);
-    setAnswer('B');
+    setAnswer("B");
   };
   const handlechangeC = () => {
     setCheckedA(false);
     setCheckedD(false);
     setCheckedC(true);
     setCheckedB(false);
-    setAnswer('C');
+    setAnswer("C");
   };
   const handlechangeD = () => {
     setCheckedA(false);
     setCheckedD(true);
     setCheckedC(false);
     setCheckedB(false);
-    setAnswer('D');
+    setAnswer("D");
   };
   const save = () => {
     var student = null;
     const solution = { exercise, student, score, answer };
-    fetch("http://localhost:8080/exercise/solution/abc", {
+    fetch("http://localhost:8080/solution/abc", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -158,7 +161,7 @@ export default function SolutionAbc({ task }) {
     setSent(true);
     var student = null;
     const solution = { exercise, student, score, answer };
-    fetch("http://localhost:8080/exercise/abc/check", {
+    fetch("http://localhost:8080/solution/abc/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
@@ -167,7 +170,9 @@ export default function SolutionAbc({ task }) {
       .then((result) => {
         console.log(result);
         setScore(result);
-        setinfoMessage("Twój wynik to " + result.toString() + " pkt");
+        result > 0
+          ? setinfoMessage("Prawidłowa odpowiedź")
+          : setinfoMessage("Niepoprawna odpowiedź");
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -177,16 +182,18 @@ export default function SolutionAbc({ task }) {
       .catch((error) => {
         console.error("Error:", error);
       });
-      setSent(false);
+    setSent(false);
   };
 
   useEffect(() => {
+   
     fetch("http://localhost:8080/exercise/one/abc/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
       .then((result) => {
+        console.log(result[0].introduction);
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -199,13 +206,11 @@ export default function SolutionAbc({ task }) {
         .then((result) => {
           console.log(result);
           setUser(result[0]);
-        });
+        }).catch((error)=>{
+          console.log(error);
+        })
     }
   }, []);
-
-  if (!exercise) {
-    return <div>Loading...</div>;
-  }
 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -213,125 +218,116 @@ export default function SolutionAbc({ task }) {
 
   return (
     <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}></div>
-      <div
-        className={classes.mainContainer}
-        style={{
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          padding: "3% 1%",
-        }}
-      >
-        <div style={{ flexBasis: "50%", flexDirection: "column" }}>
-          <Paper elevation={3} style={paperStyleTwo}>
-            <h2>{exercise.name}</h2>
-            <Font family="tahoma">
-              <p>{exercise.introduction}</p>
-            </Font>
-          </Paper>
-          <Paper elevation={3} style={paperStyle}>
-            <Font family="sans-serif">
-              <p>{exercise.content}</p>
-            </Font>
-            <h4>Maksymalna ilość punktów: </h4>
-            <p> {exercise.maxPoints} </p>
-          </Paper>
-        </div>
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+        {!exercise && (
+          <div>
+            <CircularProgress />
+          </div>
+        )}
+        {exercise && (
+          <div
+            className={classes.mainContainer}
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              padding: "3% 1%",
+            }}
+          >
+            <div style={{ flexBasis: "50%", flexDirection: "column" }}>
+              <Paper elevation={3} style={paperStyleTwo}>
+                <h2>{exercise.name}</h2>
+                {/* <Font family="tahoma"> */}
+                  <Textarea defaultValue={exercise.introduction}></Textarea>
+                {/* </Font> */}
+                <h4>Maksymalna ilość punktów:  {exercise.maxPoints}</h4>
+              </Paper>
+            </div>
 
-        <div style={{ flexBasis: "50%", flexDirection: "column" }}>
-          <Paper elevation={3} style={paperStyleTwo}>
-            <h4>{exercise.content}</h4>
-            <h4>Wybierz jedną odpowiedź: </h4>
-            <FormControl fullWidth>
-            <FormGroup>
-            <FormControlLabel
-              requeired={true}
-              label={"A. "+ exercise.firstOption}
-              value={exercise.firstOption}
-              control={
-                <Checkbox
-                  onChange={handlechangeA}
-                  checked={checkedA}
-                />
-              }
-            />
-            <FormControlLabel
-              label={"B. "+exercise.secondOption}
-              control={
-                <Checkbox
-                  onChange={handlechangeB}
-                  checked={checkedB}
-                />
-              }
-            />
-            <FormControlLabel
-              label={"C. "+exercise.thirdOption}
-              control={
-                <Checkbox
-                  onChange={handlechangeC}
-                  checked={checkedC}
-                />
-              }
-            />
-            {exercise.fourthOption && (
-              <FormControlLabel
-                label={"D. "+exercise.fourthOption}
-                control={
-                  <Checkbox
-                    onChange={handlechangeD}
-                    checked={checkedD}
-                  />
-                }
-              />
-            )}
-             </FormGroup>
-             <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Button
-                style={buttonStyle}
-                variant="contained"
-                color="secondary"
-                onClick={check}
-              >
-                Sprawdź
-              </Button>
-            </Box>
-            </FormControl>
-            <Box>  {(!infoWindowShown && sent) && (
-              
-                <CircularProgress />
-              
-            )}</Box>
-            <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
-            <Box display="inline" flexDirection="column" gap={2}>
-              {user && user.score >= 0 && (
-                <Button
-                  style={{ backgroundColor: "#001f3f" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={save}
-                >
-                  Zapisz rozwiązanie
-                </Button>
-              )}
-            </Box>
-          </Paper>
-        </div>
+            <div style={{ flexBasis: "50%", flexDirection: "column" }}>
+              <Paper elevation={3} style={paperStyleTwo}>
+                <h4>{exercise.content}</h4>
+                <h4>Wybierz jedną odpowiedź: </h4>
+                <FormControl fullWidth>
+                  <FormGroup>
+                    <FormControlLabel
+                      requeired={true}
+                      label={"A. " + exercise.firstOption}
+                      value={exercise.firstOption}
+                      control={
+                        <Checkbox onChange={handlechangeA} checked={checkedA} />
+                      }
+                    />
+                    <FormControlLabel
+                      label={"B. " + exercise.secondOption}
+                      control={
+                        <Checkbox onChange={handlechangeB} checked={checkedB} />
+                      }
+                    />
+                    <FormControlLabel
+                      label={"C. " + exercise.thirdOption}
+                      control={
+                        <Checkbox onChange={handlechangeC} checked={checkedC} />
+                      }
+                    />
+                    {exercise.fourthOption && (
+                      <FormControlLabel
+                        label={"D. " + exercise.fourthOption}
+                        control={
+                          <Checkbox
+                            onChange={handlechangeD}
+                            checked={checkedD}
+                          />
+                        }
+                      />
+                    )}
+                  </FormGroup>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    
+                  </Box>
+                </FormControl>
+                <Box> {!infoWindowShown && sent && <CircularProgress />}</Box>
+                <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
+                <Box display="inline" flexDirection="column" gap={2}>
+                  {user && user.score >= 0 && !infoWindowShown && (
+                    <Button
+                      style={{ backgroundColor: "#001f3f" }}
+                      variant="contained"
+                      color="secondary"
+                      onClick={save}
+                    >
+                      Zapisz rozwiązanie
+                    </Button>
+                  )}
+                   {!user  && (
+                    <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    onClick={check}
+                  >
+                    Sprawdź
+                  </Button>
+                  )}
+                </Box>
+              </Paper>
+            </div>
+          </div>
+        )}
       </div>
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );

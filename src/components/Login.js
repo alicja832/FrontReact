@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
@@ -11,14 +11,14 @@ import {
   setToken,
   setRefreshToken,
   setExpirationDate,
-  getToken,
 } from "./api/TokenService";
 import Footer from "./semi-components/Footer";
-const useStyles = makeStyles((theme) => ({}));
+
+const useStyles = makeStyles(() => ({}));
 
 export default function Login() {
   const paperStyle = {
-    top: "4em",
+    top: "5em",
     padding: "4% 4%",
     width: "40%",
     margin: "1% auto",
@@ -78,15 +78,16 @@ export default function Login() {
           const decoder = new TextDecoder("utf-8");
           const token = decoder.decode(value.value);
           const token_dict = JSON.parse(token);
-
+          setInfoWindowShown(true);
+          setToken(token_dict["token"]);
+          setExpirationDate(token_dict["jwtExpirationDate"]);
           setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
-            setToken(token_dict["jwtToken"]);
-            setInfoWindowShown(false);
-            setToken(token_dict["jwtToken"]);
-            setRefreshToken(token_dict["refreshToken"]);
-            setExpirationDate(token_dict["jwtExpirationDate"]);
+          }, timeout);
+          setTimeout(() => {
+            window.location.reload();
+            navigate("/profil");
           }, timeout);
         });
       } else {
@@ -103,10 +104,9 @@ export default function Login() {
           }, 3000);
         });
       }
-    });
-    if (getToken()) {
-      navigate("/profil");
-    }
+    }).catch((error)=>{
+      console.log(error);
+    })
   };
   return (
     <div
@@ -116,7 +116,7 @@ export default function Login() {
         height: "100vh",
       }}
     >
-      <div style={{ flex: 8, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
         <Container>
           <Paper elevation={3} style={paperStyle}>
             <div style={{ fontSize: "large", marginBottom: "8%" }}>
@@ -216,7 +216,7 @@ export default function Login() {
           </Paper>
         </Container>
       </div>
-      <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Footer />
       </div>
     </div>

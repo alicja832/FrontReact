@@ -15,7 +15,7 @@ import SolutionRetake from "../SolutionRetake";
 import PasswordReminder from "../Password";
 import Ranking from "../Ranking";
 import Logout from "../Logout";
-
+import SolutionAbcRetake from "../SolutionAbcRetake";
 
 function AppPanel() {
   function SolutionWrapper() {
@@ -32,7 +32,10 @@ function AppPanel() {
     const { id } = useParams();
     return <SolutionRetake task={id} />;
   }
-  
+  function SolutionRetakeAbcWrapper() {
+    const { id } = useParams();
+    return <SolutionAbcRetake task={id} />;
+  }
 
 
   return (
@@ -49,6 +52,7 @@ function AppPanel() {
       <Route path="/solutionabc/:id" element={<SolutionAbcWrapper />} />
       <Route path="/password" element={<PasswordReminder />} />
       <Route path="/solutionRetake/:id" element={<SolutionRetakeWrapper />} />
+      <Route path="/solutionAbcRetake/:id" element={<SolutionRetakeAbcWrapper />} />
       <Route path="/logout" element={<Logout />} />
     </Routes>
   );

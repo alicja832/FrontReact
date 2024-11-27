@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  TextField,
-  Paper,
-  Button,
-  Box,
-  CircularProgress,
-} from "@mui/material";
+import { TextField, Paper, Button, Box, CircularProgress } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-import Font from "react-font";
 import { classInfo } from "./semi-components/MyParticles";
 import Footer from "./semi-components/Footer";
-
+import { Textarea } from "@mui/joy";
 const useStyles = makeStyles({
   position: "relative",
   container: {
@@ -63,11 +56,21 @@ const useStyles = makeStyles({
     position: "relative",
     backgroundColor: "#000 !important",
     color: "#fff !important",
-    padding: "1%",
-    width: "100%",
+    width: "90%",
     marginTop: "1%",
     display: "block",
+    padding: "1%",
     justifyContent: "center",
+    flexDirection: "row",
+    fontWeight: "lighter",
+  },
+  ExpectedOutput: {
+    position: "relative",
+    backgroundColor: "#000 !important",
+    color: "#fff !important",
+    width: "90%",
+    left: "5%",
+    display: "block",
     flexDirection: "row",
     fontWeight: "lighter",
   },
@@ -77,7 +80,6 @@ function Toast({ message }) {
   return <div className="toast">{message}</div>;
 }
 export default function SolutionRetake({ task }) {
-  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     margin: "2%",
@@ -88,12 +90,14 @@ export default function SolutionRetake({ task }) {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
     margin: "2%",
+    marginTop: "4%",
     padding: "1%",
     textAlign: "center",
+    alignItems: "center",
   };
 
-
   const classes = useStyles();
+  const [isLoading, setisLoading] = useState(false);
   const [isOutput, setisOutput] = useState(false);
   const [solution, setSolution] = useState(null);
   const [exercise, setExercise] = useState(null);
@@ -127,6 +131,7 @@ export default function SolutionRetake({ task }) {
   };
 
   const save = () => {
+    setisLoading(true);
     const id = solution.id;
     const updatesolution = {
       id,
@@ -134,10 +139,10 @@ export default function SolutionRetake({ task }) {
       exercise,
       student,
       score,
-      output,
+      output
     };
 
-    fetch("http://localhost:8080/exercise/solution", {
+    fetch("http://localhost:8080/solution/", {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -154,11 +159,13 @@ export default function SolutionRetake({ task }) {
         console.error("Error:", error);
         setinfoMessage("Błąd zapisu!");
       });
+    setisLoading(false);
   };
   const runCode = () => {
+    setisLoading(true);
     setisOutput(true);
     classInfo.setmessage(false);
-    fetch("http://localhost:8080/exercise/interpreter", {
+    fetch("http://localhost:8080/exercise/out", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: solutionContent,
@@ -173,173 +180,171 @@ export default function SolutionRetake({ task }) {
         console.log(error);
         setOutput("Error occurred");
       });
+      setisLoading(false);
   };
 
-  const check = () => {
-    var student = null;
-    setisOutput(true);
-    const solution = { solutionContent, exercise, student, score, output };
-    console.log(outputs);
-    fetch("http://localhost:8080/exercise/programming/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(solution),
-    })
-      .then((res) => res.text())
+ 
+
+  const getData = async () => {
+    const result = await fetch("http://localhost:8080/solution/" + task, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    }).catch((error) => console.error("Error fetching:", error));
+    const result_data = await result.json();
+    setSolution(result_data[0]);
+    setStudent(result_data[0].student);
+    setSolutionContent(result_data[0].solutionContent);
+    const exerciseEX = result_data[0].exercise;
+    await fetch(
+      "http://localhost:8080/exercise/one/programming/" + exerciseEX.id,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((res) => res.json())
       .then((result) => {
-        setScore(result);
-        setinfoMessage("Twój wynik to " + result.toString() + " pkt");
-        setInfoWindowShown(true);
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-        return;
+        console.log(result);
+        setExercise(result[0]);
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      .catch((error) => console.error("Error fetching :", error));
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/exercise/solution/" + task, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${getToken()}` },
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        setSolution(result[0]);
-        setExercise(result[0].exercise);
-        setStudent(result[0].student);
-        setSolutionContent(result[0].solutionContent);
-      })
-      .catch((error) => console.error("Error fetching students:", error));
-  }, []);
-  if (!solution) {
-    return <div>Loading...</div>;
-  }
-
+    getData();
+  }, [task]);
   return (
     <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}></div>
-      <div>
-        {
-          <div
-            className={classes.mainContainer}
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-              padding: "3%",
-            }}
-          >
-            {!exercise && (
-              <div>
-                <CircularProgress />
-              </div>
-            )}
-            <div style={{ flexBasis: "40%", flexDirection: "column" }}>
-              <Paper elevation={3} style={paperStyleTwo}>
-                <h2>{exercise.name}</h2>
-                <Font family="tahoma">
-                  <p>{exercise.introduction}</p>
-                </Font>
-              </Paper>
-              <Paper elevation={3} style={paperStyle}>
-                <Font family="sans-serif">
-                  <p>{exercise.content}</p>
-                </Font>
-                <h4>Maksymalna ilość punktów: </h4>
-                <p> {exercise.maxPoints} </p>
-                <h4>Oczekiwane wyjście programu:</h4>
-                <p> {exercise.correctOutput}</p>
-              </Paper>
-            </div>
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+        <div>
+          {solution && (
             <div
-              className={classes.textFieldContainer}
+              className={classes.mainContainer}
               style={{
-                flexDirection: "column",
-                flexBasis: "60%",
-                marginTop: "2%",
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                padding: "3%",
               }}
             >
-              <h3>Konsola dla Python 2.7</h3>
+              {!exercise && (
+                <div>
+                  <CircularProgress />
+                </div>
+              )}
+              {exercise && (
+                <div style={{ flexBasis: "40%", flexDirection: "column" }}>
+                  <Paper elevation={3} style={paperStyleTwo}>
+                    <h2>{exercise.name}</h2>
+
+                    <Textarea defaultValue={exercise.introduction}></Textarea>
+                  </Paper>
+                  <Paper elevation={3} style={paperStyle}>
+                    <p>{exercise.content}</p>
+
+                    <h4>Maksymalna ilość punktów: </h4>
+                    <p> {exercise.maxPoints} </p>
+                    <h4>Oczekiwane wyjście programu:</h4>
+                    <Paper multiline="true" className={classes.ExpectedOutput}>
+                      {exercise.correctOutput
+                        .split("\n")
+                        .map((element, index) => (
+                          <p key={index}>{element}</p>
+                        ))}
+                    </Paper>
+                  </Paper>
+                </div>
+              )}
               <div
                 className={classes.textFieldContainer}
                 style={{
                   flexDirection: "column",
-                  flexBasis: "55%",
+                  flexBasis: "60%",
                   marginTop: "2%",
-                  backgroundColor: "black",
                 }}
               >
-                <TextField
-                  className={classes.textField}
-                  InputProps={{
-                    disableUnderline: true,
+                <h3>Konsola dla Python 2.7</h3>
+                <div
+                  className={classes.textFieldContainer}
+                  style={{
+                    flexDirection: "column",
+                    flexBasis: "55%",
+                    marginTop: "2%",
+                    backgroundColor: "black",
                   }}
-                  
-                  variant="standard"
-                  defaultValue={solution.solutionContent}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  fullWidth
-                  multiline
-                  maxRows={15}
-                />
-              </div>
-              <div className={classes.headerContainer}>
-                <Button
-                  style={{ backgroundColor: "#adff2f" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={runCode}
                 >
-                  Wykonaj kod
-                </Button>
+                  <TextField
+                    className={classes.textField}
+                    InputProps={{
+                      disableUnderline: true,
+                    }}
+                    variant="standard"
+                    defaultValue={solution.solutionContent}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    fullWidth
+                    multiline
+                    maxRows={15}
+                  />
+                </div>
+                <div className={classes.headerContainer}>
+                  {!infoWindowShown && !isLoading && (
+                   <div>
+                   <Button
+                      style={{
+                        backgroundColor: "#adff2f",
+                        color: "black",
+                        margin: "5px",
+                      }}
+                      variant="contained"
+                      color="secondary"
+                      onClick={runCode}
+                    >
+                      Wykonaj kod
+                    </Button>
+                
 
-                <Button
-                  style={{ backgroundColor: "#001f3f" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={check}
-                >
-                  Sprawdź
-                </Button>
-
+                 
+                    <Box display="inline" flexDirection="column" gap={2}>
+                      <Button
+                        style={{
+                          backgroundColor: "#001f3f",
+                          margin: "5px",
+                        }}
+                        variant="contained"
+                        color="secondary"
+                        onClick={save}
+                      >
+                        Zapisz rozwiązanie
+                      </Button>
+                    </Box>
+                    </div>
+                  )}
+                </div>
+                <Box>{isLoading && <CircularProgress />}</Box>
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
 
-                <Box display="inline" flexDirection="column" gap={2}>
-                  <Button
-                    style={{ backgroundColor: "#001f3f" }}
-                    variant="contained"
-                    color="secondary"
-                    onClick={save}
-                  >
-                    Zapisz rozwiązanie
-                  </Button>
-                </Box>
+                {isOutput && outputs.length > 0 && (
+                  <Paper multiline="true" className={classes.output}>
+                    {outputs.map((element, index) => (
+                      <p key={index}>{element}</p>
+                    ))}
+                  </Paper>
+                )}
+                {isOutput && !outputs.length && <CircularProgress />}
               </div>
-              {isOutput &&  outputs.length>0 && (
-                <Paper multiline="true" className={classes.output}>
-                  {outputs.map((element, index) => (
-                    <p key={index}>{element}</p>
-                  ))}
-                </Paper>
-              )}
-              {isOutput && !outputs.length && <CircularProgress />}
             </div>
-          </div>
-        }
+          )}
+        </div>
       </div>
-      <div style={{flex: 3, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );

@@ -1,9 +1,13 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import {  Paper, Box } from "@mui/material";
+import { Paper, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import Font from "react-font";
 import Footer from "./semi-components/Footer";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
 const useStyles = makeStyles({
   points: {
@@ -37,9 +41,10 @@ export default function Ranking() {
     width: "70%",
     margin: "1% auto",
     gap: "1%",
-    position: "absolute",
+    paddingLeft: "15%",
+    paddingRight: "15%",
     backgroundColor: "#FDF5E6",
-    top: "40%",
+    marginTop: "10%",
     left: "15%",
     borderRadius: "10px",
     textAlign: "center",
@@ -62,62 +67,56 @@ export default function Ranking() {
 
   return (
     <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-       <div style={{ flex: 8, display: "flex", flexDirection: "column"  }}>
-        {isPersons && (
-          <Paper elevation={3} style={paperStyle}>
-            <Font family="sans-serif">
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <div style={{ flex: 8, display: "flex", flexDirection: "column" }}>
+        <div
+          className={classes.mainContainer}
+          style={{
+            display: "flex"
+          }}
+        >
+          {isPersons && (
+            <Paper elevation={3} style={paperStyle}>
               <h2>
                 Ranking osób korzystających z aplikacji z najlepszymi wynikami:
               </h2>
-            </Font>
-            {persons.map((person, index) => (
-              <Paper
-                elevation={6}
-                style={{ margin: "10px", padding: "15px", textAlign: "left" }}
-                key={person.id}
-              >
-                <div
-                  className={classes.headerContainer}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                    <h3>{index+1}.{person.name}</h3>
-                   <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft: "auto",
+              <Table sx={{ fontSize: "30px" }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Student</TableCell>
+                    <TableCell align="right">Liczba punktów</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {persons.map((person) => (
+                    <TableRow
+                      key={person.name}
+                      sx={{
+                        "&:last-child td, &:last-child th": {
+                          border: 0,
+                          fontSize: "20px",
+                        },
                       }}
                     >
-                      <p>Osiągnięty wynik:</p>
-                    </div>
-                    <Box className={classes.points}>
-                      {person.score}
-                    </Box>
-                   
-                  </div>
-
-                
-
-
-              </Paper>
-            ))}
-          </Paper>
-        )}
+                      <TableCell component="th" scope="row">
+                        {person.name}
+                      </TableCell>
+                      <TableCell align="right">{person.score}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Paper>
+          )}
+        </div>
       </div>
-      <div style={{flex: 2, display: "flex", flexDirection: "column" }}>
-      <Footer />
+      <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
+        <Footer />
       </div>
     </div>
   );
