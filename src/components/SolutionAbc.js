@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { getToken } from "./api/TokenService";
-// import Font from "react-font";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import FormControl from "@mui/material/FormControl";
@@ -10,83 +9,16 @@ import { Checkbox } from "@mui/material";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
-const useStyles = makeStyles({
-  position: "relative",
-  container: {
-    display: "flex",
-    position: "relative",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "1%",
-  },
-
-  textFieldContainer: {
-    
-    position: "relative",
-    width: "90%",
-    padding: " 1% 1%",
-    border: "1%",
-    borderStyle: "solid",
-    borderColor: "white",
-    backgroundColor: "grey",
-    display: "flex",
-    fontWeight: "bold",
-    alignItems: "center",
-    gap: "1%",
-  },
-  textField: {
-    position: "relative",
-    height: "500px",
-    width: "100%",
-    backgroundColor: "#000",
-    color: "#fff",
-    "& .MuiInputBase-input": {
-      color: "#fff",
-    },
-    "& .MuiFormLabel-root": {
-      color: "#fff",
-    },
-  },
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    margin: "2%",
-    gap: "20px",
-    position: "relative",
-  },
-  button: {
-    position: "relative",
-    color: "#fff",
-    backgroundColor: "#000",
-  },
-  output: {
-    position: "relative",
-    backgroundColor: "#000 !important",
-    color: "#fff !important",
-    padding: "1%",
-    width: "100%",
-    marginTop: "1%",
-    display: "block",
-    justifyContent: "center",
-    flexDirection: "row",
-    fontWeight: "lighter",
-  },
-});
-
+const useStyles = makeStyles({});
 export default function SolutionAbc({ task }) {
-  const paperStyle = {
-    backgroundColor: "#FDF5E6",
-    margin: "2%",
-    padding: "1%",
-    textAlign: "center",
-  };
+
   const buttonStyle = {
     backgroundColor: "#001f3f",
     color: "white",
     width: "40%",
     margin: "1%",
   };
-  const paperStyleTwo = {
+  const paperStyle = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
     margin: "2%",
@@ -148,8 +80,13 @@ export default function SolutionAbc({ task }) {
       },
       body: JSON.stringify(solution),
     })
-      .then((res) => res.text())
-      .then((result) => {
+      .then((res) => {
+        if(!res.ok)
+        {
+          setinfoMessage("Błąd zapisu");
+          setInfoWindowShown(true);
+        }
+            
         setinfoMessage("Zapisano");
         setInfoWindowShown(true);
       })
@@ -193,7 +130,6 @@ export default function SolutionAbc({ task }) {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result[0].introduction);
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -204,7 +140,6 @@ export default function SolutionAbc({ task }) {
       })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
           setUser(result[0]);
         }).catch((error)=>{
           console.log(error);
@@ -217,14 +152,8 @@ export default function SolutionAbc({ task }) {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         {!exercise && (
           <div>
             <CircularProgress />
@@ -241,17 +170,15 @@ export default function SolutionAbc({ task }) {
             }}
           >
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
-              <Paper elevation={3} style={paperStyleTwo}>
+              <Paper elevation={3} style={paperStyle}>
                 <h2>{exercise.name}</h2>
-                {/* <Font family="tahoma"> */}
                   <Textarea defaultValue={exercise.introduction}></Textarea>
-                {/* </Font> */}
                 <h4>Maksymalna ilość punktów:  {exercise.maxPoints}</h4>
               </Paper>
             </div>
 
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
-              <Paper elevation={3} style={paperStyleTwo}>
+              <Paper elevation={3} style={paperStyle}>
                 <h4>{exercise.content}</h4>
                 <h4>Wybierz jedną odpowiedź: </h4>
                 <FormControl fullWidth>
@@ -326,7 +253,7 @@ export default function SolutionAbc({ task }) {
           </div>
         )}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

@@ -9,28 +9,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
-const useStyles = makeStyles({
-  points: {
-    width: "30px",
-    height: "30px",
-    display: "flex",
-    alignItems: "center",
-    border: "3px",
-    borderStyle: "solid",
-    borderColor: "blue",
-    borderRadius: "5px",
-    backgroundColor: "#6495ED",
-    justifyContent: "center",
-    textAlign: "center",
-    position: "relative",
-  },
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "20px",
-    position: "relative",
-  },
-});
+const useStyles = makeStyles({});
 export default function Ranking() {
   const [persons, setPersons] = useState([]);
   const [isPersons, setisPersons] = useState(false);
@@ -66,14 +45,8 @@ export default function Ranking() {
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 8, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         <div
           className={classes.mainContainer}
           style={{
@@ -85,11 +58,11 @@ export default function Ranking() {
               <h2>
                 Ranking osób korzystających z aplikacji z najlepszymi wynikami:
               </h2>
-              <Table sx={{ fontSize: "30px" }} aria-label="simple table">
+              <Table aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Student</TableCell>
-                    <TableCell align="right">Liczba punktów</TableCell>
+                    <TableCell sx={{ fontSize: "28px" }}>Student</TableCell>
+                    <TableCell sx={{ fontSize: "28px" }} align="right">Liczba punktów</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -98,15 +71,14 @@ export default function Ranking() {
                       key={person.name}
                       sx={{
                         "&:last-child td, &:last-child th": {
-                          border: 0,
-                          fontSize: "20px",
+                          border: 0
                         },
                       }}
                     >
-                      <TableCell component="th" scope="row">
+                      <TableCell  sx={{ fontSize: "20px" }} component="th" scope="row">
                         {person.name}
                       </TableCell>
-                      <TableCell align="right">{person.score}</TableCell>
+                      <TableCell sx={{ fontSize: "20px" }} align="right">{person.score}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -115,7 +87,7 @@ export default function Ranking() {
           )}
         </div>
       </div>
-      <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

@@ -4,12 +4,10 @@ import TextField from "@mui/material/TextField";
 import { Container, Paper, Button, Box } from "@mui/material";
 import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { classInfo } from "./semi-components/MyParticles";
 import {
   setToken,
-  setRefreshToken,
   setExpirationDate,
 } from "./api/TokenService";
 import Footer from "./semi-components/Footer";
@@ -32,27 +30,23 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState([]);
   const [psw, setPsw] = useState(false);
-  const [errorMessage, seterrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [infoWindowShown, setInfoWindowShown] = useState(false);
-  const [errorWindowShown, seterrorInfoWindowShown] = useState(false);
   const timeout = 3000;
   const handleShowPsw = () => setPsw((show) => !show);
   const handleHidePsw = (e) => {
     e.preventDefault();
   };
   const classes = useStyles();
-  const navigate = useNavigate();
-
   const validateData = () => {
     if (!email.includes("@")) {
-      seterrorMessage("Podano zły adres email");
-      seterrorInfoWindowShown(true);
-      setTimeout(() => {
-        seterrorInfoWindowShown(false);
-      }, 3000);
-      throw new Error(`Podano zły adres email!`);
+      throw new Error("Podano zły adres email");
+    }
+    if (password.length<8) {
+      throw new Error("Hasło powinno mieć 8 znaków minimum");
     }
   };
+
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
@@ -63,70 +57,52 @@ export default function Login() {
     const student = { name, email, password };
     try {
       validateData();
-    } catch (error) {
-      return;
-    }
-    fetch("http://localhost:8080/user/authenticate", {
+    const firstResponse = await fetch("http://localhost:8080/user/authenticate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student),
-    }).then((res) => {
-      if (res.ok) {
-        const promise1 = Promise.resolve(res.body.getReader().read());
-
-        promise1.then((value) => {
-          const decoder = new TextDecoder("utf-8");
-          const token = decoder.decode(value.value);
-          const token_dict = JSON.parse(token);
-          setInfoWindowShown(true);
-          setToken(token_dict["token"]);
-          setExpirationDate(token_dict["jwtExpirationDate"]);
-          setInfoWindowShown(true);
-          setTimeout(() => {
-            setInfoWindowShown(false);
-          }, timeout);
-          setTimeout(() => {
-            window.location.reload();
-            navigate("/profil");
-          }, timeout);
-        });
-      } else {
-        const promise1 = Promise.resolve(res.body.getReader().read());
-        console.log(promise1);
-        promise1.then((value) => {
-          const decoder = new TextDecoder("utf-8");
-          const text = decoder.decode(value.value);
-          console.log(text);
-          seterrorMessage(text);
-          seterrorInfoWindowShown(true);
-          setTimeout(() => {
-            seterrorInfoWindowShown(false);
-          }, 3000);
-        });
+    });
+    if (!firstResponse.ok) {
+      const errorText = await firstResponse.text();
+      console.log(errorText);
+      throw new Error(errorText || "Logowanie nie powiodło się");
+    }
+    const data = await firstResponse.json();
+      setToken(data.token);
+      setExpirationDate(data.jwtExpirationDate);
+      console.log(data.jwtExpirationDate);
+      const url = "http://localhost:8080/user/refreshtoken";
+      // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
+      const refreshToken = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
+      if (!refreshToken.ok) {
+        throw new Error("Błąd rejestracji. Spróbuj ponownie.");
       }
-    }).catch((error)=>{
-      console.log(error);
-    })
+      setInfoWindowShown(true);
+      setTimeout(() => {
+        setInfoWindowShown(false);
+      }, 2*timeout);
+      //to set profile option in menu
+      await window.location.reload();
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 2*timeout);
+    }
   };
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+     <div className="first-container">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-            <div style={{ fontSize: "large", marginBottom: "8%" }}>
+          <div className="img-box">
               <img
                 src={"/logo.svg"}
                 alt="Logo"
-                style={{
-                  height: "3%",
-                  verticalAlign: "middle",
-                }}
+                className="logo"
               />
               Nauka Pythona
             </div>
@@ -197,16 +173,10 @@ export default function Login() {
                   </Button>
                 </Box>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <div className = "info-box">
                 <Box display="flex" flexDirection="column" gap={2}>
                   {infoWindowShown && <Toast message="Zalogowano!" />}
-                  {errorWindowShown && <Toast message={errorMessage} />}
+                  {errorMessage&& <Toast message={errorMessage} />}
                 </Box>
               </div>
               <Box display="flex" flexDirection="column" gap={2}>
@@ -216,7 +186,7 @@ export default function Login() {
           </Paper>
         </Container>
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

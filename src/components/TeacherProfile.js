@@ -510,14 +510,8 @@ const TeacherProfile = (user) => {
     return <div className="toast">{message}</div>;
   }
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         <div
           className={classes.mainContainer}
           style={{
@@ -806,13 +800,7 @@ const TeacherProfile = (user) => {
               )}
 
               <FormControl fullWidth></FormControl>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <div className = "info-box">
                 {!isFormFilled && !clicked && !isFormCloseVisible && (
                  
                    <div>
@@ -854,13 +842,7 @@ const TeacherProfile = (user) => {
                 </Box>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <div className = "info-box">
                 <Box display="flex" flexDirection="column" gap={2}>
                   {WindowShown && <Toast message={infoMessage} />}
                 </Box>
@@ -893,14 +875,7 @@ const TeacherProfile = (user) => {
                 >
                   <h3>{exercise.name}</h3>
                   <p>{exercise.content}</p>
-                  <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginLeft: "auto",
-                        }}
-                      >
+                  <div className = "right-info">
                   <p>Ilość rozwiązań:</p>
                   <Box className={classes.points}>{exercise.quantity}</Box>
                   <p>Najczęściej osiągany wynik:</p>
@@ -908,14 +883,7 @@ const TeacherProfile = (user) => {
                     {exercise.score}/{exercise.maxPoints}
                   </Box>
                  
-                  <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          marginLeft: "auto",
-                        }}
-                      >
+                  <div className = "button-box">
                     <Button
                       style={buttonStyle}
                       variant="contained"
@@ -1093,13 +1061,7 @@ const TeacherProfile = (user) => {
                 </Paper>
               )}
                 <FormControl fullWidth></FormControl>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
+                <div className="info-box">
                   <Box display="flex" flexDirection="column" gap={2}>
                      {isLoading&&<CircularProgress/>}
                     {exercises[indexofExercise].correctSolution && (
@@ -1129,11 +1091,7 @@ const TeacherProfile = (user) => {
                 </div>
               </form>
               <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center", 
-                  alignItems: "center",
-                }}
+               className = "info-box"
               >
                 <Box display="flex" flexDirection="column" gap={2}>
                   <Box display="flex" flexDirection="column" gap={2}>
@@ -1145,7 +1103,7 @@ const TeacherProfile = (user) => {
           </Container>
         )}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

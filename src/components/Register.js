@@ -36,16 +36,14 @@ export default function Register() {
   const [roles, setRoles] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [pswVisible, setPswVisible] = useState(false);
+  const [passwordShow, setPasswordShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const navigate = useNavigate();
-
   const timeout = 3000;
 
-  const handleShowPsw = () => setPswVisible((prev) => !prev);
+  const showPassword = () => setPasswordShow((prev) => !prev);
 
   const validateData = () => {
     if (!email.includes("@")) {
@@ -59,7 +57,7 @@ export default function Register() {
     }
   };
 
-  const handleRegister = async (e) => {
+  const register = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
@@ -70,18 +68,18 @@ export default function Register() {
       const role = roles === 1 ? "TEACHER" : "STUDENT";
       const student = { name, email, password, role };
 
-      const registerResponse = await fetch("http://localhost:8080/user/", {
+      const firstResponse = await fetch("http://localhost:8080/user/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(student),
       });
 
-      if (!registerResponse.ok) {
-        const errorText = await registerResponse.text();
+      if (!firstResponse.ok) {
+        const errorText = await firstResponse.text();
         throw new Error(errorText || "Rejestracja nie powiodła się");
       }
 
-      const authResponse = await fetch(
+      const secondResponse = await fetch(
         "http://localhost:8080/user/authenticate",
         {
           method: "POST",
@@ -90,34 +88,34 @@ export default function Register() {
         }
       );
 
-      if (!authResponse.ok) {
-        throw new Error("Błąd logowania po rejestracji. Spróbuj ponownie.");
+      if (!secondResponse.ok) {
+        throw new Error("Błąd rejestracji. Spróbuj ponownie.");
       }
 
-      const authData = await authResponse.json();
-      setToken(authData.token);
-      setExpirationDate(authData.jwtExpirationDate);
-      console.log(authData.jwtExpirationDate);
+      const data = await secondResponse.json();
+      setToken(data.token);
+      setExpirationDate(data.jwtExpirationDate);
+      console.log(data.jwtExpirationDate);
       const url = "http://localhost:8080/user/refreshtoken";
       // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
       const refreshToken = await fetch(url, {
         method: "GET",
-        headers: { Authorization: `Bearer ${authData.token}` },
+        headers: { Authorization: `Bearer ${data.token}` },
       });
       if (!refreshToken.ok) {
-        throw new Error("Błąd logowania po rejestracji. Spróbuj ponownie.");
+        throw new Error("Błąd rejestracji. Spróbuj ponownie.");
       }
-      console.log(refreshToken);
       setSuccessMessage("Zarejestrowano!");
-      window.location.reload();
       setTimeout(() => {
-        navigate("/profil");
+        setSuccessMessage(null);
       }, timeout);
+      //to set profile option in menu
+      await window.location.reload();
     } catch (error) {
       setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
-      }, 2*timeout);
+      }, timeout);
     } finally {
       setIsLoading(false);
     }
@@ -127,19 +125,19 @@ export default function Register() {
     return <div className="toast">{message}</div>;
   }
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-            <div style={{ fontSize: "large", marginBottom: "8%" }}>
+            <div className="img-box">
               <img
                 src="/logo.svg"
                 alt="Logo"
-                style={{ height: "3%", verticalAlign: "middle" }}
+                className="logo"
               />
               Nauka Pythona
             </div>
-            <form onSubmit={handleRegister}>
+            <form onSubmit={register}>
               <TextField
                 label="Nazwa użytkownika"
                 variant="outlined"
@@ -166,7 +164,7 @@ export default function Register() {
                 value={password}
                 placeholder="Hasło"
                 onChange={(e) => setPassword(e.target.value)}
-                type={pswVisible ? "text" : "password"}
+                type={passwordShow ? "text" : "password"}
                 fullWidth
                 sx={{ marginBottom: "16px" }}
                 error={!!errorMessage && password.length<8}
@@ -177,8 +175,8 @@ export default function Register() {
                 }
                 endAdornment={
                   <InputAdornment position="start">
-                    <IconButton onClick={handleShowPsw}>
-                      {pswVisible ? (
+                    <IconButton onClick={showPassword}>
+                      {passwordShow ? (
                         <VisibilityOffOutlined />
                       ) : (
                         <VisibilityOutlined />
@@ -191,7 +189,7 @@ export default function Register() {
                 value={passwordConfirm}
                 placeholder="Potwierdzenie hasła"
                 onChange={(e) => setPasswordConfirm(e.target.value)}
-                type={pswVisible ? "text" : "password"}
+                type={passwordShow ? "text" : "password"}
                 fullWidth
                 sx={{ marginBottom: "16px" }}
               />
@@ -237,7 +235,7 @@ export default function Register() {
           </Paper>
         </Container>
       </div>
-      <div style={{ flex: 1 }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

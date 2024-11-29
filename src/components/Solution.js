@@ -6,77 +6,7 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
 
-const useStyles = makeStyles({
-  position: "relative",
-  container: {
-    display: "flex",
-    position: "relative",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "1%",
-  },
-  textFieldContainer: {
-    position: "relative",
-    width: "90%",
-    padding: " 1% 1%",
-    border: "1%",
-    borderStyle: "solid",
-    borderColor: "white",
-    backgroundColor: "grey",
-    display: "flex",
-    fontWeight: "bold",
-    alignItems: "center",
-    gap: "1%",
-  },
-  textField: {
-    position: "relative",
-    height: "500px",
-    width: "100%",
-    backgroundColor: "#000",
-    color: "#fff",
-    "& .MuiInputBase-input": {
-      color: "#fff",
-    },
-    "& .MuiFormLabel-root": {
-      color: "#fff",
-    },
-  },
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    margin: "2%",
-    gap: "20px",
-    position: "relative",
-  },
-  button: {
-    position: "relative",
-    color: "#fff",
-    backgroundColor: "#000",
-  },
-  output: {
-    position: "relative",
-    backgroundColor: "#000 !important",
-    color: "#fff !important",
-    width: "90%",
-    marginTop: "1%",
-    display: "block",
-    padding: "1%",
-    justifyContent: "center",
-    flexDirection: "row",
-    fontWeight: "lighter",
-  },
-  ExpectedOutput: {
-    position: "relative",
-    backgroundColor: "#000 !important",
-    color: "#fff !important",
-    width: "90%",
-    marginLeft: "5%",
-    display: "block",
-    justifyContent: "center",
-    flexDirection: "row",
-    fontWeight: "lighter",
-  },
-});
+const useStyles = makeStyles({});
 
 export default function Solution({ task }) {
   const paperStyle = {
@@ -131,7 +61,6 @@ export default function Solution({ task }) {
   const save = () => {
     setIsLoading(true);
     var student = null;
-    console.log(score);
     const solution = { solutionContent, exercise, student, score, output };
     fetch("http://localhost:8080/solution/programming", {
       method: "POST",
@@ -161,7 +90,6 @@ export default function Solution({ task }) {
       .then((res) => res.text())
       .then((result) => {
         setisOutput(true);
-        console.log(result);
         setOutput(result);
         setOutputs(result.split("\n"));
       })
@@ -203,7 +131,6 @@ export default function Solution({ task }) {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setExercise(result[0]);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -214,7 +141,6 @@ export default function Solution({ task }) {
       })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
           setUser(result[0]);
         });
     }
@@ -225,14 +151,8 @@ export default function Solution({ task }) {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         {exercise && (
           <div
             className={classes.mainContainer}
@@ -254,7 +174,7 @@ export default function Solution({ task }) {
                 <h4>Maksymalna ilość punktów: </h4>
                 <p> {exercise.maxPoints} </p>
                 <h4>Oczekiwane wyjście programu:</h4>
-                <Paper multiline="true" className={classes.ExpectedOutput}>
+                <Paper multiline="true" className="expected-output">
                   {exercise.correctOutput.split("\n").map((element, index) => (
                     <p key={index}>{element}</p>
                   ))}
@@ -262,25 +182,15 @@ export default function Solution({ task }) {
               </Paper>
             </div>
             <div
-              className={classes.textFieldContainer}
-              style={{
-                flexDirection: "column",
-                flexBasis: "50%",
-                marginTop: "2%",
-              }}
-            >
+                className="console-container"
+              >
               <h3>Konsola dla Python 2.7</h3>
               <div
-                className={classes.textFieldContainer}
-                style={{
-                  flexDirection: "column",
-                  flexBasis: "55%",
-                  marginTop: "2%",
-                  backgroundColor: "black",
-                }}
+                 className="console-board"
+               
               >
                 <TextField
-                  className={classes.textField}
+                  className="console"
                   variant="standard"
                   InputProps={{
                     disableUnderline: true,
@@ -294,7 +204,7 @@ export default function Solution({ task }) {
                   maxRows={15}
                 />
               </div>
-              <div className={classes.headerContainer}>
+              <div className="header-container">
                 {!infoWindowShown && !isLoading && (
                   <div>
                     <Button
@@ -342,7 +252,7 @@ export default function Solution({ task }) {
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
               </div>
               {isOutput && outputs.length > 0 && (
-                <Paper multiline="true" className={classes.output}>
+                <Paper multiline="true" className="output">
                   {outputs.map((element, index) => (
                     <p key={index}>{element}</p>
                   ))}
@@ -353,7 +263,7 @@ export default function Solution({ task }) {
           </div>
         )}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

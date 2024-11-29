@@ -8,19 +8,7 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import studentlogo from "../student.jpeg";
 import Footer from "./semi-components/Footer";
 const useStyles = makeStyles({
-  points: {
-    width: "30px",
-    height: "30px",
-    display: "flex",
-    alignItems: "center",
-    border: "3px",
-    borderStyle: "solid",
-    borderColor: "blue",
-    borderRadius: "5px",
-    backgroundColor: "#6495ED",
-    justifyContent: "center",
-    textAlign: "center",
-  },
+  
   headerContainer: {
     display: "flex",
     alignItems: "center",
@@ -101,15 +89,8 @@ const StudentProfile = (user) => {
   },[user.user]);
 
   return (
-    <div
-           
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-    }}
-  >
-           <div style={{ flex: 9, display: "flex", flexDirection: "column"  }}>
+    <div className="main-container">
+      <div className="first-container">
       <div
         className={classes.mainContainer}
         style={{
@@ -232,17 +213,10 @@ const StudentProfile = (user) => {
                   }}
                 >
                   <p>{solution.name}</p>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginLeft: "auto",
-                    }}
-                  >
+                  <div className = "right-info">
                     <p>Twój wynik:</p>
                   </div>
-                  <Box className={classes.points}>{solution.score}</Box>
+                  <Box className="points">{solution.score}</Box>
                 </div>
 
                 <div>
@@ -280,7 +254,7 @@ const StudentProfile = (user) => {
         )}
       </div>
       </div>
-      <div style={{flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
       <Footer />
       </div>
     </div>

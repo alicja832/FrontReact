@@ -92,14 +92,8 @@ export default function SolutionAbcRetake({ task }) {
   }, [task]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         {!exercise && (
           <div>
             <CircularProgress />
@@ -168,7 +162,7 @@ export default function SolutionAbcRetake({ task }) {
           </div>
         )}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

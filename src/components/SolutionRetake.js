@@ -139,7 +139,7 @@ export default function SolutionRetake({ task }) {
       exercise,
       student,
       score,
-      output
+      output,
     };
 
     fetch("http://localhost:8080/solution/", {
@@ -180,10 +180,8 @@ export default function SolutionRetake({ task }) {
         console.log(error);
         setOutput("Error occurred");
       });
-      setisLoading(false);
+    setisLoading(false);
   };
-
- 
 
   const getData = async () => {
     const result = await fetch("http://localhost:8080/solution/" + task, {
@@ -214,14 +212,8 @@ export default function SolutionRetake({ task }) {
     getData();
   }, [task]);
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         <div>
           {solution && (
             <div
@@ -251,7 +243,7 @@ export default function SolutionRetake({ task }) {
                     <h4>Maksymalna ilość punktów: </h4>
                     <p> {exercise.maxPoints} </p>
                     <h4>Oczekiwane wyjście programu:</h4>
-                    <Paper multiline="true" className={classes.ExpectedOutput}>
+                    <Paper multiline="true" className="expected-output">
                       {exercise.correctOutput
                         .split("\n")
                         .map((element, index) => (
@@ -261,26 +253,11 @@ export default function SolutionRetake({ task }) {
                   </Paper>
                 </div>
               )}
-              <div
-                className={classes.textFieldContainer}
-                style={{
-                  flexDirection: "column",
-                  flexBasis: "60%",
-                  marginTop: "2%",
-                }}
-              >
+              <div className="console-container">
                 <h3>Konsola dla Python 2.7</h3>
-                <div
-                  className={classes.textFieldContainer}
-                  style={{
-                    flexDirection: "column",
-                    flexBasis: "55%",
-                    marginTop: "2%",
-                    backgroundColor: "black",
-                  }}
-                >
+                <div className="console-board">
                   <TextField
-                    className={classes.textField}
+                    className="console"
                     InputProps={{
                       disableUnderline: true,
                     }}
@@ -295,35 +272,33 @@ export default function SolutionRetake({ task }) {
                 </div>
                 <div className={classes.headerContainer}>
                   {!infoWindowShown && !isLoading && (
-                   <div>
-                   <Button
-                      style={{
-                        backgroundColor: "#adff2f",
-                        color: "black",
-                        margin: "5px",
-                      }}
-                      variant="contained"
-                      color="secondary"
-                      onClick={runCode}
-                    >
-                      Wykonaj kod
-                    </Button>
-                
-
-                 
-                    <Box display="inline" flexDirection="column" gap={2}>
+                    <div>
                       <Button
                         style={{
-                          backgroundColor: "#001f3f",
+                          backgroundColor: "#adff2f",
+                          color: "black",
                           margin: "5px",
                         }}
                         variant="contained"
                         color="secondary"
-                        onClick={save}
+                        onClick={runCode}
                       >
-                        Zapisz rozwiązanie
+                        Wykonaj kod
                       </Button>
-                    </Box>
+
+                      <Box display="inline" flexDirection="column" gap={2}>
+                        <Button
+                          style={{
+                            backgroundColor: "#001f3f",
+                            margin: "5px",
+                          }}
+                          variant="contained"
+                          color="secondary"
+                          onClick={save}
+                        >
+                          Zapisz rozwiązanie
+                        </Button>
+                      </Box>
                     </div>
                   )}
                 </div>
@@ -331,7 +306,7 @@ export default function SolutionRetake({ task }) {
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
 
                 {isOutput && outputs.length > 0 && (
-                  <Paper multiline="true" className={classes.output}>
+                  <Paper multiline="true" className="output">
                     {outputs.map((element, index) => (
                       <p key={index}>{element}</p>
                     ))}
@@ -343,7 +318,7 @@ export default function SolutionRetake({ task }) {
           )}
         </div>
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

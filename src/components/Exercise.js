@@ -7,34 +7,7 @@ import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 
-const useStyles = makeStyles({
-  points: {
-    width: "30px",
-    height: "30px",
-    display: "flex",
-    alignItems: "center",
-    border: "3px",
-    borderStyle: "solid",
-    borderColor: "blue",
-    borderRadius: "5px",
-    backgroundColor: "#6495ED",
-    justifyContent: "center",
-    textAlign: "center",
-    position: "relative",
-  },
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "20px",
-    position: "relative",
-  },
-  check: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginLeft: "auto",
-  },
-});
+const useStyles = makeStyles({});
 
 export default function Exercise() {
   const paperStyle = {
@@ -83,14 +56,8 @@ export default function Exercise() {
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div style={{ flex: 9, display: "flex", flexDirection: "column" }}>
+    <div className="main-container">
+      <div className="first-container">
         <div
           className={classes.mainContainer}
           style={{
@@ -114,7 +81,7 @@ export default function Exercise() {
                     key={index}
                   >
                     <div
-                      className={classes.headerContainer}
+                      className="header-container"
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -122,21 +89,15 @@ export default function Exercise() {
                       }}
                     >
                       <h3>{exercise.key.name}</h3>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          marginLeft: "auto",
-                        }}
+                      <div className = "right-info"
                       >
                         <p>Punkty do zdobycia:</p>
                       </div>
-                      <Box className={classes.points}>
+                      <Box className="points">
                         {exercise.key.maxPoints}
                       </Box>
                       {exercise.value ? (
-                        <div className={classes.check}>
+                        <div className="check">
                           <CheckIcon />
                           <span>Zrobione</span>
                         </div>
@@ -166,29 +127,18 @@ export default function Exercise() {
                     key={index}
                   >
                     <div
-                      className={classes.headerContainer}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
+                      className="header-container"
                     >
                       <h3>{exercise.key.name}</h3>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          marginLeft: "auto",
-                        }}
+                      <div className = "right-info"
                       >
                         <p>Punkty do zdobycia:</p>
                       </div>
-                      <Box className={classes.points}>
+                      <Box className="points">
                         {exercise.key.maxPoints}
                       </Box>
                       {exercise.value ? (
-                        <div className={classes.check}>
+                        <div className="check">
                           <CheckIcon />
                           <span>Zrobione</span>
                         </div>
@@ -213,7 +163,7 @@ export default function Exercise() {
           </Paper>
         </div>
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="footer">
         <Footer />
       </div>
     </div>

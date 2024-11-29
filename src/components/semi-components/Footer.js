@@ -38,9 +38,6 @@ const Footer = () => {
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px"}}
           >
-            <li  >
-              <Link style={{color:"white"}} to={"/profil"}>Profil</Link>
-            </li>
             <li>
               <Link style={{color:"white"}} to={"/tasks"}>Zadania</Link>
             </li>
