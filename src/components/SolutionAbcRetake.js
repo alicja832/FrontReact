@@ -13,7 +13,6 @@ import { Textarea } from "@mui/joy";
 const useStyles = makeStyles({});
 
 export default function SolutionAbcRetake({ task }) {
- 
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -74,16 +73,12 @@ export default function SolutionAbcRetake({ task }) {
   };
 
   useEffect(() => {
-    fetch(
-      "http://localhost:8080/solution/abc/" + task,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${getToken()}` },
-      }
-    )
+    fetch("http://localhost:8080/solution/abc/" + task, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((res) => res.json())
       .then((result) => {
-     
         setExercise(result[0].exercise);
         setAnswer(result[0].exercise.correctAnswer);
         setAnswerChecked(result[0].answer);
@@ -112,9 +107,9 @@ export default function SolutionAbcRetake({ task }) {
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
-              
+
                 <Textarea defaultValue={exercise.introduction}></Textarea>
-           
+
                 <h4>Maksymalna ilość punktów: {exercise.maxPoints}</h4>
               </Paper>
             </div>
@@ -124,35 +119,74 @@ export default function SolutionAbcRetake({ task }) {
                 <h4>{exercise.content}</h4>
                 <FormControl fullWidth>
                   <FormGroup>
-                    <FormControlLabel
-                      label={"A. " + exercise.firstOption}
-                      value={exercise.firstOption}
-                      control={
-                        <Checkbox checked={checkedA} disabled={!checkedA} />
-                      }
-                    />
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"A. "}
+                          value={exercise.firstOption}
+                          control={
+                            <Checkbox checked={checkedA} disabled={!checkedA} />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.firstOption}
+                        ></Textarea>
+                      </div>
+                    </div>
 
-                    <FormControlLabel
-                      label={"B. " + exercise.secondOption}
-                      control={
-                        <Checkbox checked={checkedB} disabled={!checkedB} />
-                      }
-                    />
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"B. "}
+                          value={exercise.secondOption}
+                          control={
+                            <Checkbox checked={checkedB} disabled={!checkedB} />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.secondOption}
+                        ></Textarea>
+                      </div>
+                    </div>
 
-                    <FormControlLabel
-                      label={"C. " + exercise.thirdOption}
-                      control={
-                        <Checkbox checked={checkedC} disabled={!checkedC} />
-                      }
-                    />
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"C. "}
+                          value={exercise.thirdOption}
+                          control={
+                            <Checkbox checked={checkedC} disabled={!checkedC} />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.secondOption}
+                        ></Textarea>
+                      </div>
+                    </div>
 
                     {exercise.fourthOption && (
-                      <FormControlLabel
-                        label={"D. " + exercise.fourthOption}
-                        control={
-                          <Checkbox checked={checkedD} disabled={!checkedD} />
-                        }
-                      />
+                     <div className="main-row">
+                     <div className="right-info">
+                       <FormControlLabel
+                         label={"B. "}
+                         value={exercise.fourthOption}
+                         control={
+                           <Checkbox checked={checkedD} disabled={!checkedD} />
+                         }
+                       />
+                     </div>
+                     <div className="option">
+                       <Textarea
+                         defaultValue={exercise.secondOption}
+                       ></Textarea>
+                     </div>
+                   </div>
                     )}
                   </FormGroup>
                 </FormControl>

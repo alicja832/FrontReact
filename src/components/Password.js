@@ -133,7 +133,7 @@ export default function PasswordReminder() {
   function changePassword()
   {
     const verification = {email,code,password};
-    fetch("http://naukapythona.azurewebsites.net/user/changePassword",
+    fetch("http://localhost:8080/user/changePassword",
     {
       method: "PUT",
       headers : { "Content-Type": "application/json" },

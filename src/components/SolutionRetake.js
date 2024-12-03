@@ -222,7 +222,8 @@ export default function SolutionRetake({ task }) {
                 display: "flex",
                 justifyContent: "flex-start",
                 alignItems: "flex-start",
-                padding: "3%",
+                padding: "1%",
+                marginTop: "2%",
               }}
             >
               {!exercise && (
@@ -231,7 +232,7 @@ export default function SolutionRetake({ task }) {
                 </div>
               )}
               {exercise && (
-                <div style={{ flexBasis: "40%", flexDirection: "column" }}>
+                <div style={{ flexBasis: "50%", flexDirection: "column" }}>
                   <Paper elevation={3} style={paperStyleTwo}>
                     <h2>{exercise.name}</h2>
 

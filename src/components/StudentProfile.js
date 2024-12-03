@@ -7,23 +7,15 @@ import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import studentlogo from "../student.jpeg";
 import Footer from "./semi-components/Footer";
-const useStyles = makeStyles({
-  
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "20px",
-  },
-});
+const useStyles = makeStyles({});
 
 const StudentProfile = (user) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const paperStyle = {
-   
     backgroundColor: "#FDF5E6",
     padding: "50px 20px",
-    width:"50%",
+    width: "50%",
     margin: "2% auto",
     position: "relative",
     textAlign: "center",
@@ -32,7 +24,7 @@ const StudentProfile = (user) => {
     top: "4em",
     backgroundColor: "#FDF5E6",
     padding: "3% 2%",
-    width:"90%",
+    width: "90%",
     margin: "2% auto",
     position: "relative",
     textAlign: "center",
@@ -50,7 +42,7 @@ const StudentProfile = (user) => {
   const [exercisesWithScores, setExercisesWithScores] = useState([]);
   const [student, setStudent] = useState(null);
   const [position, setPosition] = useState(null);
-  const [quantity, setQuantity] = useState(null);
+  const [quantity, setQuantity ] = useState(null);
   const retake = (e) => {
     navigate("/solutionRetake/" + e.target.value);
   };
@@ -58,7 +50,6 @@ const StudentProfile = (user) => {
     navigate("/solutionAbcRetake/" + e.target.value);
   };
   const getInfo = () => {
-    
     fetch("http://localhost:8080/solution/programming", {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
@@ -77,7 +68,7 @@ const StudentProfile = (user) => {
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
-        setPosition(result.key+1);
+        setPosition(result.key + 1);
         setQuantity(result.value);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -86,90 +77,89 @@ const StudentProfile = (user) => {
   useEffect(() => {
     setStudent(user.user);
     getInfo();
-  },[user.user]);
+  }, [user.user]);
 
   return (
     <div className="main-container">
       <div className="first-container">
-      <div
-        className={classes.mainContainer}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          padding: "10%",
-        }}
-      >
         <div
-          style={{ display: "flex", flexBasis: "60%", flexDirection: "column" }}
-        >
-          <Paper elevation={1} style={paperStyleFirst}>
-            <div
-              className={classes.mainContainer}
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "flex-start",
-              }}
-            >
-              {!student&&(
-                 <div>
-                 <CircularProgress />
-               </div>
-              )}
-              {(student)&&
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexBasis: "60%",
-                }}
-              >
-          
-                  <h2>Profil ucznia:</h2>
-                  <p>{student.name}</p>
-                  <p>{student.email}</p>
-                  <h4>Twój wynik: {student.score} pkt</h4>
-                  <p>Pozycja w rankingu: {position}</p>
-                  <p>Liczba osób biorących udział w rywalizacji:{quantity}</p>
-              
-              </div>
-                }
-              <div
-                className={classes.textFieldContainer}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexBasis: "40%",
-                }}
-              >
-                <Paper elevation={3}>
-                  <img
-                    src={studentlogo}
-                    alt="Logo"
-                    style={{
-                      height: "140px",
-                      width: "200px",
-                      verticalAlign: "middle",
-                      marginRight: "10px",
-                    }}
-                  />
-                </Paper>
-              </div>
-           
-            </div>
-           
-          </Paper>
-        </div>
-        <div
+          className={classes.mainContainer}
           style={{
             display: "flex",
-            flexDirection: "column",
-            flexBasis: "40%",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            padding: "10%",
           }}
         >
-          <Paper elevation={1} style={paperStyleTwo}>
-          
+          <div
+            style={{
+              display: "flex",
+              flexBasis: "60%",
+              flexDirection: "column",
+            }}
+          >
+            <Paper elevation={1} style={paperStyleFirst}>
+              <div
+                className={classes.mainContainer}
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "flex-start",
+                }}
+              >
+                {!student && (
+                  <div>
+                    <CircularProgress />
+                  </div>
+                )}
+                {student && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flexBasis: "60%",
+                    }}
+                  >
+                    <h2>Profil ucznia:</h2>
+                    <p>{student.name}</p>
+                    <p>{student.email}</p>
+                    <h4>Twój wynik: {student.score} pkt</h4>
+                    <p>Pozycja w rankingu: {position}</p>
+                    <p>Liczba osób biorących udział w rywalizacji:{quantity}</p>
+                  </div>
+                )}
+                <div
+                  className={classes.textFieldContainer}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flexBasis: "40%",
+                  }}
+                >
+                  <Paper elevation={3}>
+                    <img
+                      src={studentlogo}
+                      alt="Logo"
+                      style={{
+                        height: "140px",
+                        width: "200px",
+                        verticalAlign: "middle",
+                        marginRight: "10px",
+                      }}
+                    />
+                  </Paper>
+                </div>
+              </div>
+            </Paper>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flexBasis: "40%",
+            }}
+          >
+            <Paper elevation={1} style={paperStyleTwo}>
               <h3>Jako uczeń możesz rozwiązywać zadania:</h3>
               <h4>Na zadanie składa się:</h4>
 
@@ -184,78 +174,61 @@ const StudentProfile = (user) => {
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
               <h3>Możesz także poprawiać swoje rozwiązania</h3>
               <p>Uwaga! Ale tylko programistyczne!</p>
-           
-          </Paper>
+            </Paper>
+          </div>
+        </div>
+
+        <div>
+          {exercisesWithScores.length !== 0 && (
+            <Paper elevation={1} style={paperStyle}>
+              <h3>Zadania, które rozwiązałeś:</h3>
+              {exercisesWithScores.map((solution) => (
+                <Paper elevation={6} key={solution.id}>
+                  <div className="main-row">
+                    <div className="header-container-exercise">
+                      <p>{solution.name}</p>
+                    </div>
+
+                    <div className="right-info-exercise">
+                      
+                      <p>Twój wynik:</p>
+
+                      <Box className="points">{solution.score}</Box>
+
+                      <div className="button-exercise">
+                        {solution.retakeposibility === "true" && (
+                          <Button
+                            style={buttonStyle}
+                            variant="contained"
+                            value={solution.id}
+                            color="inherit"
+                            onClick={retake}
+                          >
+                            Wykonaj ponownie
+                          </Button>
+                        )}
+                        {solution.retakeposibility === "false" && (
+                          <Button
+                            style={buttonStyle}
+                            variant="contained"
+                            value={solution.id}
+                            color="inherit"
+                            onClick={show}
+                          >
+                            Zobacz
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Paper>
+              ))}
+            </Paper>
+          )}
         </div>
       </div>
-
-      <div>
-        {exercisesWithScores.length !== 0 && (
-          <Paper elevation={1} style={paperStyle}>
-            <h3>Zadania, które rozwiązałeś:</h3>
-            {exercisesWithScores.map((solution) => (
-              <Paper
-                elevation={6}
-                style={{
-                  margin: "10px",
-                  padding: "15px",
-                  textAlign: "left",
-                }}
-                key={solution.id}
-              >
-                <div
-                  className={classes.headerContainer}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexDirection: "row",
-                  }}
-                >
-                  <p>{solution.name}</p>
-                  <div className = "right-info">
-                    <p>Twój wynik:</p>
-                  </div>
-                  <Box className="points">{solution.score}</Box>
-                </div>
-
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginLeft: "auto",
-                    }}
-                  >
-                    {(solution.retakeposibility==="true") && <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      value={solution.id}
-                      color="inherit"
-                      onClick={retake}
-                    >
-                      Wykonaj ponownie
-                    </Button>}
-                   {(solution.retakeposibility==="false") &&  <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      value={solution.id}
-                      color="inherit"
-                      onClick={show}
-                    >
-                     Zobacz
-                    </Button>}
-                  </div>
-                </div>
-              </Paper>
-            ))}
-          </Paper>
-        )}
-      </div>
-      </div>
       <div className="footer">
-      <Footer />
+        <Footer />
       </div>
     </div>
   );

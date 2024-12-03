@@ -13,7 +13,7 @@ export default function Exercise() {
   const paperStyle = {
     top: "4em",
     padding: "4% 4%",
-    width: "40%",
+    width: "60%",
     margin: "1% auto",
     gap: "1%",
     position: "relative",
@@ -26,12 +26,12 @@ export default function Exercise() {
   const navigate = useNavigate();
   const openSolution = (e) => {
     if (longExercises[e.target.value].value) {
-      navigate("/solutionRetake/" + longExercises[e.target.value].key.id);
+      navigate("/profil");
     } else navigate("/solution/" + longExercises[e.target.value].key.id);
   };
   const openSolutionAbc = (e) => {
     if (shortExercises[e.target.value].value) {
-      navigate("/solutionAbcRetake/" + shortExercises[e.target.value].key.id);
+      navigate("/profil");
     } else navigate("/solutionabc/" + shortExercises[e.target.value].key.id);
   };
   useEffect(() => {
@@ -80,28 +80,21 @@ export default function Exercise() {
                     style={{ padding: "15px", textAlign: "left" }}
                     key={index}
                   >
-                    <div
-                      className="header-container"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <h3>{exercise.key.name}</h3>
-                      <div className = "right-info"
-                      >
-                        <p>Punkty do zdobycia:</p>
+                    <div className="main-row">
+                      <div className="header-container-exercise">
+                        <h3>{exercise.key.name}</h3>
                       </div>
-                      <Box className="points">
-                        {exercise.key.maxPoints}
-                      </Box>
-                      {exercise.value ? (
-                        <div className="check">
-                          <CheckIcon />
-                          <span>Zrobione</span>
-                        </div>
-                      ) : null}
+                      <div className="right-info-exercise">
+                        <p>Punkty do zdobycia:</p>
+
+                        <Box className="points">{exercise.key.maxPoints}</Box>
+                        {exercise.value ? (
+                          <div className="check">
+                            <CheckIcon />
+                            <span>Zrobione</span>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
 
                     <div>
@@ -126,23 +119,22 @@ export default function Exercise() {
                     style={{ padding: "15px", textAlign: "left" }}
                     key={index}
                   >
-                    <div
-                      className="header-container"
-                    >
-                      <h3>{exercise.key.name}</h3>
-                      <div className = "right-info"
-                      >
-                        <p>Punkty do zdobycia:</p>
+                    <div className="main-row">
+                      <div className="header-container-exercise">
+                        <h3>{exercise.key.name}</h3>
                       </div>
-                      <Box className="points">
-                        {exercise.key.maxPoints}
-                      </Box>
-                      {exercise.value ? (
-                        <div className="check">
-                          <CheckIcon />
-                          <span>Zrobione</span>
-                        </div>
-                      ) : null}
+                      <div className="right-info-exercise">
+                        <p>Punkty do zdobycia:</p>
+
+                        <Box className="points">{exercise.key.maxPoints}</Box>
+
+                        {exercise.value ? (
+                          <div className="check">
+                            <CheckIcon />
+                            <span>Zrobione</span>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
 
                     <div>

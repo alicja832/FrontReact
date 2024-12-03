@@ -105,6 +105,7 @@ export default function Register() {
       if (!refreshToken.ok) {
         throw new Error("Błąd rejestracji. Spróbuj ponownie.");
       }
+      
       setSuccessMessage("Zarejestrowano!");
       setTimeout(() => {
         setSuccessMessage(null);

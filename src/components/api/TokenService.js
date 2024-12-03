@@ -7,10 +7,11 @@ export function getToken() {
   ) {
     console.log("halo");
     fetch("http://localhost:8080/user/token", {
-      method: "GET"
+      method: "GET",
+      credentials:'include'
     }).then((res) => {
       if (!res.ok) {
-       setToken(null);
+       
       } else {
         const promise1 = Promise.resolve(res.body.getReader().read());
         promise1.then((value) => {
@@ -18,8 +19,7 @@ export function getToken() {
           const tokenvalue = decoder.decode(value.value);
           const token_dict = JSON.parse(tokenvalue);
           token = token_dict["token"];
-          console.log(token);
-          window.localStorage.setItem("token", token);
+          setToken(token);
         });
       }
     }).catch((error)=>{
@@ -34,7 +34,6 @@ export function setToken(token) {
 
   if (token !== null) {
     window.localStorage.setItem("token", token);
-    //window.location.reload();
   } else {
     setExpirationDate(null);
     setRefreshToken(null);

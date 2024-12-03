@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
-import { Container, Paper, Button, Box } from "@mui/material";
+import { Container, Paper, Button, Box, CircularProgress } from "@mui/material";
 import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
@@ -30,6 +30,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState([]);
   const [psw, setPsw] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const timeout = 3000;
@@ -53,6 +54,7 @@ export default function Login() {
 
   const loginClicked = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
     classInfo.setmessage(false);
     const student = { name, email, password };
     try {
@@ -75,23 +77,28 @@ export default function Login() {
       // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
       const refreshToken = await fetch(url, {
         method: "GET",
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${data.token}` }, credentials:'include'
       });
       if (!refreshToken.ok) {
-        throw new Error("Błąd rejestracji. Spróbuj ponownie.");
+        throw new Error("Błąd logowania. Spróbuj ponownie.");
       }
+     
+      setIsLoading(false);
       setInfoWindowShown(true);
       setTimeout(() => {
         setInfoWindowShown(false);
-      }, 2*timeout);
+      }, timeout);
+
       //to set profile option in menu
-      await window.location.reload();
+      window.location.reload();
     } catch (error) {
+      console.log(error);
       setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
       }, 2*timeout);
     }
+   
   };
   return (
     <div className="main-container">
@@ -106,9 +113,9 @@ export default function Login() {
               />
               Nauka Pythona
             </div>
-            <form className={classes.root} noValidate autoComplete="off">
+            <form className={classes.root} noValidate autoComplete="off" >
               <TextField
-                id="outlined-basic"
+                id="name"
                 label="Nazwa użytkownika"
                 variant="outlined"
                 fullWidth
@@ -127,7 +134,7 @@ export default function Login() {
                 }}
               />
               <TextField
-                id="outlined-basic"
+                id="email"
                 label="Adres e-mail"
                 variant="outlined"
                 fullWidth
@@ -138,6 +145,7 @@ export default function Login() {
                 sx={{ marginBottom: "16px" }}
               />
               <FilledInput
+                id="password"
                 value={password}
                 placeholder="Hasło"
                 onChange={(e) => setPassword(e.target.value)}
@@ -164,13 +172,18 @@ export default function Login() {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
+                 {
+                  !isLoading &&  <Button
                     variant="contained"
                     style={{ backgroundColor: "#001f3f" }}
                     onClick={loginClicked}
                   >
                     Zaloguj
                   </Button>
+                  }
+                  { isLoading && 
+                    <CircularProgress size={24}/>
+                  }
                 </Box>
               </div>
               <div className = "info-box">

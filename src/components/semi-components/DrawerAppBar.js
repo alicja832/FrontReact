@@ -72,7 +72,7 @@ export default function DrawerAppBar(register, props) {
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}></Typography>
+      <Typography variant="h6" sx={{ my: 2 }}/>
       <Divider />
       <List>
         {navItems.map((item, index) => (
@@ -82,9 +82,9 @@ export default function DrawerAppBar(register, props) {
               to={purposes[index]}
               sx={{ textAlign: "center" }}
             >
-              <p>
+              
                 <ListItemText primary={item} />
-              </p>
+              
             </ListItemButton>
           </ListItem>
         ))}

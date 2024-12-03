@@ -16,12 +16,12 @@ export default function Ranking() {
   const classes = useStyles();
 
   const paperStyle = {
-    padding: "3% 3%",
+    padding: "1% 1%",
     width: "70%",
     margin: "1% auto",
     gap: "1%",
-    paddingLeft: "15%",
-    paddingRight: "15%",
+    paddingLeft: "12%",
+    paddingRight: "12%",
     backgroundColor: "#FDF5E6",
     marginTop: "10%",
     left: "15%",
@@ -61,7 +61,7 @@ export default function Ranking() {
               <Table aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontSize: "28px" }}>Student</TableCell>
+                    <TableCell sx={{ fontSize: "28px" }}>Uczeń</TableCell>
                     <TableCell sx={{ fontSize: "28px" }} align="right">Liczba punktów</TableCell>
                   </TableRow>
                 </TableHead>

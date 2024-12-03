@@ -11,7 +11,6 @@ import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
 const useStyles = makeStyles({});
 export default function SolutionAbc({ task }) {
-
   const buttonStyle = {
     backgroundColor: "#001f3f",
     color: "white",
@@ -37,7 +36,7 @@ export default function SolutionAbc({ task }) {
   const [answer, setAnswer] = useState("");
   const [exercise, setExercise] = useState(null);
   const [score, setScore] = useState(0);
-  const [sent, setSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
   const [user, setUser] = useState(null);
@@ -70,6 +69,7 @@ export default function SolutionAbc({ task }) {
     setAnswer("D");
   };
   const save = () => {
+    setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
     fetch("http://localhost:8080/solution/abc", {
@@ -81,21 +81,23 @@ export default function SolutionAbc({ task }) {
       body: JSON.stringify(solution),
     })
       .then((res) => {
-        if(!res.ok)
-        {
+        if (!res.ok) {
           setinfoMessage("Błąd zapisu");
           setInfoWindowShown(true);
         }
-            
+
         setinfoMessage("Zapisano");
         setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setinfoMessage("Błąd zapisu");
+        setInfoWindowShown(true);
       });
+    setIsLoading(false);
   };
   const check = () => {
-    setSent(true);
+    setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
     fetch("http://localhost:8080/solution/abc/check", {
@@ -119,11 +121,10 @@ export default function SolutionAbc({ task }) {
       .catch((error) => {
         console.error("Error:", error);
       });
-    setSent(false);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-   
     fetch("http://localhost:8080/exercise/one/abc/" + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -141,9 +142,10 @@ export default function SolutionAbc({ task }) {
         .then((res) => res.json())
         .then((result) => {
           setUser(result[0]);
-        }).catch((error)=>{
-          console.log(error);
         })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }, []);
 
@@ -172,8 +174,9 @@ export default function SolutionAbc({ task }) {
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyle}>
                 <h2>{exercise.name}</h2>
-                  <Textarea defaultValue={exercise.introduction}></Textarea>
-                <h4>Maksymalna ilość punktów:  {exercise.maxPoints}</h4>
+                <Textarea defaultValue={exercise.introduction}></Textarea>
+
+                <h4>Maksymalna ilość punktów: {exercise.maxPoints}</h4>
               </Paper>
             </div>
 
@@ -183,36 +186,83 @@ export default function SolutionAbc({ task }) {
                 <h4>Wybierz jedną odpowiedź: </h4>
                 <FormControl fullWidth>
                   <FormGroup>
-                    <FormControlLabel
-                      requeired={true}
-                      label={"A. " + exercise.firstOption}
-                      value={exercise.firstOption}
-                      control={
-                        <Checkbox onChange={handlechangeA} checked={checkedA} />
-                      }
-                    />
-                    <FormControlLabel
-                      label={"B. " + exercise.secondOption}
-                      control={
-                        <Checkbox onChange={handlechangeB} checked={checkedB} />
-                      }
-                    />
-                    <FormControlLabel
-                      label={"C. " + exercise.thirdOption}
-                      control={
-                        <Checkbox onChange={handlechangeC} checked={checkedC} />
-                      }
-                    />
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"A."}
+                          value={exercise.firstOption}
+                          control={
+                            <Checkbox
+                              onChange={handlechangeA}
+                              checked={checkedA}
+                            />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.secondOption}
+                        ></Textarea>
+                      </div>
+                    </div>
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"B."}
+                          value={exercise.secondOption}
+                          control={
+                            <Checkbox
+                              onChange={handlechangeB}
+                              checked={checkedB}
+                            />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.secondOption}
+                        ></Textarea>
+                      </div>
+                    </div>
+                    <div className="main-row">
+                      <div className="right-info">
+                        <FormControlLabel
+                          label={"C."}
+                          value={exercise.thirdOption}
+                          control={
+                            <Checkbox
+                              onChange={handlechangeC}
+                              checked={checkedC}
+                            />
+                          }
+                        />
+                      </div>
+                      <div className="option">
+                        <Textarea
+                          defaultValue={exercise.thirdOption}
+                        ></Textarea>
+                      </div>
+                    </div>
                     {exercise.fourthOption && (
-                      <FormControlLabel
-                        label={"D. " + exercise.fourthOption}
-                        control={
-                          <Checkbox
-                            onChange={handlechangeD}
-                            checked={checkedD}
+                      <div className="main-row">
+                        <div className="right-info">
+                          <FormControlLabel
+                            label={"D."}
+                            value={exercise.fourthOption}
+                            control={
+                              <Checkbox
+                                onChange={handlechangeD}
+                                checked={checkedD}
+                              />
+                            }
                           />
-                        }
-                      />
+                        </div>
+                        <div className="option">
+                          <Textarea
+                            defaultValue={exercise.fourthOption}
+                          ></Textarea>
+                        </div>
+                      </div>
                     )}
                   </FormGroup>
                   <Box
@@ -220,34 +270,34 @@ export default function SolutionAbc({ task }) {
                     flexDirection="column"
                     justifyContent="center"
                     alignItems="center"
-                  >
-                    
-                  </Box>
+                  ></Box>
                 </FormControl>
-                <Box> {!infoWindowShown && sent && <CircularProgress />}</Box>
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
-                <Box display="inline" flexDirection="column" gap={2}>
-                  {user && user.score >= 0 && !infoWindowShown && (
-                    <Button
-                      style={{ backgroundColor: "#001f3f" }}
-                      variant="contained"
-                      color="secondary"
-                      onClick={save}
-                    >
-                      Zapisz rozwiązanie
-                    </Button>
-                  )}
-                   {!user  && (
-                    <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    onClick={check}
-                  >
-                    Sprawdź
-                  </Button>
-                  )}
-                </Box>
+                {!isLoading && (
+                  <Box display="inline" flexDirection="column" gap={2}>
+                    {user && user.score >= 0 && !infoWindowShown && (
+                      <Button
+                        style={{ backgroundColor: "#001f3f" }}
+                        variant="contained"
+                        color="secondary"
+                        onClick={save}
+                      >
+                        Zapisz rozwiązanie
+                      </Button>
+                    )}
+                    {!user && (
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        color="secondary"
+                        onClick={check}
+                      >
+                        Sprawdź
+                      </Button>
+                    )}
+                  </Box>
+                )}
+                {isLoading && <CircularProgress />}
               </Paper>
             </div>
           </div>

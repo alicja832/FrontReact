@@ -160,7 +160,8 @@ export default function Solution({ task }) {
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "flex-start",
-              padding: "3% 1%",
+              padding: "1%",
+              marginTop: "2%",
             }}
           >
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
