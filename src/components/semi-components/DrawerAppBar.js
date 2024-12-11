@@ -22,14 +22,12 @@ export default function DrawerAppBar(register, props) {
   
   const [navItems, setNavItems] = useState([
     "Zadania",
-    "Główna",
     "Zaloguj",
     "Zarejestruj",
   ]);
 
   const [purposes, setPurposes] = useState([
     "/tasks",
-    "/",
     "/login",
     "/register",
   ]);
@@ -40,10 +38,11 @@ export default function DrawerAppBar(register, props) {
   
     if (getToken() && !navItems.includes(profile)) {
         
-        navItems.unshift("Profil");
-        navItems.unshift("Ranking");
-        purposes.unshift("/profil");
-        purposes.unshift("/ranking");
+    
+        navItems.push("Ranking");
+        purposes.push("/ranking");
+        navItems.push("Profil");
+        purposes.push("/profil");
         navItems.push("Wyloguj");
         purposes.push("/logout");
 
@@ -84,7 +83,6 @@ export default function DrawerAppBar(register, props) {
             >
               
                 <ListItemText primary={item} />
-              
             </ListItemButton>
           </ListItem>
         ))}
@@ -130,8 +128,9 @@ export default function DrawerAppBar(register, props) {
                   marginRight: "10px",
                 }}
               />
-              Nauka Pythona
-          
+             <Link to="/">
+             <Button sx={{color:"white",textDecoration:"none"}}>Nauka Pythona</Button> 
+             </Link> 
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {navItems.map((item, index) => (

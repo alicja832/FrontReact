@@ -83,22 +83,25 @@ export default function Login() {
         throw new Error("Błąd logowania. Spróbuj ponownie.");
       }
      
+      //to set profile option in menu
+     
+
       setIsLoading(false);
       setInfoWindowShown(true);
       setTimeout(() => {
         setInfoWindowShown(false);
       }, timeout);
-
-      //to set profile option in menu
       window.location.reload();
+
     } catch (error) {
       console.log(error);
       setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
+        setIsLoading(false);
       }, 2*timeout);
     }
-   
+    
   };
   return (
     <div className="main-container">

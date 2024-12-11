@@ -2,7 +2,7 @@ export function getToken() {
   var token = window.localStorage.getItem("token");
   if (
     token &&
-    new Date().getTime() >=
+    (new Date().getTime()+10) >=
       new Date(window.localStorage.getItem("expiration-date")).getTime()
   ) {
     console.log("halo");
@@ -11,7 +11,8 @@ export function getToken() {
       credentials:'include'
     }).then((res) => {
       if (!res.ok) {
-       
+       setToken(null);
+       window.location.reload();
       } else {
         const promise1 = Promise.resolve(res.body.getReader().read());
         promise1.then((value) => {
@@ -19,11 +20,13 @@ export function getToken() {
           const tokenvalue = decoder.decode(value.value);
           const token_dict = JSON.parse(tokenvalue);
           token = token_dict["token"];
-          setToken(token);
+          window.localStorage.setItem("token", token);
+         
         });
       }
     }).catch((error)=>{
       console.log("Error occured:"+ error);
+      setToken(null);
     })
   }
   return token;
@@ -37,7 +40,7 @@ export function setToken(token) {
   } else {
     setExpirationDate(null);
     setRefreshToken(null);
-    window.location.reload();
+   
   }
 
   return;

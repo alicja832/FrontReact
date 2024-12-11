@@ -103,16 +103,32 @@ export default function Solution({ task }) {
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
     console.log(outputs);
-    fetch("http://localhost:8080/solution/programming/check", {
+    const url = (exercise.solutionSchema? "http://localhost:8080/solution/programming/test":"http://localhost:8080/solution/programming/check")
+    fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
     })
-      .then((res) => res.text())
+      .then((res) => res.json())
       .then((result) => {
+      
         console.log(result);
-        setScore(result);
-        setinfoMessage("Twój wynik:" + result.toString() + " pkt");
+        console.log(result.value);
+        if(exercise.solutionSchema)
+        {
+          setScore(result.value);
+          setisOutput(true);
+          setOutput(result.key);
+          setOutputs(result.key.split("\n"));
+          setinfoMessage("Twój wynik:" + result.value.toString() + " pkt");
+        }
+
+        else
+        { 
+          setScore(result);
+          setinfoMessage("Twój wynik:" + result.toString() + " pkt");
+        }
+       
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -132,6 +148,8 @@ export default function Solution({ task }) {
       .then((res) => res.json())
       .then((result) => {
         setExercise(result[0]);
+        console.log(result[0]);
+        setSolutionContent(result[0].solutionSchema);
       })
       .catch((error) => console.error("Error fetching students:", error));
     if (getToken()) {
