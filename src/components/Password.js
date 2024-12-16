@@ -1,9 +1,8 @@
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
-import { Container, Paper, Button, Box } from "@mui/material";
+import { Container, Paper, Button, Box ,CircularProgress } from "@mui/material";
 import React, { useState } from "react";
-import { FilledInput, IconButton, InputAdornment } 
-from "@mui/material";
+import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import Footer from "./semi-components/Footer";
 
@@ -21,6 +20,7 @@ export default function PasswordReminder() {
     const [infoWindowShown, setInfoWindowShown] = useState(false);
     const [emailFormShow, setemailFormShow] = useState(true);
     const [infoTwoWindowShown, setInfoTwoWindowShown] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleShowPsw = () => setPsw((show) => !show);
     const handleHidePsw = (e) => {
@@ -53,8 +53,8 @@ export default function PasswordReminder() {
     };
   function send()
   {
-    
-    const url = "https://naukapythona.azurewebsites.net/user/code";
+    setIsLoading(true);
+    const url = `${process.env.REACT_APP_API_URL}/user/code`;
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,8 +79,7 @@ export default function PasswordReminder() {
         }
         else
         {
-          setEmail("");
-           setInfoWindowShown(true);
+          setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
           }, 3000);
@@ -88,18 +87,20 @@ export default function PasswordReminder() {
         }
       }).catch((error) =>
         {
-          seterrorMessage("Błąd");
+          seterrorMessage("Błąd połączenia");
           setInfoWindowShown(false);
           seterrorInfoWindowShown(true);
           setTimeout(() => {
             seterrorInfoWindowShown(false);
           }, 3000);
         });
+        setIsLoading(false);
   };
   function verificationCode()
   {
+    setIsLoading(true);
     const verification = {email,code,password};
-    const url = "https://naukapythona.azurewebsites.net/user/CodeVerification";
+    const url = `${process.env.REACT_APP_API_URL}/user/codeverification`;
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,11 +130,13 @@ export default function PasswordReminder() {
         {
           console.log(error);
         });
+        setIsLoading(false);
   }
   function changePassword()
   {
+    setIsLoading(true);
     const verification = {email,code,password};
-    fetch("http://localhost:8080/user/changePassword",
+    fetch(`${process.env.REACT_APP_API_URL}/user/changepassword`,
     {
       method: "PUT",
       headers : { "Content-Type": "application/json" },
@@ -166,6 +169,7 @@ export default function PasswordReminder() {
     {
       console.log(error);
     })
+    setIsLoading(false);
   }
   
   function Toast({ message }) {
@@ -207,6 +211,9 @@ export default function PasswordReminder() {
                   >
                     Wyślij
                   </Button>
+                  { isLoading && 
+                    <CircularProgress size={24}/>
+                  }
                 </Box>
               </div>
               <div
@@ -256,6 +263,9 @@ export default function PasswordReminder() {
                   >
                     Zweryfikuj
                   </Button>
+                  { isLoading && 
+                    <CircularProgress size={24}/>
+                  }
                 </Box>
               </div>
               <div
@@ -265,9 +275,7 @@ export default function PasswordReminder() {
                   alignItems: "center",
                 }}
               >
-                <Box display="flex" flexDirection="column" gap={2}>
-                  {infoWindowShown && <Toast message="Na podany adres email wysłano wiadomość z kodem do zmiany hasła" />}
-                </Box>
+                
               </div>
             </form>
           </Paper>
@@ -311,6 +319,9 @@ export default function PasswordReminder() {
                   >
                    Zmień
                   </Button>
+                  { isLoading && 
+                    <CircularProgress size={24}/>
+                  }
                 </Box>
               </div>
               <div

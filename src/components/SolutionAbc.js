@@ -72,7 +72,7 @@ export default function SolutionAbc({ task }) {
     setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
-    fetch("http://localhost:8080/solution/abc", {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/abc`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -100,7 +100,7 @@ export default function SolutionAbc({ task }) {
     setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
-    fetch("http://localhost:8080/solution/abc/check", {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/abc/check`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(solution),
@@ -125,7 +125,7 @@ export default function SolutionAbc({ task }) {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/exercise/one/abc/" + task, {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/abc/` + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -135,7 +135,7 @@ export default function SolutionAbc({ task }) {
       })
       .catch((error) => console.error("Error fetching students:", error));
     if (getToken()) {
-      fetch("http://localhost:8080/user/", {
+      fetch(`${process.env.REACT_APP_API_URL}/user/`, {
         headers: { Authorization: `Bearer ${getToken()}` },
         method: "GET",
       })

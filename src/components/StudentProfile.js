@@ -50,7 +50,7 @@ const StudentProfile = (user) => {
     navigate("/solutionAbcRetake/" + e.target.value);
   };
   const getInfo = () => {
-    fetch("http://localhost:8080/solution/programming", {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/programming`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
@@ -61,7 +61,7 @@ const StudentProfile = (user) => {
       })
       .catch((error) => console.error("Error fetching students:", error));
 
-    fetch("http://localhost:8080/user/position", {
+    fetch(`${process.env.REACT_APP_API_URL}/user/position`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })

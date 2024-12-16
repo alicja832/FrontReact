@@ -68,7 +68,7 @@ export default function Register() {
       const role = roles === 1 ? "TEACHER" : "STUDENT";
       const student = { name, email, password, role };
 
-      const firstResponse = await fetch("http://localhost:8080/user/", {
+      const firstResponse = await fetch(`${process.env.REACT_APP_API_URL}/user/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(student),
@@ -80,7 +80,7 @@ export default function Register() {
       }
 
       const secondResponse = await fetch(
-        "http://localhost:8080/user/authenticate",
+        `${process.env.REACT_APP_API_URL}/user/authenticate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -96,8 +96,8 @@ export default function Register() {
       setToken(data.token);
       setExpirationDate(data.jwtExpirationDate);
       console.log(data.jwtExpirationDate);
-      const url = "http://localhost:8080/user/refreshtoken";
-      // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
+      const url = `${process.env.REACT_APP_API_URL}/user/refreshtoken`;
+  
       const refreshToken = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${data.token}` },

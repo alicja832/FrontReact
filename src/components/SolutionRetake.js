@@ -108,7 +108,7 @@ export default function SolutionRetake({ task }) {
   const [infoMessage, setinfoMessage] = useState(0);
   const [student, setStudent] = useState(null);
   const [outputs, setOutputs] = useState([]);
-
+  const timeout = 3000;
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
@@ -141,8 +141,8 @@ export default function SolutionRetake({ task }) {
       score,
       output,
     };
-
-    fetch("http://localhost:8080/solution/", {
+    console.log(updatesolution);
+    fetch(`${process.env.REACT_APP_API_URL}/solution/`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -154,6 +154,9 @@ export default function SolutionRetake({ task }) {
       .then((result) => {
         setinfoMessage("Zapisano!");
         setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 3 * timeout);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -165,7 +168,7 @@ export default function SolutionRetake({ task }) {
     setisLoading(true);
     setisOutput(true);
     classInfo.setmessage(false);
-    fetch("http://localhost:8080/exercise/out", {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/out`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: solutionContent,
@@ -182,19 +185,63 @@ export default function SolutionRetake({ task }) {
       });
     setisLoading(false);
   };
+  const check = () => {
+    var student = null;
+    setisOutput(true);
+    const solution = { exercise, solutionContent, student, score, output };
+    console.log(outputs);
+    const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(solution),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+      
+        console.log(result);
+        console.log(result.value);
+        if(exercise.solutionSchema)
+        {
+          setScore(result.value);
+          setisOutput(true);
+          setOutput(result.key);
+          setOutputs(result.key.split("\n"));
+          setinfoMessage("Twój wynik:" + result.value.toString() + " pkt");
+        }
 
+        else
+        { 
+          setScore(result);
+          setinfoMessage("Twój wynik:" + result.toString() + " pkt");
+        }
+       
+        setInfoWindowShown(true);
+        setTimeout(() => {
+          setInfoWindowShown(false);
+        }, 2 * timeout);
+        return;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
   const getData = async () => {
-    const result = await fetch("http://localhost:8080/solution/" + task, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${getToken()}` },
-    }).catch((error) => console.error("Error fetching:", error));
+    const result = await fetch(
+      `${process.env.REACT_APP_API_URL}/solution/` + task,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    ).catch((error) => console.error("Error fetching:", error));
     const result_data = await result.json();
     setSolution(result_data[0]);
     setStudent(result_data[0].student);
     setSolutionContent(result_data[0].solutionContent);
     const exerciseEX = result_data[0].exercise;
     await fetch(
-      "http://localhost:8080/exercise/one/programming/" + exerciseEX.id,
+      `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
+        exerciseEX.id,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -299,6 +346,16 @@ export default function SolutionRetake({ task }) {
                         >
                           Zapisz rozwiązanie
                         </Button>
+                        
+                          <Button
+                            style={{ backgroundColor: "#001f3f" }}
+                            variant="contained"
+                            color="secondary"
+                            onClick={check}
+                          >
+                            Sprawdź
+                          </Button>
+                        
                       </Box>
                     </div>
                   )}

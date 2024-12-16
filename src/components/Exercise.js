@@ -35,7 +35,7 @@ export default function Exercise() {
     } else navigate("/solutionabc/" + shortExercises[e.target.value].key.id);
   };
   useEffect(() => {
-    fetch("http://localhost:8080/exercise/programming", {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/programming`, {
       method: "GET",
       headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
     })
@@ -44,7 +44,7 @@ export default function Exercise() {
         setLongExercises(result);
       })
       .catch((error) => console.error("Error:", error));
-    fetch("http://localhost:8080/exercise/abc", {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/abc`, {
       method: "GET",
       headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
     })
@@ -62,8 +62,7 @@ export default function Exercise() {
           className={classes.mainContainer}
           style={{
             display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
+           
             padding: "3% 1%",
           }}
         >

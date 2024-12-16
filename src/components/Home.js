@@ -1,4 +1,5 @@
 import React from "react";
+import getToken from "./api/TokenService"
 import { Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ExampleConsole from "./semi-components/ExampleConsole";
@@ -74,7 +75,7 @@ export default function Home() {
                 Ty jesteś najlepszy. Pokaż, na co Cię stać, i sprawdź, jak
                 wypadasz w tej pasjonującej grze o kodowanie!
               </p>
-            <Button
+           { (getToken())&&<Button
               component={Link}
               to={"/ranking"}
               variant="contained"
@@ -82,6 +83,7 @@ export default function Home() {
             >
               Zobacz ranking
             </Button>
+          }
           </Paper>
           <Paper elevation={2} style={paperStyleC}>
             <ExampleConsole />

@@ -27,7 +27,6 @@ export default function Login() {
   };
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState([]);
   const [psw, setPsw] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,14 +38,6 @@ export default function Login() {
     e.preventDefault();
   };
   const classes = useStyles();
-  const validateData = () => {
-    if (!email.includes("@")) {
-      throw new Error("Podano zły adres email");
-    }
-    if (password.length<8) {
-      throw new Error("Hasło powinno mieć 8 znaków minimum");
-    }
-  };
 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -56,10 +47,10 @@ export default function Login() {
     event.preventDefault();
     setIsLoading(true);
     classInfo.setmessage(false);
-    const student = { name, email, password };
+    const student = { name, password };
     try {
-      validateData();
-    const firstResponse = await fetch("http://localhost:8080/user/authenticate", {
+    
+    const firstResponse = await fetch(`${process.env.REACT_APP_API_URL}/user/authenticate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student),
@@ -73,8 +64,8 @@ export default function Login() {
       setToken(data.token);
       setExpirationDate(data.jwtExpirationDate);
       console.log(data.jwtExpirationDate);
-      const url = "http://localhost:8080/user/refreshtoken";
-      // const url = "https://naukapythona.azurewebsites.net/user/authenticate";
+      const url = `${process.env.REACT_APP_API_URL}/user/refreshtoken`;
+      
       const refreshToken = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${data.token}` }, credentials:'include'
@@ -82,10 +73,6 @@ export default function Login() {
       if (!refreshToken.ok) {
         throw new Error("Błąd logowania. Spróbuj ponownie.");
       }
-     
-      //to set profile option in menu
-     
-
       setIsLoading(false);
       setInfoWindowShown(true);
       setTimeout(() => {
@@ -95,7 +82,10 @@ export default function Login() {
 
     } catch (error) {
       console.log(error);
-      setErrorMessage(error.message);
+      if(error.message==="Failed to fetch")
+        setErrorMessage("Błąd połączenia");
+      else
+        setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
         setIsLoading(false);
@@ -135,17 +125,6 @@ export default function Login() {
                     borderColor: "red",
                   },
                 }}
-              />
-              <TextField
-                id="email"
-                label="Adres e-mail"
-                variant="outlined"
-                fullWidth
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                sx={{ marginBottom: "16px" }}
               />
               <FilledInput
                 id="password"

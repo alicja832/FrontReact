@@ -9,7 +9,7 @@ const Profile = () => {
   
   useEffect(() => {
     //fetch("https://naukapythona.azurewebsites.net/user/"
-    fetch("http://localhost:8080/user/",{
+    fetch(`${process.env.REACT_APP_API_URL}/user/`,{
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })

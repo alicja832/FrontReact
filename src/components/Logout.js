@@ -1,6 +1,7 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setToken} from './api/TokenService';
+import { setToken,getToken} from './api/TokenService';
+
 
 export default function Logout(){
   
@@ -9,6 +10,8 @@ export default function Logout(){
   useEffect(() => {
       setToken(null);  
     navigate("/");
+    window.location.reload(); 
+    window.alert("Wylogowano");
   },[]);
   
  

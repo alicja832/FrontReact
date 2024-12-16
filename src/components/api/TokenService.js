@@ -13,6 +13,7 @@ export function getToken() {
       if (!res.ok) {
        setToken(null);
        window.location.reload();
+       window.alert("Zaloguj się ponownie!");
       } else {
         const promise1 = Promise.resolve(res.body.getReader().read());
         promise1.then((value) => {

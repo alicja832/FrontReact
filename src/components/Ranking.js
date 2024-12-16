@@ -31,7 +31,7 @@ export default function Ranking() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/user/ranking", {
+    fetch(`${process.env.REACT_APP_API_URL}/user/ranking`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })

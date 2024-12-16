@@ -1,5 +1,7 @@
 import { Paper } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import React from "react";
+
 // import Font from "react-font";
 import { Link } from "react-router-dom";
 const Footer = () => {
@@ -43,9 +45,6 @@ const Footer = () => {
             </li>
             <li>
               <Link style={{color:"white"}}  to={"/"}>Główna</Link>
-            </li>
-            <li>
-              <Link style={{color:"white"}}  to={"/ranking"}>Ranking</Link>
             </li>
             <li>
               <Link style={{color:"white"}}  to={"/logout"}>Wyloguj</Link>

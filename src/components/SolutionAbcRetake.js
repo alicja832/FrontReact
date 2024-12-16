@@ -73,7 +73,7 @@ export default function SolutionAbcRetake({ task }) {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/solution/abc/" + task, {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/abc/` + task, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })

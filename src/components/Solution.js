@@ -62,7 +62,7 @@ export default function Solution({ task }) {
     setIsLoading(true);
     var student = null;
     const solution = { solutionContent, exercise, student, score, output };
-    fetch("http://localhost:8080/solution/programming", {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/programming`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -75,6 +75,9 @@ export default function Solution({ task }) {
           setinfoMessage("Zapisano");
           setInfoWindowShown(true);
           setIsLoading(false);
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3 * timeout);
         }
       })
       .catch((error) => {
@@ -83,7 +86,7 @@ export default function Solution({ task }) {
   };
   const runCode = () => {
     console.log(solutionContent);
-    fetch("http://localhost:8080/exercise/out", {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/out`, {
       method: "POST",
       body: solutionContent,
     })
@@ -103,7 +106,7 @@ export default function Solution({ task }) {
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
     console.log(outputs);
-    const url = (exercise.solutionSchema? "http://localhost:8080/solution/programming/test":"http://localhost:8080/solution/programming/check")
+    const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -141,7 +144,7 @@ export default function Solution({ task }) {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/exercise/one/programming/" + task, {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/programming/` + task, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -153,7 +156,7 @@ export default function Solution({ task }) {
       })
       .catch((error) => console.error("Error fetching students:", error));
     if (getToken()) {
-      fetch("http://localhost:8080/user/", {
+      fetch(`${process.env.REACT_APP_API_URL}/user/`, {
         headers: { Authorization: `Bearer ${getToken()}` },
         method: "GET",
       })
@@ -171,6 +174,11 @@ export default function Solution({ task }) {
   return (
     <div className="main-container">
       <div className="first-container">
+      { !exercise&& (
+                <Paper style={{top:"40%",width:"40%"}}>
+                <CircularProgress />
+                </Paper>
+              )}
         {exercise && (
           <div
             className={classes.mainContainer}
@@ -182,6 +190,8 @@ export default function Solution({ task }) {
               marginTop: "2%",
             }}
           >
+            
+             
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
@@ -253,7 +263,7 @@ export default function Solution({ task }) {
                             Zapisz rozwiązanie
                           </Button>
                         )}
-                        {(!user || !user.score) && (
+                        {
                           <Button
                             style={{ backgroundColor: "#001f3f" }}
                             variant="contained"
@@ -262,7 +272,7 @@ export default function Solution({ task }) {
                           >
                             Sprawdź
                           </Button>
-                        )}
+                        }
                       </Box>
                     )}
                   </div>

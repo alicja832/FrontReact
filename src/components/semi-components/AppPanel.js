@@ -16,7 +16,7 @@ import PasswordReminder from "../Password";
 import Ranking from "../Ranking";
 import Logout from "../Logout";
 import SolutionAbcRetake from "../SolutionAbcRetake";
-
+import React from "react";
 function AppPanel() {
   function SolutionWrapper() {
 
