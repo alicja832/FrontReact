@@ -9,6 +9,7 @@ import Footer from "./semi-components/Footer";
 const useStyles = makeStyles((theme) => ({}));
 
 export default function PasswordReminder() {
+
     const [code, setCode] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -204,13 +205,15 @@ export default function PasswordReminder() {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
+                  { !isLoading &&  
+                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#001f3f" }}
                     onClick={send}
-                  >
+                   >
                     Wyślij
                   </Button>
+                  }
                   { isLoading && 
                     <CircularProgress size={24}/>
                   }
@@ -220,10 +223,11 @@ export default function PasswordReminder() {
                 style={{
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
+                  {isLoading && <CircularProgress size={24}/>}
                   {infoWindowShown && <Toast message="Na podany adres email wysłano wiadomość z kodem do zmiany hasła" />}
                   {errorWindowShown && <Toast message={errorMessage} />}
                 </Box>
@@ -241,7 +245,7 @@ export default function PasswordReminder() {
             
               <TextField
                 id="outlined-basic"
-                label="email"
+                label="kod"
                 variant="outlined"
                 fullWidth
                 value={code}
@@ -312,16 +316,18 @@ export default function PasswordReminder() {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Button
+                { !isLoading && <Button
                     variant="contained"
                     color="primary"
                     onClick={changePassword}
                   >
                    Zmień
-                  </Button>
+                   </Button>
+                }
                   { isLoading && 
                     <CircularProgress size={24}/>
                   }
+                    
                 </Box>
               </div>
               <div

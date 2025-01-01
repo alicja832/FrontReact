@@ -1,9 +1,10 @@
 import React from "react";
-import getToken from "./api/TokenService"
+import {getToken} from "./api/TokenService"
 import { Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ExampleConsole from "./semi-components/ExampleConsole";
 import Footer from "./semi-components/Footer";
+
 export default function Home() {
   const paperStyle = {
     padding: "3% 3%",

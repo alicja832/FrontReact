@@ -18,16 +18,6 @@ import Logout from "../Logout";
 import SolutionAbcRetake from "../SolutionAbcRetake";
 import React from "react";
 function AppPanel() {
-  function SolutionWrapper() {
-
-    const { id } = useParams();
-    return <Solution task={id} />;
-  }
-  function SolutionAbcWrapper() {
-
-    const { id } = useParams();
-    return <SolutionAbc task={id} />;
-  }
   function SolutionRetakeWrapper() {
     const { id } = useParams();
     return <SolutionRetake task={id} />;
@@ -48,8 +38,8 @@ function AppPanel() {
       <Route path="/tasks" element={<Exercise />} />
       <Route path="/teacherprofil" element={<TeacherProfile />} />
       <Route path="/studentprofil" element={<StudentProfile />} />
-      <Route path="/solution/:id" element={<SolutionWrapper />} />
-      <Route path="/solutionabc/:id" element={<SolutionAbcWrapper />} />
+      <Route path="/solution" element={<Solution />} />
+      <Route path="/solutionabc" element={<SolutionAbc />} />
       <Route path="/password" element={<PasswordReminder />} />
       <Route path="/solutionRetake/:id" element={<SolutionRetakeWrapper />} />
       <Route path="/solutionAbcRetake/:id" element={<SolutionRetakeAbcWrapper />} />

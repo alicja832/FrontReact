@@ -5,81 +5,11 @@ import { getToken } from "./api/TokenService";
 import { classInfo } from "./semi-components/MyParticles";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
-const useStyles = makeStyles({
-  position: "relative",
-  container: {
-    display: "flex",
-    position: "relative",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "1%",
-  },
-  textFieldContainer: {
-    position: "relative",
-    width: "90%",
-    padding: " 1% 1%",
-    border: "1%",
-    borderStyle: "solid",
-    borderColor: "white",
-    backgroundColor: "grey",
-    display: "flex",
-    fontWeight: "bold",
-    alignItems: "center",
-    gap: "1%",
-  },
-  textField: {
-    position: "relative",
-    height: "500px",
-    width: "100%",
-    backgroundColor: "#000",
-    color: "#fff",
-    "& .MuiInputBase-input": {
-      color: "#fff",
-    },
-    "& .MuiFormLabel-root": {
-      color: "#fff",
-    },
-  },
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    margin: "2%",
-    gap: "20px",
-    position: "relative",
-  },
-  button: {
-    position: "relative",
-    color: "#fff",
-    backgroundColor: "#000",
-  },
-  output: {
-    position: "relative",
-    backgroundColor: "#000 !important",
-    color: "#fff !important",
-    width: "90%",
-    marginTop: "1%",
-    display: "block",
-    padding: "1%",
-    justifyContent: "center",
-    flexDirection: "row",
-    fontWeight: "lighter",
-  },
-  ExpectedOutput: {
-    position: "relative",
-    backgroundColor: "#000 !important",
-    color: "#fff !important",
-    width: "90%",
-    left: "5%",
-    display: "block",
-    flexDirection: "row",
-    fontWeight: "lighter",
-  },
-});
 
-function Toast({ message }) {
-  return <div className="toast">{message}</div>;
-}
+const useStyles = makeStyles({});
+
 export default function SolutionRetake({ task }) {
+  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     margin: "2%",
@@ -109,28 +39,34 @@ export default function SolutionRetake({ task }) {
   const [student, setStudent] = useState(null);
   const [outputs, setOutputs] = useState([]);
   const timeout = 3000;
+  
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyTabDown = (e) => {
+    
     if (e.key === "Tab") {
+      
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
       setSolutionContent(
-        (prevContent) =>
-          prevContent.substring(0, selectionStart) +
+        (prev) =>
+          prev.substring(0, selectionStart) +
           "\t" +
-          prevContent.substring(selectionEnd)
+          prev.substring(selectionEnd)
       );
       setTimeout(() => {
         e.target.selectionStart = selectionStart + 1;
         e.target.selectionEnd = selectionStart + 1;
       }, 0);
+    
     }
+  
   };
 
   const save = () => {
+    
     setisLoading(true);
     const id = solution.id;
     const updatesolution = {
@@ -189,7 +125,6 @@ export default function SolutionRetake({ task }) {
     var student = null;
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
-    console.log(outputs);
     const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
     fetch(url, {
       method: "POST",
@@ -199,8 +134,6 @@ export default function SolutionRetake({ task }) {
       .then((res) => res.json())
       .then((result) => {
       
-        console.log(result);
-        console.log(result.value);
         if(exercise.solutionSchema)
         {
           setScore(result.value);
@@ -238,31 +171,47 @@ export default function SolutionRetake({ task }) {
     setSolution(result_data[0]);
     setStudent(result_data[0].student);
     setSolutionContent(result_data[0].solutionContent);
-    const exerciseEX = result_data[0].exercise;
+    const exerciseFromSolution = result_data[0].exercise;
+    
     await fetch(
-      `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
-        exerciseEX.id,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-        setExercise(result[0]);
-      })
-      .catch((error) => console.error("Error fetching :", error));
-  };
+    `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
+        exerciseFromSolution.id,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+        ).then((res) => res.json())
+        .then((result) => {
+          setExercise(result[0]);
+        })
+        .catch((error) => console.error("Error fetching :", error));
+     };
 
   useEffect(() => {
     getData();
   }, [task]);
+
+  function Toast({ message }) {
+    return <div className="toast">{message}</div>;
+  }
+  
   return (
-    <div className="main-container">
-      <div className="first-container">
+    <div className = "main-container">
+      <div className = "first-container">
+      {(!exercise) && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <CircularProgress />
+              </div>
+            )}
         <div>
-          {solution && (
+          {solution && exercise && (
             <div
               className={classes.mainContainer}
               style={{
@@ -273,12 +222,7 @@ export default function SolutionRetake({ task }) {
                 marginTop: "2%",
               }}
             >
-              {!exercise && (
-                <div>
-                  <CircularProgress />
-                </div>
-              )}
-              {exercise && (
+              
                 <div style={{ flexBasis: "50%", flexDirection: "column" }}>
                   <Paper elevation={3} style={paperStyleTwo}>
                     <h2>{exercise.name}</h2>
@@ -300,7 +244,7 @@ export default function SolutionRetake({ task }) {
                     </Paper>
                   </Paper>
                 </div>
-              )}
+              
               <div className="console-container">
                 <h3>Konsola dla Python 2.7</h3>
                 <div className="console-board">
@@ -310,9 +254,10 @@ export default function SolutionRetake({ task }) {
                       disableUnderline: true,
                     }}
                     variant="standard"
-                    defaultValue={solution.solutionContent}
+                   
+                    value={solutionContent}
                     onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={handleKeyTabDown}
                     fullWidth
                     multiline
                     maxRows={15}

@@ -6,7 +6,6 @@ import { setToken,getToken} from './api/TokenService';
 export default function Logout(){
   
   const navigate = useNavigate();
-  const timeout = 4000;
   useEffect(() => {
       setToken(null);  
     navigate("/");

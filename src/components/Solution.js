@@ -5,16 +5,19 @@ import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
+import {useLocation} from 'react-router-dom';
 
 const useStyles = makeStyles({});
 
-export default function Solution({ task }) {
+export default function Solution() {
+  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     margin: "2%",
     padding: "1%",
     textAlign: "center",
   };
+  
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -24,24 +27,26 @@ export default function Solution({ task }) {
     textAlign: "center",
     alignItems: "center",
   };
-
+   
+  const location = useLocation();  
   const classes = useStyles();
   const [solutionContent, setSolutionContent] = useState("");
   const [output, setOutput] = useState("");
+  const [exercise,setExercise] = useState(null);
   const [isOutput, setisOutput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [outputs, setOutputs] = useState([]);
-  const [exercise, setExercise] = useState(null);
   const [score, setScore] = useState(0);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [infoMessage, setinfoMessage] = useState(0);
   const [user, setUser] = useState(null);
   const timeout = 4000;
+  
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyTabDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
@@ -142,16 +147,15 @@ export default function Solution({ task }) {
         console.error("Error:", error);
       });
   };
-
+ 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/programming/` + task, {
+    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/programming/` + location.state.exercise.longExercise.key.id, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
       .then((result) => {
         setExercise(result[0]);
-        console.log(result[0]);
         setSolutionContent(result[0].solutionSchema);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -165,7 +169,7 @@ export default function Solution({ task }) {
           setUser(result[0]);
         });
     }
-  }, [task]);
+  }, []);
 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -174,11 +178,20 @@ export default function Solution({ task }) {
   return (
     <div className="main-container">
       <div className="first-container">
-      { !exercise&& (
-                <Paper style={{top:"40%",width:"40%"}}>
-                <CircularProgress />
-                </Paper>
-              )}
+    
+          {(!exercise) && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  }}
+              >
+              <CircularProgress />
+              </div>
+            )}
+       
         {exercise && (
           <div
             className={classes.mainContainer}
@@ -227,7 +240,7 @@ export default function Solution({ task }) {
                   placeholder="Miejsce na rozwiązanie..."
                   value={solutionContent}
                   onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
+                  onKeyDown={handleKeyTabDown}
                   fullWidth
                   multiline
                   maxRows={15}
@@ -277,7 +290,7 @@ export default function Solution({ task }) {
                     )}
                   </div>
                 )}
-                   <Box>{isLoading && <CircularProgress/>}</Box>
+                <Box>{isLoading && <CircularProgress/>}</Box>
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
               </div>
               {isOutput && outputs.length > 0 && (

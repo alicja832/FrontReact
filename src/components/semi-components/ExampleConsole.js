@@ -1,9 +1,9 @@
 import { Paper } from "@mui/material";
 import React from "react";
 
-function Console()
+function ExampleConsole()
 {
-    const paperSS = {
+    const paper = {
         width: "60%",
         margin: "1% auto",
         height: "50%",
@@ -12,7 +12,7 @@ function Console()
         textAlign: "left",
         padding: "1%",
       };
-    return  (<Paper elevation={3} style={paperSS}>
+    return  (<Paper elevation={3} style={paper}>
     <span style={{ color: "#6495ed" }}>def </span>
     <span style={{ color: "#FFF59D" }}>fun</span>
     <span style={{ color: "#FFD600" }}>()</span>
@@ -49,4 +49,4 @@ function Console()
     <span style={{ color: "#FFD600" }}>)</span>
   </Paper>);
 }
-export default Console;
+export default ExampleConsole;

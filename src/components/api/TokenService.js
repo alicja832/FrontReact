@@ -5,8 +5,8 @@ export function getToken() {
     (new Date().getTime()+10) >=
       new Date(window.localStorage.getItem("expiration-date")).getTime()
   ) {
-    console.log("halo");
-    fetch("http://localhost:8080/user/token", {
+   
+    fetch(`${process.env.REACT_APP_API_URL}/user/token`, {
       method: "GET",
       credentials:'include'
     }).then((res) => {
@@ -47,7 +47,9 @@ export function setToken(token) {
   return;
 }
 export function getRefreshToken() {
+
   return window.localStorage.getItem("refresh-token");
+
 }
 
 export function setRefreshToken(refreshToken) {

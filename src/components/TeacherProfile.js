@@ -10,7 +10,7 @@ import teacherlogo from "../teacher.jpeg";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles(() => ({}));
 
 const TeacherProfile = (user) => {
   const paperStyle = {
@@ -58,7 +58,7 @@ const TeacherProfile = (user) => {
   };
 
   const classes = useStyles();
-  const [access, setAccess] = useState(true);
+  const [access, setAccess] = useState(null);
   const [indexofExercise, setIndexofExercise] = useState(0);
   const [correctSolution, setCorrectSolution] = useState(null);
   const [priceType, setPriceType] = useState("Fragment poprawnego rozwiązania");
@@ -89,7 +89,6 @@ const TeacherProfile = (user) => {
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  //te dwie funkcje nalezy trochę zmienic
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -144,9 +143,9 @@ const TeacherProfile = (user) => {
     }
   };
   const clearData = () => {
-    setAccess(true);
-    settestingData([]);
     
+    setAccess(null);
+    settestingData([]);
     setName("");
     setSolutionSchema(null);
     setContent("");
@@ -168,39 +167,54 @@ const TeacherProfile = (user) => {
     setPriceType("Fragment poprawnego rozwiązania");
     setPoints([]);
     setPoint("");
+  
   };
 
   const closeFormTwo = () => {
+    
     clearData();
     setIsFormTwoVisible(false);
+  
   };
 
   const closeForm = () => {
+    
     clearData();
     setIsFormVisible(false);
+  
   };
 
   const closeFormClose = () => {
+    
     clearData();
     setIsFormCloseVisible(false);
+  
   };
 
   const showForm = async () => {
+    
     clearData();
     closeFormTwo();
     setIsFormCloseVisible(false);
     setIsFormVisible(true);
+  
   };
 
   const showFormClose = () => {
+    
     classInfo.setmessage(true);
+    clearData();
     closeFormTwo();
     setIsFormVisible(false);
     setIsFormCloseVisible(true);
+  
   };
 
-  const showFormTwo = async (e) => {
-    await closeFormTwo();
+  const showFormTwo = async(e) => {
+    
+    closeFormTwo();
+    clearData();
+    closeFormTwo();
     classInfo.setmessage(true);
     setIsFormVisible(false);
     setIsFormCloseVisible(false);
@@ -233,13 +247,12 @@ const TeacherProfile = (user) => {
         const parts = await response.json();
         await settestingData(parts);
         setPriceType("Dane Testujące");
-        console.log(parts);
         setPoint("");
       }
     } catch (error) {
       console.log(error);
     }
-    console.log(found);
+  
     setContent(found.content);
     setName(found.name);
     setIntroduction(found.introduction);
@@ -275,6 +288,8 @@ const TeacherProfile = (user) => {
   };
 
   const editExercise = (e) => {
+
+    setIsLoading(true);
     let suma = testingData.length > 0 ? 0 : maxPoints;
     points.forEach((element) => {
       suma += element;
@@ -282,13 +297,11 @@ const TeacherProfile = (user) => {
     testingData.forEach((element) => {
       suma += element.points;
     });
-    console.log(suma);
+   
     if (maxPoints > solutionParts.length && suma < maxPoints) {
       setClicked(true);
       return;
     }
-
-    setIsLoading(true);
     const correctSolutions = [];
     const testData = [];
     if (correctSolution) {
@@ -306,10 +319,7 @@ const TeacherProfile = (user) => {
         else correctSolutions.push(solutionParts[i]);
       }
     }
-    console.log(correctSolutions);
-
     const id = exercises[indexofExercise].id;
-    console.log(id);
     const exercise = {
       id,
       name,
@@ -322,7 +332,7 @@ const TeacherProfile = (user) => {
       testData,
       points,
     };
-    console.log(exercise);
+    
     const url =  `${process.env.REACT_APP_API_URL}/exercise/programming`;
     fetch(url, {
       method: "PUT",
@@ -334,11 +344,10 @@ const TeacherProfile = (user) => {
     })
       .then((response) => {
         if (response.ok) {
-          clearData();
+         
           setIsLoading(false);
           setMessage("Zmieniono zadanie");
           setInfoWindowShown(true);
-          clearData();
           setTimeout(() => {
             setInfoWindowShown(false);
           }, 3000);
@@ -347,7 +356,7 @@ const TeacherProfile = (user) => {
             getExercises();
           }, 3000);
         } else {
-          console.log(response);
+        
           setMessage("Nie udało się zmienić zadania");
           setIsLoading(false);
           setInfoWindowShown(true);
@@ -390,7 +399,6 @@ const TeacherProfile = (user) => {
     })
       .then((response) => {
         if (response.ok) {
-          clearData();
           setIsLoading(false);
           setMessage("Zmieniono zadanie");
           setInfoWindowShown(true);
@@ -416,6 +424,7 @@ const TeacherProfile = (user) => {
   };
 
   const showSolutionsField = (e) => {
+    
     if (e.target.value) {
       solutionParts.push(e.target.value);
       if (point) {
@@ -425,29 +434,22 @@ const TeacherProfile = (user) => {
         setPoint("");
       }
     }
-    console.log(testingData);
-    console.log(points);
     let suma = 0;
     points.forEach((element) => {
       suma += element;
     });
+
     testingData.forEach((element) => {
-      console.log(element);
       suma += element.points ? element.points : 0;
     });
-    console.log(suma);
 
     if (!solutionSchema && solutionParts.length === parseInt(maxPoints)) {
-      console.log(solutionParts);
       setClicked(false);
       setIsFormFilled(true);
       return;
     }
-    console.log(solutionSchema);
-    console.log(maxPoints);
-
-    if (solutionSchema && suma == maxPoints) {
-      console.log(solutionParts);
+  
+    if (solutionSchema && suma === maxPoints) {
       setClicked(false);
       setIsFormFilled(true);
       return;
@@ -489,7 +491,6 @@ const TeacherProfile = (user) => {
       testData,
       points
     };
-    console.log(exercise);
     const url = `${process.env.REACT_APP_API_URL}/exercise/programming`;
 
     fetch(url, {
@@ -501,43 +502,40 @@ const TeacherProfile = (user) => {
       body: JSON.stringify(exercise),
     })
       .then((res) => {
-        if (!res.ok) {
-          setInfoWindowShown(true);
-          setMessage("Niepoprawny kod pythona");
-          setIsLoading(false);
-          setTimeout(() => {
-            setInfoWindowShown(false);
-          }, 3000);
-          return;
-        } else {
-          setIsLoading(false);
-          setInfoWindowShown(true);
-          setMessage("Dodano zadanie");
-          setIsLoading(false);
-          setTimeout(() => {
-            closeForm();
-            clearData();
-            setInfoWindowShown(false);
-            getExercises();
-          }, 3000);
-        }
+          if (!res.ok) {
+            setInfoWindowShown(true);
+            setMessage("Nie udało się dodać zadania");
+            setIsLoading(false);
+            setTimeout(() => {
+              setInfoWindowShown(false);
+            }, 3000);
+            return;
+          } else {
+            setIsLoading(false);
+            setInfoWindowShown(true);
+            setMessage("Dodano zadanie");
+            setIsLoading(false);
+            setTimeout(() => {
+              closeForm();
+              setInfoWindowShown(false);
+              getExercises();
+            }, 3000);
+          }
       })
       .catch((error) => {
         console.log(error);
       });
   };
   const getExercises = () => {
-    console.log(getToken());
+    
     fetch(`${process.env.REACT_APP_API_URL}/user/exercises`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setExercises(result);
         if (result.length !== 0) setisExercises(true);
-        console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -588,7 +586,6 @@ const TeacherProfile = (user) => {
           setInfoWindowShown(true);
           setMessage("Udało się dodać zadanie");
           setIsLoading(false);
-          clearData();
           setTimeout(() => {
             setInfoWindowShown(false);
           }, 3000);
@@ -604,26 +601,6 @@ const TeacherProfile = (user) => {
   };
   useEffect(() => {
     setTeacher(user.user);
-    fetch( `${process.env.REACT_APP_API_URL}/user/token`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-        } else {
-          const promise1 = Promise.resolve(res.body.getReader().read());
-          promise1.then((value) => {
-            const decoder = new TextDecoder("utf-8");
-            const tokenvalue = decoder.decode(value.value);
-            const token_dict = JSON.parse(tokenvalue);
-            const token = token_dict["token"];
-            console.log(token);
-          });
-        }
-      })
-      .catch((error) => {
-        console.log("Error occured:" + error);
-      });
     getExercises();
   }, [user.user]);
   useEffect(() => {}, [indexofExercise, solutionParts]);
@@ -890,6 +867,10 @@ const TeacherProfile = (user) => {
                         marginBottom: "2%",
                       }}
                       defaultValue={solutionPart}
+                      onChange={(e) =>
+                        (solutionPart =
+                          e.target.value)
+                      }
                     />
                     {index < points.length && (
                       <TextField
@@ -935,7 +916,7 @@ const TeacherProfile = (user) => {
                       }}
                     />
                   )}
-                  <Button
+                  { (priceType === "Dane do testowania") && <Button
                     style={buttonStyle}
                     variant="contained"
                     color="secondary"
@@ -946,6 +927,19 @@ const TeacherProfile = (user) => {
                   >
                     Dodaj kolejny fragment
                   </Button>
+                  }
+                  {(priceType === "Dane do testowania") && <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    value={solutionpart}
+                    onClick={(e) => {
+                      showSolutionsField(e);
+                    }}
+                    >
+                      Dodaj kolejne dane testowe
+                    </Button>
+                  }
                 </Paper>
               )}
 
@@ -1007,10 +1001,10 @@ const TeacherProfile = (user) => {
                 </div>
               )}
                  <h4>Ustaw widoczność zadania:</h4>
-              <Button style={{backgroundColor: access? "#001f3f" : "white"}}  onClick={(e) => {
+              <Button style={{backgroundColor: access === true? "#ffd700" : "white",color:"black"}}  onClick={(e) => {
                  setAccess(true);
                  }} >Tylko dla zalogowanych </Button>
-              <Button  style={{backgroundColor: access?  "white" : "#001f3f" }} onClick={(e) => {
+              <Button  style={{backgroundColor: access === false ?  "#ffd700" : "white",color:"black"}} onClick={(e) => {
                  setAccess(false);
                  }}>Dla wszystkich </Button>
               <FormControl fullWidth></FormControl>
@@ -1324,6 +1318,7 @@ const TeacherProfile = (user) => {
                   <TextField
                     id="outlined-basic"
                     variant="outlined"
+                    label="Prawidłowa odpowiedź"
                     fullWidth
                     sx={{ backgroundColor: "white", marginBottom: "2%" }}
                     defaultValue={exercises[indexofExercise].correctAnswer}
@@ -1383,8 +1378,6 @@ const TeacherProfile = (user) => {
                     </Button>
                   </Paper>
                 )}
-
-                <FormControl fullWidth></FormControl>
                 <div className="info-box">
                   <Box display="flex" flexDirection="column" gap={2}>
                     {isLoading && <CircularProgress />}

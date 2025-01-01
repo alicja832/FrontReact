@@ -8,7 +8,6 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   
   useEffect(() => {
-    //fetch("https://naukapythona.azurewebsites.net/user/"
     fetch(`${process.env.REACT_APP_API_URL}/user/`,{
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",

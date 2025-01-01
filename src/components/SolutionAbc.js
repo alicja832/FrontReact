@@ -9,14 +9,21 @@ import { Checkbox } from "@mui/material";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
+import {useLocation} from 'react-router-dom';
+
 const useStyles = makeStyles({});
-export default function SolutionAbc({ task }) {
+
+export default function SolutionAbc() {
+    
+  const location = useLocation();  
+
   const buttonStyle = {
     backgroundColor: "#001f3f",
     color: "white",
     width: "40%",
     margin: "1%",
   };
+  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -33,13 +40,15 @@ export default function SolutionAbc({ task }) {
   const [checkedB, setCheckedB] = useState(false);
   const [checkedC, setCheckedC] = useState(false);
   const [checkedD, setCheckedD] = useState(false);
-  const [answer, setAnswer] = useState("");
   const [exercise, setExercise] = useState(null);
+  const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
-  const [infoMessage, setinfoMessage] = useState(0);
+  const [infoMessage, setInfoMessage] = useState(0);
   const [user, setUser] = useState(null);
+  const timeout = 3000;
+
   const handlechangeA = () => {
     setCheckedA(true);
     setCheckedD(false);
@@ -72,6 +81,7 @@ export default function SolutionAbc({ task }) {
     setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
+    console.log(exercise);
     fetch(`${process.env.REACT_APP_API_URL}/solution/abc`, {
       method: "POST",
       headers: {
@@ -82,72 +92,59 @@ export default function SolutionAbc({ task }) {
     })
       .then((res) => {
         if (!res.ok) {
-          setinfoMessage("Błąd zapisu");
-          setInfoWindowShown(true);
+          setInfoMessage("Błąd zapisu");
         }
-
-        setinfoMessage("Zapisano");
+        else
+          setInfoMessage("Zapisano");
         setInfoWindowShown(true);
       })
       .catch((error) => {
         console.error("Error:", error);
-        setinfoMessage("Błąd zapisu");
+        setInfoMessage("Błąd zapisu");
         setInfoWindowShown(true);
       });
     setIsLoading(false);
   };
   const check = () => {
+    
     setIsLoading(true);
-    var student = null;
-    const solution = { exercise, student, score, answer };
-    fetch(`${process.env.REACT_APP_API_URL}/solution/abc/check`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(solution),
-    })
-      .then((res) => res.text())
-      .then((result) => {
-        console.log(result);
-        setScore(result);
-        result > 0
-          ? setinfoMessage("Prawidłowa odpowiedź")
-          : setinfoMessage("Niepoprawna odpowiedź");
-        setInfoWindowShown(true);
-        setTimeout(() => {
-          setInfoWindowShown(false);
-        }, 3000);
-        return;
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    setInfoWindowShown(true);
+    
+    if(answer === exercise.correctAnswer)
+    {
+      setScore(exercise.maxPoints);
+      setInfoMessage("Prawidłowa odpowiedź")
+    }
+    else
+    {
+      setInfoMessage("Niepoprawna odpowiedź");
+    }
+    
+    setTimeout(() => {
+      setInfoWindowShown(false);
+    }, timeout);
+    
     setIsLoading(false);
   };
-
+ 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/abc/` + task, {
+    setExercise(location.state.exercise.shortExercise.key);
+  }, [location.state.exercise.shortExercise.key]);
+
+  useEffect(()=>{
+
+    fetch(`${process.env.REACT_APP_API_URL}/user/`,{
+      headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
-      headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
       .then((result) => {
-        setExercise(result[0]);
-      })
-      .catch((error) => console.error("Error fetching students:", error));
-    if (getToken()) {
-      fetch(`${process.env.REACT_APP_API_URL}/user/`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-        method: "GET",
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          setUser(result[0]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }, []);
+        setUser(result[0]);
+      }).catch((error)=>{
+        console.log(error);
+      });
+  
+  },[]);
 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -156,11 +153,20 @@ export default function SolutionAbc({ task }) {
   return (
     <div className="main-container">
       <div className="first-container">
-        {!exercise && (
-          <div>
-            <CircularProgress />
-          </div>
-        )}
+      <div>
+          {(!exercise) && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  }}
+              >
+              <CircularProgress />
+              </div>
+            )}
+        </div>
         {exercise && (
           <div
             className={classes.mainContainer}
@@ -201,7 +207,7 @@ export default function SolutionAbc({ task }) {
                       </div>
                       <div className="option">
                         <Textarea
-                          defaultValue={exercise.secondOption}
+                          defaultValue={exercise.firstOption}
                         ></Textarea>
                       </div>
                     </div>

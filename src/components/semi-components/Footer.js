@@ -1,9 +1,8 @@
 import { Paper } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import React from "react";
-
-// import Font from "react-font";
 import { Link } from "react-router-dom";
+
 const Footer = () => {
   const paperStyle = {
     width: "100%",

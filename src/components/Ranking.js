@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 
 const useStyles = makeStyles({});
 export default function Ranking() {
+  
   const [persons, setPersons] = useState([]);
   const [isPersons, setisPersons] = useState(false);
   const classes = useStyles();

@@ -6,10 +6,12 @@ import CheckIcon from "@mui/icons-material/Check";
 import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
-
+import Solution from "./Solution.js"
+import SolutionAbc from "./SolutionAbc.js"
 const useStyles = makeStyles({});
 
 export default function Exercise() {
+  
   const paperStyle = {
     top: "4em",
     padding: "4% 4%",
@@ -20,19 +22,35 @@ export default function Exercise() {
     backgroundColor: "#FDF5E6",
     textAlign: "center",
   };
+  
   const classes = useStyles();
   const [longExercises, setLongExercises] = useState(false);
   const [shortExercises, setShortExercises] = useState(false);
   const navigate = useNavigate();
+  
   const openSolution = (e) => {
+    
     if (longExercises[e.target.value].value) {
       navigate("/profil");
-    } else navigate("/solution/" + longExercises[e.target.value].key.id);
+    } 
+    else
+    {
+      var longExercise = longExercises[e.target.value];
+      navigate("/solution",{state:{exercise:{longExercise}}});
+    } 
+  
   };
   const openSolutionAbc = (e) => {
+    
     if (shortExercises[e.target.value].value) {
       navigate("/profil");
-    } else navigate("/solutionabc/" + shortExercises[e.target.value].key.id);
+    } 
+    else{
+      
+      var shortExercise = shortExercises[e.target.value];
+      navigate("/solutionabc",{state:{exercise:{shortExercise}}});
+    } 
+  
   };
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_URL}/exercise/programming`, {

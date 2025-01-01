@@ -80,23 +80,31 @@ export default function SolutionAbcRetake({ task }) {
       .then((res) => res.json())
       .then((result) => {
         setExercise(result[0].exercise);
+        console.log(result[0].exercise);
         setAnswer(result[0].exercise.correctAnswer);
         setAnswerChecked(result[0].answer);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  }, [task]);
+  });
 
   return (
     <div className="main-container">
       <div className="first-container">
         {!exercise && (
-          <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <CircularProgress />
           </div>
         )}
         {exercise && (
           <div
-            className={classes.mainContainer}
+            className = {classes.mainContainer}
             style={{
               display: "flex",
               justifyContent: "flex-start",
@@ -165,28 +173,31 @@ export default function SolutionAbcRetake({ task }) {
                       </div>
                       <div className="option">
                         <Textarea
-                          defaultValue={exercise.secondOption}
+                          defaultValue={exercise.thirdOption}
                         ></Textarea>
                       </div>
                     </div>
 
                     {exercise.fourthOption && (
-                     <div className="main-row">
-                     <div className="right-info">
-                       <FormControlLabel
-                         label={"B. "}
-                         value={exercise.fourthOption}
-                         control={
-                           <Checkbox checked={checkedD} disabled={!checkedD} />
-                         }
-                       />
-                     </div>
-                     <div className="option">
-                       <Textarea
-                         defaultValue={exercise.secondOption}
-                       ></Textarea>
-                     </div>
-                   </div>
+                      <div className="main-row">
+                        <div className="right-info">
+                          <FormControlLabel
+                            label={"B. "}
+                            value={exercise.fourthOption}
+                            control={
+                              <Checkbox
+                                checked={checkedD}
+                                disabled={!checkedD}
+                              />
+                            }
+                          />
+                        </div>
+                        <div className="option">
+                          <Textarea
+                            defaultValue={exercise.fourthOption}
+                          ></Textarea>
+                        </div>
+                      </div>
                     )}
                   </FormGroup>
                 </FormControl>

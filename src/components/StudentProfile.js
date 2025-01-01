@@ -42,7 +42,7 @@ const StudentProfile = (user) => {
   const [exercisesWithScores, setExercisesWithScores] = useState([]);
   const [student, setStudent] = useState(null);
   const [position, setPosition] = useState(null);
-  const [quantity, setQuantity ] = useState(null);
+  const [quantity, setQuantity] = useState(null);
   const retake = (e) => {
     navigate("/solutionRetake/" + e.target.value);
   };
@@ -50,13 +50,12 @@ const StudentProfile = (user) => {
     navigate("/solutionAbcRetake/" + e.target.value);
   };
   const getInfo = () => {
-    fetch(`${process.env.REACT_APP_API_URL}/solution/programming`, {
+    fetch(`${process.env.REACT_APP_API_URL}/solution/`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setExercisesWithScores(result);
       })
       .catch((error) => console.error("Error fetching students:", error));
@@ -67,7 +66,6 @@ const StudentProfile = (user) => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setPosition(result.key + 1);
         setQuantity(result.value);
       })
@@ -82,6 +80,20 @@ const StudentProfile = (user) => {
   return (
     <div className="main-container">
       <div className="first-container">
+      
+          {(!student) && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  }}
+              >
+              <CircularProgress />
+              </div>
+            )}
+      
         <div
           className={classes.mainContainer}
           style={{
@@ -190,7 +202,6 @@ const StudentProfile = (user) => {
                     </div>
 
                     <div className="right-info-exercise">
-                      
                       <p>Twój wynik:</p>
 
                       <Box className="points">{solution.score}</Box>
