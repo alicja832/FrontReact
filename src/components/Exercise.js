@@ -6,8 +6,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
-import Solution from "./Solution.js"
-import SolutionAbc from "./SolutionAbc.js"
+
 const useStyles = makeStyles({});
 
 export default function Exercise() {

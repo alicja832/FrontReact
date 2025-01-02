@@ -1,16 +1,16 @@
 import React, { useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setToken,getToken} from './api/TokenService';
+import { setToken} from './api/TokenService';
 
 
 export default function Logout(){
   
   const navigate = useNavigate();
   useEffect(() => {
-      setToken(null);  
+    setToken(null);  
     navigate("/");
-    window.location.reload(); 
     window.alert("Wylogowano");
+    window.location.reload(); 
   },[]);
   
  
