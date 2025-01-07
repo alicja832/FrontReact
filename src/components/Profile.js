@@ -14,7 +14,6 @@ const Profile = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setUser(result[0]);
       }).catch((error)=>{
         console.log(error);

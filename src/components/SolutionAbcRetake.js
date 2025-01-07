@@ -80,12 +80,11 @@ export default function SolutionAbcRetake({ task }) {
       .then((res) => res.json())
       .then((result) => {
         setExercise(result[0].exercise);
-        console.log(result[0].exercise);
         setAnswer(result[0].exercise.correctAnswer);
         setAnswerChecked(result[0].answer);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  });
+  },[]);
 
   return (
     <div className="main-container">

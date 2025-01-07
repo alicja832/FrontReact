@@ -94,7 +94,7 @@ export default function Register() {
       const data = await secondResponse.json();
       setToken(data.token);
       setExpirationDate(data.jwtExpirationDate);
-      console.log(data.jwtExpirationDate);
+   
       const url = `${process.env.REACT_APP_API_URL}/user/refreshtoken`;
   
       const refreshToken = await fetch(url, {
@@ -109,7 +109,7 @@ export default function Register() {
       setTimeout(() => {
         setSuccessMessage(null);
       }, timeout);
-      //to set profile option in menu
+  
       await window.location.reload();
     } catch (error) {
       setErrorMessage(error.message);

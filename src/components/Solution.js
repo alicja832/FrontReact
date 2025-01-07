@@ -90,7 +90,7 @@ export default function Solution() {
       });
   };
   const runCode = () => {
-    console.log(solutionContent);
+    
     fetch(`${process.env.REACT_APP_API_URL}/exercise/out`, {
       method: "POST",
       body: solutionContent,
@@ -110,7 +110,7 @@ export default function Solution() {
     var student = null;
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
-    console.log(outputs);
+
     const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
     fetch(url, {
       method: "POST",
@@ -120,8 +120,6 @@ export default function Solution() {
       .then((res) => res.json())
       .then((result) => {
       
-        console.log(result);
-        console.log(result.value);
         if(exercise.solutionSchema)
         {
           setScore(result.value);

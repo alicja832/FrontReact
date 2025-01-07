@@ -81,7 +81,7 @@ export default function SolutionAbc() {
     setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
-    console.log(exercise);
+   
     fetch(`${process.env.REACT_APP_API_URL}/solution/abc`, {
       method: "POST",
       headers: {
@@ -291,7 +291,7 @@ export default function SolutionAbc() {
                         Zapisz rozwiązanie
                       </Button>
                     )}
-                    {!user && (
+                    {!user || !(user.score) && (
                       <Button
                         style={buttonStyle}
                         variant="contained"

@@ -60,7 +60,7 @@ const TeacherProfile = (user) => {
   const classes = useStyles();
   const [access, setAccess] = useState(null);
   const [indexofExercise, setIndexofExercise] = useState(0);
-  const [correctSolution, setCorrectSolution] = useState(null);
+  const [correctSolution, setCorrectSolution] = useState("");
   const [priceType, setPriceType] = useState("Fragment poprawnego rozwiązania");
   const [solutionSchema, setSolutionSchema] = useState(null);
   const [name, setName] = useState("");
@@ -88,7 +88,7 @@ const TeacherProfile = (user) => {
   const [point, setPoint] = useState(null);
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showButton, setShowButton] = useState(true);
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -143,14 +143,12 @@ const TeacherProfile = (user) => {
     }
   };
   const clearData = () => {
-    
     setAccess(null);
     settestingData([]);
     setName("");
-    setSolutionSchema(null);
     setContent("");
     setSolutionSchema("");
-    setCorrectSolution(null);
+    setCorrectSolution("");
     setMaxPoints("");
     setIntroduction("");
     setFirstOption("");
@@ -167,50 +165,40 @@ const TeacherProfile = (user) => {
     setPriceType("Fragment poprawnego rozwiązania");
     setPoints([]);
     setPoint("");
-  
+    setShowButton(true);
   };
 
   const closeFormTwo = () => {
-    
     clearData();
     setIsFormTwoVisible(false);
-  
   };
 
   const closeForm = () => {
-    
     clearData();
     setIsFormVisible(false);
-  
   };
 
   const closeFormClose = () => {
-    
     clearData();
     setIsFormCloseVisible(false);
-  
   };
 
   const showForm = async () => {
-    
     clearData();
     closeFormTwo();
     setIsFormCloseVisible(false);
     setIsFormVisible(true);
-  
   };
 
   const showFormClose = () => {
-    
     classInfo.setmessage(true);
     clearData();
     closeFormTwo();
     setIsFormVisible(false);
     setIsFormCloseVisible(true);
-  
   };
 
-  const showFormTwo = async(e) => {
+  const showFormTwo = async (e) => {
     
     closeFormTwo();
     clearData();
@@ -219,11 +207,12 @@ const TeacherProfile = (user) => {
     setIsFormVisible(false);
     setIsFormCloseVisible(false);
     setIndexofExercise(e.target.value);
-
     const found = exercises[e.target.value];
+
     try {
       if (found.correctSolution) {
-        const url = `${process.env.REACT_APP_API_URL}/solution/parts/` + found.id;
+        const url =
+          `${process.env.REACT_APP_API_URL}/solution/parts/` + found.id;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -236,7 +225,8 @@ const TeacherProfile = (user) => {
         setPriceType("Fragment poprawnego rozwiązania");
       }
       if (found.solutionSchema) {
-        const url = `${process.env.REACT_APP_API_URL}/exercise/testdata/` + found.id;
+        const url =
+          `${process.env.REACT_APP_API_URL}/exercise/testdata/` + found.id;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -245,14 +235,15 @@ const TeacherProfile = (user) => {
           },
         });
         const parts = await response.json();
+
         await settestingData(parts);
-        setPriceType("Dane Testujące");
+        setPriceType("Dane do testowania");
         setPoint("");
       }
     } catch (error) {
       console.log(error);
     }
-  
+
     setContent(found.content);
     setName(found.name);
     setIntroduction(found.introduction);
@@ -262,13 +253,14 @@ const TeacherProfile = (user) => {
     setFirstOption(found.firstOption);
     setSecondOption(found.secondOption);
     setThirdOption(found.thirdOption);
+    setAccess(found.access);
     setMaxPoints(found.maxPoints);
     setIsFormTwoVisible(true);
   };
 
   const deleteExercise = (e) => {
     setIsLoading(true);
-    const url =`${process.env.REACT_APP_API_URL}/exercise/` + e.target.value;
+    const url = `${process.env.REACT_APP_API_URL}/exercise/` + e.target.value;
     fetch(url, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -288,23 +280,29 @@ const TeacherProfile = (user) => {
   };
 
   const editExercise = (e) => {
-
-    setIsLoading(true);
-    let suma = testingData.length > 0 ? 0 : maxPoints;
+    
+    let suma = 0;
     points.forEach((element) => {
       suma += element;
     });
+
     testingData.forEach((element) => {
       suma += element.points;
     });
-   
-    if (maxPoints > solutionParts.length && suma < maxPoints) {
+
+    solutionParts.forEach((element) => {
+      suma += element.points;
+    });
+    
+    if (suma < maxPoints) {
       setClicked(true);
       return;
     }
+
     const correctSolutions = [];
     const testData = [];
-    if (correctSolution) {
+    
+    if (solutionSchema) {
       for (let i = 0; i < testingData.length; i++) {
         if (testingData[i].testingData) {
           testData.push(testingData[i].testingData);
@@ -315,13 +313,21 @@ const TeacherProfile = (user) => {
     } else {
       for (let i = 0; i < maxPoints; i++) {
         if (solutionParts[i].correctSolutionPart)
+        {  
           correctSolutions.push(solutionParts[i].correctSolutionPart);
+          points.push(solutionParts[i].points);
+        }
         else correctSolutions.push(solutionParts[i]);
       }
     }
+   
+    setIsLoading(true);
+
     const id = exercises[indexofExercise].id;
+   
     const exercise = {
       id,
+      access,
       name,
       introduction,
       content,
@@ -332,8 +338,8 @@ const TeacherProfile = (user) => {
       testData,
       points,
     };
-    
-    const url =  `${process.env.REACT_APP_API_URL}/exercise/programming`;
+
+    const url = `${process.env.REACT_APP_API_URL}/exercise/programming`;
     fetch(url, {
       method: "PUT",
       headers: {
@@ -343,9 +349,8 @@ const TeacherProfile = (user) => {
       body: JSON.stringify(exercise),
     })
       .then((response) => {
+        setIsLoading(false);
         if (response.ok) {
-         
-          setIsLoading(false);
           setMessage("Zmieniono zadanie");
           setInfoWindowShown(true);
           setTimeout(() => {
@@ -356,9 +361,7 @@ const TeacherProfile = (user) => {
             getExercises();
           }, 3000);
         } else {
-        
           setMessage("Nie udało się zmienić zadania");
-          setIsLoading(false);
           setInfoWindowShown(true);
           setTimeout(() => {
             setInfoWindowShown(false);
@@ -387,7 +390,7 @@ const TeacherProfile = (user) => {
       correctAnswer,
     };
 
-    const url =  `${process.env.REACT_APP_API_URL}/exercise/abc`;
+    const url = `${process.env.REACT_APP_API_URL}/exercise/abc`;
 
     fetch(url, {
       method: "PUT",
@@ -424,16 +427,15 @@ const TeacherProfile = (user) => {
   };
 
   const showSolutionsField = (e) => {
-    
     if (e.target.value) {
       solutionParts.push(e.target.value);
       if (point) {
         points.push(parseInt(point));
-        console.log(points);
         testingData.push(e.target.value);
         setPoint("");
       }
     }
+
     let suma = 0;
     points.forEach((element) => {
       suma += element;
@@ -443,15 +445,21 @@ const TeacherProfile = (user) => {
       suma += element.points ? element.points : 0;
     });
 
-    if (!solutionSchema && solutionParts.length === parseInt(maxPoints)) {
+    solutionParts.forEach((element) => {
+      suma += element.points ? element.points : 0;
+    });
+
+    if (!solutionSchema && suma == maxPoints) {
       setClicked(false);
       setIsFormFilled(true);
+      setShowButton(true);
       return;
     }
-  
-    if (solutionSchema && suma === maxPoints) {
+
+    if (solutionSchema && suma == maxPoints) {
       setClicked(false);
       setIsFormFilled(true);
+      setShowButton(true);
       return;
     }
     setSolutionPart("");
@@ -459,6 +467,11 @@ const TeacherProfile = (user) => {
     setClicked(true);
   };
   const addExercise = (e) => {
+    if (!clicked && !isFormFilled) {
+      showSolutionsField(e);
+      setShowButton(false);
+      return;
+    }
     setIsLoading(true);
     setClicked(false);
     if (isNaN(parseInt(maxPoints))) {
@@ -479,6 +492,7 @@ const TeacherProfile = (user) => {
     } else
       for (let i = 0; i < solutionParts.length; i++)
         correctSolutions.push(solutionParts[i]);
+    if (!!access) access = false;
     const exercise = {
       name,
       introduction,
@@ -489,8 +503,9 @@ const TeacherProfile = (user) => {
       teacher,
       solutionSchema,
       testData,
-      points
+      points,
     };
+  
     const url = `${process.env.REACT_APP_API_URL}/exercise/programming`;
 
     fetch(url, {
@@ -502,32 +517,30 @@ const TeacherProfile = (user) => {
       body: JSON.stringify(exercise),
     })
       .then((res) => {
-          if (!res.ok) {
-            setInfoWindowShown(true);
-            setMessage("Nie udało się dodać zadania");
-            setIsLoading(false);
-            setTimeout(() => {
-              setInfoWindowShown(false);
-            }, 3000);
-            return;
-          } else {
-            setIsLoading(false);
-            setInfoWindowShown(true);
-            setMessage("Dodano zadanie");
-            setIsLoading(false);
-            setTimeout(() => {
-              closeForm();
-              setInfoWindowShown(false);
-              getExercises();
-            }, 3000);
-          }
+        if (!res.ok) {
+          setInfoWindowShown(true);
+          setMessage("Nie udało się dodać zadania");
+          setIsLoading(false);
+          setTimeout(() => {
+            setInfoWindowShown(false);
+          }, 3000);
+          return;
+        } else {
+          setIsLoading(false);
+          setInfoWindowShown(true);
+          setMessage("Dodano zadanie");
+          setTimeout(() => {
+            closeForm();
+            setInfoWindowShown(false);
+            getExercises();
+          }, 3000);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
   const getExercises = () => {
-    
     fetch(`${process.env.REACT_APP_API_URL}/user/exercises`, {
       method: "GET",
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -561,10 +574,10 @@ const TeacherProfile = (user) => {
       secondOption,
       thirdOption,
       fourthOption,
-      correctAnswer
+      correctAnswer,
     };
 
-    const url =  `${process.env.REACT_APP_API_URL}/exercise/abc`;
+    const url = `${process.env.REACT_APP_API_URL}/exercise/abc`;
     fetch(url, {
       method: "POST",
       headers: {
@@ -622,11 +635,7 @@ const TeacherProfile = (user) => {
         >
           {!teacher && (
             <Paper style={paperStyle}>
-            <div>
-              {!teacher && (
-                <CircularProgress />
-              )}
-              </div>
+              <div>{!teacher && <CircularProgress />}</div>
             </Paper>
           )}
           {teacher && (
@@ -738,8 +747,10 @@ const TeacherProfile = (user) => {
               </li>
               <li>
                 Schemat rozwiązania - ramy funkcji przyjmującej odpowiednie
-                parametry i zwracającej odpowiednie wartości oraz dane testujące -
-                zestaw argumentów wywołania funkcji,każdy zestaw może być oceniony na inną liczbę punktów - ważne żeby suma była równa maksymalnej liczbie punktów
+                parametry i zwracającej odpowiednie wartości oraz dane testujące
+                - zestaw argumentów wywołania funkcji,każdy zestaw może być
+                oceniony na inną liczbę punktów - ważne żeby suma była równa
+                maksymalnej liczbie punktów
               </li>
               <li>Maksymalna ilość punktów do zdobycia za dane zadanie</li>
               <h4>Na zadanie zamknięte składa się:</h4>
@@ -828,7 +839,7 @@ const TeacherProfile = (user) => {
                   }}
                 />
               )}
-           
+
               <div>
                 {priceType === "Dane do testowania" && (
                   <div>
@@ -867,13 +878,11 @@ const TeacherProfile = (user) => {
                         marginBottom: "2%",
                       }}
                       defaultValue={solutionPart}
-                      onChange={(e) =>
-                        (solutionPart =
-                          e.target.value)
-                      }
+                      onChange={(e) => (solutionPart = e.target.value)}
                     />
                     {index < points.length && (
                       <TextField
+                        key={index}
                         id="outlined-basic"
                         sx={{ backgroundColor: "white", marginBottom: "2%" }}
                         label="ilość punktów"
@@ -903,11 +912,11 @@ const TeacherProfile = (user) => {
                     onChange={(e) => setSolutionPart(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-                  {priceType === "Dane do testowania" && (
+                  {
                     <TextField
                       id="outlined-basic"
                       sx={{ backgroundColor: "white", marginBottom: "2%" }}
-                      label="max ilość punktów"
+                      label="ilość punktów"
                       variant="outlined"
                       fullWidth
                       value={point}
@@ -915,31 +924,33 @@ const TeacherProfile = (user) => {
                         setPoint(e.target.value);
                       }}
                     />
-                  )}
-                  { (priceType === "Dane do testowania") && <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    value={solutionpart}
-                    onClick={(e) => {
-                      showSolutionsField(e);
-                    }}
-                  >
-                    Dodaj kolejny fragment
-                  </Button>
                   }
-                  {(priceType === "Dane do testowania") && <Button
-                    style={buttonStyle}
-                    variant="contained"
-                    color="secondary"
-                    value={solutionpart}
-                    onClick={(e) => {
-                      showSolutionsField(e);
-                    }}
+                  {priceType === "Fragment poprawnego rozwiązania" && (
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      value={solutionpart}
+                      onClick={(e) => {
+                        showSolutionsField(e);
+                      }}
+                    >
+                      Dodaj kolejny fragment
+                    </Button>
+                  )}
+                  {priceType === "Dane do testowania" && (
+                    <Button
+                      style={buttonStyle}
+                      variant="contained"
+                      color="secondary"
+                      value={solutionpart}
+                      onClick={(e) => {
+                        showSolutionsField(e);
+                      }}
                     >
                       Dodaj kolejne dane testowe
                     </Button>
-                  }
+                  )}
                 </Paper>
               )}
 
@@ -1000,30 +1011,42 @@ const TeacherProfile = (user) => {
                   />
                 </div>
               )}
-                 <h4>Ustaw widoczność zadania:</h4>
-              <Button style={{backgroundColor: access === true? "#ffd700" : "white",color:"black"}}  onClick={(e) => {
-                 setAccess(true);
-                 }} >Tylko dla zalogowanych </Button>
-              <Button  style={{backgroundColor: access === false ?  "#ffd700" : "white",color:"black"}} onClick={(e) => {
-                 setAccess(false);
-                 }}>Dla wszystkich </Button>
+              <h4>Ustaw widoczność zadania:</h4>
+              <Button
+                style={{
+                  backgroundColor: access === true ? "#ffd700" : "white",
+                  color: "black",
+                }}
+                onClick={(e) => {
+                  setAccess(true);
+                }}
+              >
+                Tylko dla zalogowanych{" "}
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: access === false ? "#ffd700" : "white",
+                  color: "black",
+                }}
+                onClick={(e) => {
+                  setAccess(false);
+                }}
+              >
+                Dla wszystkich{" "}
+              </Button>
               <FormControl fullWidth></FormControl>
-              <div className="info-box">
-                {!isFormFilled && !clicked && !isFormCloseVisible && (
-                  <div>
-                    <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      color="secondary"
-                      onClick={showSolutionsField}
-                    >
-                      Dalej
-                    </Button>
-                  </div>
-                )}
-                <Box display="flex" flexDirection="column" gap={2}>
-                  {isLoading && <CircularProgress />}
-                  {!isFormCloseVisible && !isLoading && !WindowShown && (
+
+              <Box
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+              >
+                {isLoading && <CircularProgress />}
+                {!isFormCloseVisible &&
+                  !isLoading &&
+                  !WindowShown &&
+                  showButton && (
                     <Button
                       style={buttonStyle}
                       variant="contained"
@@ -1033,25 +1056,18 @@ const TeacherProfile = (user) => {
                       Dodaj zadanie
                     </Button>
                   )}
-
-                  {isFormCloseVisible && !isLoading && !WindowShown && (
-                    <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      color="secondary"
-                      onClick={addCloseExercise}
-                    >
-                      Dodaj
-                    </Button>
-                  )}
-                </Box>
-              </div>
-
-              <div className="info-box">
-                <Box display="flex" flexDirection="column" gap={2}>
-                  {WindowShown && <Toast message={infoMessage} />}
-                </Box>
-              </div>
+                {isFormCloseVisible && !isLoading && !WindowShown && (
+                  <Button
+                    style={buttonStyle}
+                    variant="contained"
+                    color="secondary"
+                    onClick={addCloseExercise}
+                  >
+                    Dodaj zadanie
+                  </Button>
+                )}
+                {WindowShown && <Toast message={infoMessage} />}
+              </Box>
             </form>
           </Paper>
         )}
@@ -1155,33 +1171,53 @@ const TeacherProfile = (user) => {
                     {!exercises[indexofExercise].solutionSchema && (
                       <div>
                         {solutionParts.map((solutionPart, index) => (
-                          <Textarea
-                            minRows={2}
-                            id={index}
-                            key={index}
-                            label="Fragment poprawnego rozwiązania"
-                            placeholder="Fragment poprawnego rozwiązania"
-                            variant="outlined"
-                            fullWidth
-                            sx={{
-                              backgroundColor: "#000",
-                              color: "white",
-                              marginBottom: "2%",
-                            }}
-                            defaultValue={
-                              solutionPart.correctSolutionPart
-                                ? solutionPart.correctSolutionPart
-                                : solutionPart
-                            }
-                            onChange={(e) =>
-                              (solutionPart.correctSolutionPart =
-                                e.target.value)
-                            }
-                          />
+                          <div>
+                            <Textarea
+                              minRows={2}
+                              id={index}
+                              key={index}
+                              label="Fragment poprawnego rozwiązania"
+                              placeholder="Fragment poprawnego rozwiązania"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: "#000",
+                                color: "white",
+                                marginBottom: "2%",
+                              }}
+                              defaultValue={
+                                solutionPart.correctSolutionPart
+                                  ? solutionPart.correctSolutionPart
+                                  : solutionPart
+                              }
+                              onChange={(e) =>
+                                (solutionPart.correctSolutionPart =
+                                  e.target.value)
+                              }
+                            />
+                            <TextField
+                              id="outlined-basic"
+                              label="ilość punktów"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: "white",
+                                marginBottom: "2%",
+                              }}
+                              defaultValue={
+                                solutionPart.points
+                                  ? solutionPart.points
+                                  : points[index - solutionParts.length + 1]
+                              }
+                              onChange={(e) => {
+                                solutionPart.points = e.target.value;
+                              }}
+                            />
+                          </div>
                         ))}
                       </div>
                     )}
-                    {testingData.length > 0 && (
+                    {priceType === "Dane do testowania" && (
                       <div>
                         <h5>Poprawne rozwiązanie:</h5>
 
@@ -1225,46 +1261,52 @@ const TeacherProfile = (user) => {
                             setSolutionSchema(e.target.value);
                           }}
                         />
+
+                        <h5>Dane testujące:</h5>
+                        {testingData.map((test, index) => (
+                          <div>
+                            <Textarea
+                              minRows={2}
+                              id={index}
+                              key={index}
+                              label="Dane testujące"
+                              placeholder="Dane testujące"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: "#000",
+                                color: "white",
+                                marginBottom: "2%",
+                              }}
+                              defaultValue={
+                                test.testingData ? test.testingData : test
+                              }
+                              onChange={(e) =>
+                                (test.testingData = e.target.value)
+                              }
+                            />
+                            <TextField
+                              id="outlined-basic"
+                              label="ilość punktów"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: "white",
+                                marginBottom: "2%",
+                              }}
+                              defaultValue={
+                                test.points
+                                  ? test.points
+                                  : points[index - testingData.length + 1]
+                              }
+                              onChange={(e) => {
+                                test.points = e.target.value;
+                              }}
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
-                    {testingData.length > 0 && <h5>Dane testujące:</h5>}
-                    {testingData.map((test, index) => (
-                      <div>
-                        <Textarea
-                          minRows={2}
-                          id={index}
-                          key={index}
-                          label="Dane testujące"
-                          placeholder="Dane testujące"
-                          variant="outlined"
-                          fullWidth
-                          sx={{
-                            backgroundColor: "#000",
-                            color: "white",
-                            marginBottom: "2%",
-                          }}
-                          defaultValue={
-                            test.testingData ? test.testingData : test
-                          }
-                          onChange={(e) => (test.testingData = e.target.value)}
-                        />
-                        <TextField
-                          id="outlined-basic"
-                          label="ilość punktów"
-                          variant="outlined"
-                          fullWidth
-                          sx={{ backgroundColor: "white", marginBottom: "2%" }}
-                          defaultValue={
-                            test.points
-                              ? test.points
-                              : points[index - testingData.length + 1]
-                          }
-                          onChange={(e) => {
-                            test.points = e.target.value;
-                          }}
-                        />
-                      </div>
-                    ))}
                   </div>
                 )}
                 {exercises[indexofExercise].firstOption && (
@@ -1352,7 +1394,7 @@ const TeacherProfile = (user) => {
                       onChange={(e) => setSolutionPart(e.target.value)}
                       onKeyDown={handleKeyDown}
                     />
-                    {testingData.length > 0 && (
+                    {
                       <TextField
                         id="outlined-basic"
                         sx={{ backgroundColor: "white", marginBottom: "2%" }}
@@ -1364,25 +1406,65 @@ const TeacherProfile = (user) => {
                           setPoint(e.target.value);
                         }}
                       />
+                    }
+                    {priceType === "Fragment poprawnego rozwiązania" && (
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        color="secondary"
+                        value={solutionpart}
+                        onClick={(e) => {
+                          showSolutionsField(e);
+                        }}
+                      >
+                        Dodaj kolejny fragment
+                      </Button>
                     )}
-                    <Button
-                      style={buttonStyle}
-                      variant="contained"
-                      color="secondary"
-                      value={solutionpart}
-                      onClick={(e) => {
-                        showSolutionsField(e);
-                      }}
-                    >
-                      Dalej
-                    </Button>
+                    {priceType === "Dane do testowania" && (
+                      <Button
+                        style={buttonStyle}
+                        variant="contained"
+                        color="secondary"
+                        value={solutionpart}
+                        onClick={(e) => {
+                          showSolutionsField(e);
+                        }}
+                      >
+                        Dodaj kolejne dane testowe
+                      </Button>
+                    )}
                   </Paper>
                 )}
+                <h4>Ustaw widoczność zadania:</h4>
+                <Button
+                  style={{
+                    backgroundColor: access === true ? "#ffd700" : "white",
+                    color: "black",
+                  }}
+                  onClick={(e) => {
+                    setAccess(true);
+                  }}
+                >
+                  Tylko dla zalogowanych{" "}
+                </Button>
+                <Button
+                  style={{
+                    backgroundColor: access === false ? "#ffd700" : "white",
+                    color: "black",
+                  }}
+                  onClick={(e) => {
+                    setAccess(false);
+                  }}
+                >
+                  Dla wszystkich{" "}
+                </Button>
+                <FormControl fullWidth></FormControl>
                 <div className="info-box">
                   <Box display="flex" flexDirection="column" gap={2}>
                     {isLoading && <CircularProgress />}
                     {exercises[indexofExercise].correctSolution &&
-                      !isLoading && !WindowShown && (
+                      !isLoading &&
+                      !WindowShown && (
                         <Button
                           style={buttonStyle}
                           variant="contained"
@@ -1393,17 +1475,19 @@ const TeacherProfile = (user) => {
                           Zmień
                         </Button>
                       )}
-                    {exercises[indexofExercise].correctAnswer && !isLoading && !WindowShown &&  (
-                      <Button
-                        style={buttonStyle}
-                        variant="contained"
-                        color="secondary"
-                        value={indexofExercise}
-                        onClick={editCloseExercise}
-                      >
-                        Zmień
-                      </Button>
-                    )}
+                    {exercises[indexofExercise].correctAnswer &&
+                      !isLoading &&
+                      !WindowShown && (
+                        <Button
+                          style={buttonStyle}
+                          variant="contained"
+                          color="secondary"
+                          value={indexofExercise}
+                          onClick={editCloseExercise}
+                        >
+                          Zmień
+                        </Button>
+                      )}
                   </Box>
                 </div>
               </form>

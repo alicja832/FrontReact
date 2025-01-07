@@ -43,12 +43,15 @@ const StudentProfile = (user) => {
   const [student, setStudent] = useState(null);
   const [position, setPosition] = useState(null);
   const [quantity, setQuantity] = useState(null);
+  
   const retake = (e) => {
     navigate("/solutionRetake/" + e.target.value);
   };
+  
   const show = (e) => {
     navigate("/solutionAbcRetake/" + e.target.value);
   };
+
   const getInfo = () => {
     fetch(`${process.env.REACT_APP_API_URL}/solution/`, {
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -186,6 +189,8 @@ const StudentProfile = (user) => {
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
               <h3>Możesz także poprawiać swoje rozwiązania</h3>
               <p>Uwaga! Ale tylko programistyczne!</p>
+              <p>Nie masz również możliwości poprawy zadań usuniętych przez ich twórcę.</p>
+              <p>Jeśli zadanie zostało zmienione, twój wynik jest obliczony na podstawie wersji, która została przez Ciebie wykonana.</p>
             </Paper>
           </div>
         </div>
@@ -216,6 +221,16 @@ const StudentProfile = (user) => {
                             onClick={retake}
                           >
                             Wykonaj ponownie
+                          </Button>
+                        )}
+                         {solution.retakeposibility === "deleted" && (
+                          <Button
+                            style={buttonStyle}
+                            variant="contained"
+                            value={solution.id}
+                            color="inherit"
+                          >
+                            Brak dostępu
                           </Button>
                         )}
                         {solution.retakeposibility === "false" && (

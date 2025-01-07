@@ -57,13 +57,12 @@ export default function Login() {
     });
     if (!firstResponse.ok) {
       const errorText = await firstResponse.text();
-      console.log(errorText);
+    
       throw new Error(errorText || "Logowanie nie powiodło się");
     }
     const data = await firstResponse.json();
       setToken(data.token);
       setExpirationDate(data.jwtExpirationDate);
-      console.log(data.jwtExpirationDate);
       const url = `${process.env.REACT_APP_API_URL}/user/refreshtoken`;
       
       const refreshToken = await fetch(url, {

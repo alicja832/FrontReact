@@ -77,7 +77,7 @@ export default function SolutionRetake({ task }) {
       score,
       output,
     };
-    console.log(updatesolution);
+   
     fetch(`${process.env.REACT_APP_API_URL}/solution/`, {
       method: "PUT",
       headers: {

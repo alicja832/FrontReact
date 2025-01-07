@@ -7,10 +7,13 @@ export default function Logout(){
   
   const navigate = useNavigate();
   useEffect(() => {
+    
     setToken(null);  
     navigate("/");
+    
     window.alert("Wylogowano");
     window.location.reload(); 
+  
   },[]);
   
  

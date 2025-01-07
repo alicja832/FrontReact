@@ -103,7 +103,6 @@ const MyParticles = (props) => {
           if (frameCount < wyzn + 2 * context.lineWidth) {
             context.fillStyle = "white";
 
-            //zolty
             context.beginPath();
             context.arc(
               halfwidth - between + context.lineWidth / 4,
@@ -114,7 +113,6 @@ const MyParticles = (props) => {
             );
             context.fill();
 
-            //niebieski
             context.beginPath();
             context.arc(
               halfwidth + between - context.lineWidth / 4,
@@ -128,7 +126,7 @@ const MyParticles = (props) => {
             context.fill();
           } else {
 
-            //to jest oczko przesuwajace sie w prawo
+          
             context.fillStyle = "white";
             context.beginPath();
             context.arc(
@@ -144,7 +142,6 @@ const MyParticles = (props) => {
             );
             context.fill();
 
-            //to jest oczko przesuwajace sie w lewo
             context.fillStyle = "white";
             context.beginPath();
             context.arc(
@@ -287,14 +284,12 @@ const MyParticles = (props) => {
           );
           context.stroke();
 
-          //snakes are falling down
           context.strokeStyle = "#FFD700";
           context.beginPath();
           context.moveTo(halfwidth + between, frameCount);
           context.lineTo(halfwidth + between, frameCount + pythonlength);
           context.stroke();
 
-          //eyes yellow
           context.fillStyle = "white";
           context.beginPath();
           context.arc(
@@ -306,7 +301,6 @@ const MyParticles = (props) => {
           );
           context.fill();
 
-          //eyes blue
           context.beginPath();
           context.arc(
             halfwidth - between + context.lineWidth / 4,
