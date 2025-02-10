@@ -5,19 +5,18 @@ import { getToken } from "./api/TokenService";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
-import {useLocation} from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles({});
 
 export default function Solution() {
-  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     margin: "2%",
     padding: "1%",
     textAlign: "center",
   };
-  
+
   const paperStyleTwo = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -27,12 +26,12 @@ export default function Solution() {
     textAlign: "center",
     alignItems: "center",
   };
-   
-  const location = useLocation();  
+
+  const location = useLocation();
   const classes = useStyles();
   const [solutionContent, setSolutionContent] = useState("");
   const [output, setOutput] = useState("");
-  const [exercise,setExercise] = useState(null);
+  const [exercise, setExercise] = useState(null);
   const [isOutput, setisOutput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [outputs, setOutputs] = useState([]);
@@ -41,11 +40,14 @@ export default function Solution() {
   const [infoMessage, setinfoMessage] = useState(0);
   const [user, setUser] = useState(null);
   const timeout = 4000;
-  
+
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
-
+  /**
+   *
+   * @param {*} e - keydown event
+   */
   const handleKeyTabDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -62,7 +64,9 @@ export default function Solution() {
       }, 0);
     }
   };
-
+  /**
+   * save solution
+   */
   const save = () => {
     setIsLoading(true);
     var student = null;
@@ -89,8 +93,10 @@ export default function Solution() {
         console.error("Error:", error);
       });
   };
+  /**
+   * run code in python interpreter get from console
+   */
   const runCode = () => {
-    
     fetch(`${process.env.REACT_APP_API_URL}/exercise/out`, {
       method: "POST",
       body: solutionContent,
@@ -106,12 +112,17 @@ export default function Solution() {
         setOutput("Error occurred");
       });
   };
+  /**
+   * check solution
+   */
   const check = () => {
     var student = null;
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
 
-    const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
+    const url = exercise.solutionSchema
+      ? `${process.env.REACT_APP_API_URL}/solution/programming/test`
+      : `${process.env.REACT_APP_API_URL}/solution/programming/check`;
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -119,22 +130,17 @@ export default function Solution() {
     })
       .then((res) => res.json())
       .then((result) => {
-      
-        if(exercise.solutionSchema)
-        {
+        if (exercise.solutionSchema) {
           setScore(result.value);
           setisOutput(true);
           setOutput(result.key);
           setOutputs(result.key.split("\n"));
           setinfoMessage("Twój wynik:" + result.value.toString() + " pkt");
-        }
-
-        else
-        { 
+        } else {
           setScore(result);
           setinfoMessage("Twój wynik:" + result.toString() + " pkt");
         }
-       
+
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -145,12 +151,16 @@ export default function Solution() {
         console.error("Error:", error);
       });
   };
- 
+
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/exercise/one/programming/` + location.state.exercise.longExercise.key.id, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
+    fetch(
+      `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
+        location.state.exercise.longExercise.key.id,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
         setExercise(result[0]);
@@ -176,20 +186,19 @@ export default function Solution() {
   return (
     <div className="main-container">
       <div className="first-container">
-    
-          {(!exercise) && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                  }}
-              >
-              <CircularProgress />
-              </div>
-            )}
-       
+        {!exercise && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        )}
+
         {exercise && (
           <div
             className={classes.mainContainer}
@@ -201,8 +210,6 @@ export default function Solution() {
               marginTop: "2%",
             }}
           >
-            
-             
             <div style={{ flexBasis: "50%", flexDirection: "column" }}>
               <Paper elevation={3} style={paperStyleTwo}>
                 <h2>{exercise.name}</h2>
@@ -221,14 +228,9 @@ export default function Solution() {
                 </Paper>
               </Paper>
             </div>
-            <div
-                className="console-container"
-              >
+            <div className="console-container">
               <h3>Konsola dla Python 2.7</h3>
-              <div
-                 className="console-board"
-               
-              >
+              <div className="console-board">
                 <TextField
                   className="console"
                   variant="standard"
@@ -288,7 +290,7 @@ export default function Solution() {
                     )}
                   </div>
                 )}
-                <Box>{isLoading && <CircularProgress/>}</Box>
+                <Box>{isLoading && <CircularProgress />}</Box>
                 <Box>{infoWindowShown && <Toast message={infoMessage} />}</Box>
               </div>
               {isOutput && outputs.length > 0 && (

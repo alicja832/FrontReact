@@ -52,6 +52,9 @@ export default function PasswordReminder() {
       backgroundColor: "#FDF5E6",
       position: "relative",
     };
+  /**
+   * function which sent the email from form to server 
+   */
   function send()
   {
     setIsLoading(true);
@@ -97,6 +100,9 @@ export default function PasswordReminder() {
         });
         setIsLoading(false);
   };
+  /**
+   * verification of code from form
+   */
   function verificationCode()
   {
     setIsLoading(true);
@@ -133,6 +139,9 @@ export default function PasswordReminder() {
         });
         setIsLoading(false);
   }
+  /**
+   * function which sent the new version of password to serwer 
+   */
   function changePassword()
   {
     setIsLoading(true);
@@ -148,7 +157,6 @@ export default function PasswordReminder() {
         promise1.then((value) => {
           const decoder = new TextDecoder('utf-8');
           const text = decoder.decode(value.value);
-          console.log(text);
           seterrorMessage(text);
         })
         setInfoWindowShown(false);
@@ -163,6 +171,7 @@ export default function PasswordReminder() {
         setInfoTwoWindowShown(true);
         setTimeout(() => {
           setInfoTwoWindowShown(false);
+          setIsFormVisible(false);
         }, 3000);
       }
      

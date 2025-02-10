@@ -6,15 +6,13 @@ import { FilledInput, IconButton, InputAdornment } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import { classInfo } from "./semi-components/MyParticles";
-import {
-  setToken,
-  setExpirationDate,
-} from "./api/TokenService";
+import { setToken, setExpirationDate } from "./api/TokenService";
 import Footer from "./semi-components/Footer";
 
 const useStyles = makeStyles(() => ({}));
 
 export default function Login() {
+  
   const paperStyle = {
     top: "5em",
     padding: "4% 4%",
@@ -42,32 +40,37 @@ export default function Login() {
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
+  /**
+   * function which set token in localstorage if person was logged succesfully
+   */
+  const loginClicked = async () => {
 
-  const loginClicked = async (event) => {
-    event.preventDefault();
     setIsLoading(true);
     classInfo.setmessage(false);
     const student = { name, password };
     try {
-    
-    const firstResponse = await fetch(`${process.env.REACT_APP_API_URL}/user/authenticate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(student),
-    });
-    if (!firstResponse.ok) {
-      const errorText = await firstResponse.text();
-    
-      throw new Error(errorText || "Logowanie nie powiodło się");
-    }
-    const data = await firstResponse.json();
+      const firstResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/user/authenticate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(student),
+        }
+      );
+      if (!firstResponse.ok) {
+        const errorText = await firstResponse.text();
+
+        throw new Error(errorText || "Logowanie nie powiodło się");
+      }
+      const data = await firstResponse.json();
       setToken(data.token);
       setExpirationDate(data.jwtExpirationDate);
       const url = `${process.env.REACT_APP_API_URL}/user/refreshtoken`;
-      
+
       const refreshToken = await fetch(url, {
         method: "GET",
-        headers: { Authorization: `Bearer ${data.token}` }, credentials:'include'
+        headers: { Authorization: `Bearer ${data.token}` },
+        credentials: "include",
       });
       if (!refreshToken.ok) {
         throw new Error("Błąd logowania. Spróbuj ponownie.");
@@ -78,34 +81,27 @@ export default function Login() {
         setInfoWindowShown(false);
       }, timeout);
       window.location.reload();
-
     } catch (error) {
       console.log(error);
-      if(error.message==="Failed to fetch")
+      if (error.message === "Failed to fetch")
         setErrorMessage("Błąd połączenia");
-      else
-        setErrorMessage(error.message);
+      else setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
         setIsLoading(false);
-      }, 2*timeout);
+      }, 2 * timeout);
     }
-    
   };
   return (
     <div className="main-container">
-     <div className="first-container">
+      <div className="first-container">
         <Container>
           <Paper elevation={3} style={paperStyle}>
-          <div className="img-box">
-              <img
-                src={"/logo.svg"}
-                alt="Logo"
-                className="logo"
-              />
+            <div className="img-box">
+              <img src={"/logo.svg"} alt="Logo" className="logo" />
               Nauka Pythona
             </div>
-            <form className={classes.root} noValidate autoComplete="off" >
+            <form className={classes.root} noValidate autoComplete="off">
               <TextField
                 id="name"
                 label="Nazwa użytkownika"
@@ -153,24 +149,22 @@ export default function Login() {
                 }}
               >
                 <Box display="flex" flexDirection="column" gap={2}>
-                 {
-                  !isLoading &&  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#001f3f" }}
-                    onClick={loginClicked}
-                  >
-                    Zaloguj
-                  </Button>
-                  }
-                  { isLoading && 
-                    <CircularProgress size={24}/>
-                  }
+                  {!isLoading && (
+                    <Button
+                      variant="contained"
+                      style={{ backgroundColor: "#001f3f" }}
+                      onClick={loginClicked}
+                    >
+                      Zaloguj
+                    </Button>
+                  )}
+                  {isLoading && <CircularProgress size={24} />}
                 </Box>
               </div>
-              <div className = "info-box">
+              <div className="info-box">
                 <Box display="flex" flexDirection="column" gap={2}>
                   {infoWindowShown && <Toast message="Zalogowano!" />}
-                  {errorMessage&& <Toast message={errorMessage} />}
+                  {errorMessage && <Toast message={errorMessage} />}
                 </Box>
               </div>
               <Box display="flex" flexDirection="column" gap={2}>

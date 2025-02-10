@@ -17,7 +17,6 @@ export default function Home() {
     textAlign: "center",
     textShadow: "1px 1px 2px black",
   };
-
   const paperStyleB = {
     padding: "3% 3%",
     width: "34%",

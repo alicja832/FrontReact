@@ -43,11 +43,11 @@ const StudentProfile = (user) => {
   const [student, setStudent] = useState(null);
   const [position, setPosition] = useState(null);
   const [quantity, setQuantity] = useState(null);
-  
+
   const retake = (e) => {
     navigate("/solutionRetake/" + e.target.value);
   };
-  
+
   const show = (e) => {
     navigate("/solutionAbcRetake/" + e.target.value);
   };
@@ -83,20 +83,19 @@ const StudentProfile = (user) => {
   return (
     <div className="main-container">
       <div className="first-container">
-      
-          {(!student) && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                  }}
-              >
-              <CircularProgress />
-              </div>
-            )}
-      
+        {!student && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        )}
+
         <div
           className={classes.mainContainer}
           style={{
@@ -189,8 +188,14 @@ const StudentProfile = (user) => {
               <li>Maksymalną ilość punktów do zdobycia za dane zadanie</li>
               <h3>Możesz także poprawiać swoje rozwiązania</h3>
               <p>Uwaga! Ale tylko programistyczne!</p>
-              <p>Nie masz również możliwości poprawy zadań usuniętych przez ich twórcę.</p>
-              <p>Jeśli zadanie zostało zmienione, twój wynik jest obliczony na podstawie wersji, która została przez Ciebie wykonana.</p>
+              <p>
+                Nie masz również możliwości poprawy zadań usuniętych przez ich
+                twórcę.
+              </p>
+              <p>
+                Jeśli zadanie zostało zmienione, twój wynik jest obliczony na
+                podstawie wersji, która została przez Ciebie wykonana.
+              </p>
             </Paper>
           </div>
         </div>
@@ -223,7 +228,7 @@ const StudentProfile = (user) => {
                             Wykonaj ponownie
                           </Button>
                         )}
-                         {solution.retakeposibility === "deleted" && (
+                        {solution.retakeposibility === "deleted" && (
                           <Button
                             style={buttonStyle}
                             variant="contained"

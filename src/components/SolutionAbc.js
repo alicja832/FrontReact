@@ -9,13 +9,12 @@ import { Checkbox } from "@mui/material";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Footer from "./semi-components/Footer";
 import { Textarea } from "@mui/joy";
-import {useLocation} from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles({});
 
 export default function SolutionAbc() {
-    
-  const location = useLocation();  
+  const location = useLocation();
 
   const buttonStyle = {
     backgroundColor: "#001f3f",
@@ -23,7 +22,7 @@ export default function SolutionAbc() {
     width: "40%",
     margin: "1%",
   };
-  
+
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     fontWeight: "bold",
@@ -77,11 +76,14 @@ export default function SolutionAbc() {
     setCheckedB(false);
     setAnswer("D");
   };
+  /**
+   * save solution
+   */
   const save = () => {
     setIsLoading(true);
     var student = null;
     const solution = { exercise, student, score, answer };
-   
+
     fetch(`${process.env.REACT_APP_API_URL}/solution/abc`, {
       method: "POST",
       headers: {
@@ -93,9 +95,7 @@ export default function SolutionAbc() {
       .then((res) => {
         if (!res.ok) {
           setInfoMessage("Błąd zapisu");
-        }
-        else
-          setInfoMessage("Zapisano");
+        } else setInfoMessage("Zapisano");
         setInfoWindowShown(true);
       })
       .catch((error) => {
@@ -105,46 +105,44 @@ export default function SolutionAbc() {
       });
     setIsLoading(false);
   };
+  /**
+   * check solution
+   */
   const check = () => {
-    
     setIsLoading(true);
     setInfoWindowShown(true);
-    
-    if(answer === exercise.correctAnswer)
-    {
+
+    if (answer === exercise.correctAnswer) {
       setScore(exercise.maxPoints);
-      setInfoMessage("Prawidłowa odpowiedź")
-    }
-    else
-    {
+      setInfoMessage("Prawidłowa odpowiedź");
+    } else {
       setInfoMessage("Niepoprawna odpowiedź");
     }
-    
+
     setTimeout(() => {
       setInfoWindowShown(false);
     }, timeout);
-    
+
     setIsLoading(false);
   };
- 
+
   useEffect(() => {
     setExercise(location.state.exercise.shortExercise.key);
   }, [location.state.exercise.shortExercise.key]);
 
-  useEffect(()=>{
-
-    fetch(`${process.env.REACT_APP_API_URL}/user/`,{
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_URL}/user/`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       method: "GET",
     })
       .then((res) => res.json())
       .then((result) => {
         setUser(result[0]);
-      }).catch((error)=>{
+      })
+      .catch((error) => {
         console.log(error);
       });
-  
-  },[]);
+  }, []);
 
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
@@ -153,19 +151,19 @@ export default function SolutionAbc() {
   return (
     <div className="main-container">
       <div className="first-container">
-      <div>
-          {(!exercise) && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                  }}
-              >
+        <div>
+          {!exercise && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
               <CircularProgress />
-              </div>
-            )}
+            </div>
+          )}
         </div>
         {exercise && (
           <div
@@ -291,7 +289,7 @@ export default function SolutionAbc() {
                         Zapisz rozwiązanie
                       </Button>
                     )}
-                    {!user || !(user.score) && (
+                    {((user && !user.score) || !user) && (
                       <Button
                         style={buttonStyle}
                         variant="contained"

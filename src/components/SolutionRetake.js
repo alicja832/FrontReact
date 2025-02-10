@@ -9,7 +9,6 @@ import { Textarea } from "@mui/joy";
 const useStyles = makeStyles({});
 
 export default function SolutionRetake({ task }) {
-  
   const paperStyle = {
     backgroundColor: "#FDF5E6",
     margin: "2%",
@@ -39,15 +38,16 @@ export default function SolutionRetake({ task }) {
   const [student, setStudent] = useState(null);
   const [outputs, setOutputs] = useState([]);
   const timeout = 3000;
-  
+
   const handleInputChange = (e) => {
     setSolutionContent(e.target.value);
   };
-
+  /**
+   * 
+   * @param {} e -key down event
+   */
   const handleKeyTabDown = (e) => {
-    
     if (e.key === "Tab") {
-      
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
       setSolutionContent(
@@ -60,13 +60,12 @@ export default function SolutionRetake({ task }) {
         e.target.selectionStart = selectionStart + 1;
         e.target.selectionEnd = selectionStart + 1;
       }, 0);
-    
     }
-  
   };
-
+  /**
+   * update solution
+   */
   const save = () => {
-    
     setisLoading(true);
     const id = solution.id;
     const updatesolution = {
@@ -77,7 +76,7 @@ export default function SolutionRetake({ task }) {
       score,
       output,
     };
-   
+
     fetch(`${process.env.REACT_APP_API_URL}/solution/`, {
       method: "PUT",
       headers: {
@@ -111,7 +110,6 @@ export default function SolutionRetake({ task }) {
     })
       .then((res) => res.text())
       .then((result) => {
-        console.log(result);
         setOutput(result);
         setOutputs(result.split("\n"));
       })
@@ -125,7 +123,9 @@ export default function SolutionRetake({ task }) {
     var student = null;
     setisOutput(true);
     const solution = { exercise, solutionContent, student, score, output };
-    const url = (exercise.solutionSchema? `${process.env.REACT_APP_API_URL}/solution/programming/test`:`${process.env.REACT_APP_API_URL}/solution/programming/check`)
+    const url = exercise.solutionSchema
+      ? `${process.env.REACT_APP_API_URL}/solution/programming/test`
+      : `${process.env.REACT_APP_API_URL}/solution/programming/check`;
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -133,22 +133,17 @@ export default function SolutionRetake({ task }) {
     })
       .then((res) => res.json())
       .then((result) => {
-      
-        if(exercise.solutionSchema)
-        {
+        if (exercise.solutionSchema) {
           setScore(result.value);
           setisOutput(true);
           setOutput(result.key);
           setOutputs(result.key.split("\n"));
           setinfoMessage("Twój wynik:" + result.value.toString() + " pkt");
-        }
-
-        else
-        { 
+        } else {
           setScore(result);
           setinfoMessage("Twój wynik:" + result.toString() + " pkt");
         }
-       
+
         setInfoWindowShown(true);
         setTimeout(() => {
           setInfoWindowShown(false);
@@ -172,20 +167,21 @@ export default function SolutionRetake({ task }) {
     setStudent(result_data[0].student);
     setSolutionContent(result_data[0].solutionContent);
     const exerciseFromSolution = result_data[0].exercise;
-    
+
     await fetch(
-    `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
+      `${process.env.REACT_APP_API_URL}/exercise/one/programming/` +
         exerciseFromSolution.id,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-        ).then((res) => res.json())
-        .then((result) => {
-          setExercise(result[0]);
-        })
-        .catch((error) => console.error("Error fetching :", error));
-     };
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        setExercise(result[0]);
+      })
+      .catch((error) => console.error("Error fetching :", error));
+  };
 
   useEffect(() => {
     getData();
@@ -194,22 +190,22 @@ export default function SolutionRetake({ task }) {
   function Toast({ message }) {
     return <div className="toast">{message}</div>;
   }
-  
+
   return (
-    <div className = "main-container">
-      <div className = "first-container">
-      {(!exercise) && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <CircularProgress />
-              </div>
-            )}
+    <div className="main-container">
+      <div className="first-container">
+        {!exercise && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        )}
         <div>
           {solution && exercise && (
             <div
@@ -222,29 +218,28 @@ export default function SolutionRetake({ task }) {
                 marginTop: "2%",
               }}
             >
-              
-                <div style={{ flexBasis: "50%", flexDirection: "column" }}>
-                  <Paper elevation={3} style={paperStyleTwo}>
-                    <h2>{exercise.name}</h2>
+              <div style={{ flexBasis: "50%", flexDirection: "column" }}>
+                <Paper elevation={3} style={paperStyleTwo}>
+                  <h2>{exercise.name}</h2>
 
-                    <Textarea defaultValue={exercise.introduction}></Textarea>
-                  </Paper>
-                  <Paper elevation={3} style={paperStyle}>
-                    <p>{exercise.content}</p>
+                  <Textarea defaultValue={exercise.introduction}></Textarea>
+                </Paper>
+                <Paper elevation={3} style={paperStyle}>
+                  <p>{exercise.content}</p>
 
-                    <h4>Maksymalna ilość punktów: </h4>
-                    <p> {exercise.maxPoints} </p>
-                    <h4>Oczekiwane wyjście programu:</h4>
-                    <Paper multiline="true" className="expected-output">
-                      {exercise.correctOutput
-                        .split("\n")
-                        .map((element, index) => (
-                          <p key={index}>{element}</p>
-                        ))}
-                    </Paper>
+                  <h4>Maksymalna ilość punktów: </h4>
+                  <p> {exercise.maxPoints} </p>
+                  <h4>Oczekiwane wyjście programu:</h4>
+                  <Paper multiline="true" className="expected-output">
+                    {exercise.correctOutput
+                      .split("\n")
+                      .map((element, index) => (
+                        <p key={index}>{element}</p>
+                      ))}
                   </Paper>
-                </div>
-              
+                </Paper>
+              </div>
+
               <div className="console-container">
                 <h3>Konsola dla Python 2.7</h3>
                 <div className="console-board">
@@ -254,7 +249,6 @@ export default function SolutionRetake({ task }) {
                       disableUnderline: true,
                     }}
                     variant="standard"
-                   
                     value={solutionContent}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyTabDown}
@@ -291,16 +285,15 @@ export default function SolutionRetake({ task }) {
                         >
                           Zapisz rozwiązanie
                         </Button>
-                        
-                          <Button
-                            style={{ backgroundColor: "#001f3f" }}
-                            variant="contained"
-                            color="secondary"
-                            onClick={check}
-                          >
-                            Sprawdź
-                          </Button>
-                        
+
+                        <Button
+                          style={{ backgroundColor: "#001f3f" }}
+                          variant="contained"
+                          color="secondary"
+                          onClick={check}
+                        >
+                          Sprawdź
+                        </Button>
                       </Box>
                     </div>
                   )}

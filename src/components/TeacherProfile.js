@@ -89,6 +89,10 @@ const TeacherProfile = (user) => {
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showButton, setShowButton] = useState(true);
+  /**
+   * 
+   * @param {*} e - keydown event 
+   */
   const handleKeyDown = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -107,7 +111,9 @@ const TeacherProfile = (user) => {
       }, 0);
     }
   };
-
+  /**
+   * keydown event 
+   */
   const handleKeyDownSchema = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -125,6 +131,10 @@ const TeacherProfile = (user) => {
       }, 0);
     }
   };
+  /**
+   * 
+   * @param {*} e keydown event on solution 
+   */
   const handleKeyDownSolution = (e) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -199,7 +209,6 @@ const TeacherProfile = (user) => {
   };
 
   const showFormTwo = async (e) => {
-    
     closeFormTwo();
     clearData();
     closeFormTwo();
@@ -253,11 +262,14 @@ const TeacherProfile = (user) => {
     setFirstOption(found.firstOption);
     setSecondOption(found.secondOption);
     setThirdOption(found.thirdOption);
-    setAccess(found.access);
+    setAccess(found.access === "true" ? true : false);
     setMaxPoints(found.maxPoints);
     setIsFormTwoVisible(true);
   };
-
+  /**
+   * delete exercise
+   * @param {} e - event with exercise id
+   */
   const deleteExercise = (e) => {
     setIsLoading(true);
     const url = `${process.env.REACT_APP_API_URL}/exercise/` + e.target.value;
@@ -290,10 +302,13 @@ const TeacherProfile = (user) => {
       suma += element.points;
     });
 
-    solutionParts.forEach((element) => {
-      suma += element.points;
-    });
-    
+    if (testingData.length === 0) {
+      solutionParts.forEach((element) => {
+        suma += element.points;
+      });
+    }
+
+    console.log(suma);
     if (suma < maxPoints) {
       setClicked(true);
       return;
@@ -301,7 +316,7 @@ const TeacherProfile = (user) => {
 
     const correctSolutions = [];
     const testData = [];
-    
+
     if (solutionSchema) {
       for (let i = 0; i < testingData.length; i++) {
         if (testingData[i].testingData) {
@@ -312,19 +327,17 @@ const TeacherProfile = (user) => {
       correctSolutions.push(correctSolution);
     } else {
       for (let i = 0; i < maxPoints; i++) {
-        if (solutionParts[i].correctSolutionPart)
-        {  
+        if (solutionParts[i].correctSolutionPart) {
           correctSolutions.push(solutionParts[i].correctSolutionPart);
           points.push(solutionParts[i].points);
-        }
-        else correctSolutions.push(solutionParts[i]);
+        } else correctSolutions.push(solutionParts[i]);
       }
     }
-   
+
     setIsLoading(true);
 
     const id = exercises[indexofExercise].id;
-   
+
     const exercise = {
       id,
       access,
@@ -383,6 +396,7 @@ const TeacherProfile = (user) => {
       content,
       teacher,
       maxPoints,
+      access,
       firstOption,
       secondOption,
       thirdOption,
@@ -429,6 +443,7 @@ const TeacherProfile = (user) => {
   const showSolutionsField = (e) => {
     if (e.target.value) {
       solutionParts.push(e.target.value);
+
       if (point) {
         points.push(parseInt(point));
         testingData.push(e.target.value);
@@ -445,18 +460,13 @@ const TeacherProfile = (user) => {
       suma += element.points ? element.points : 0;
     });
 
-    solutionParts.forEach((element) => {
-      suma += element.points ? element.points : 0;
-    });
-
-    if (!solutionSchema && suma == maxPoints) {
-      setClicked(false);
-      setIsFormFilled(true);
-      setShowButton(true);
-      return;
+    if (!solutionSchema) {
+      solutionParts.forEach((element) => {
+        suma += element.points ? element.points : 0;
+      });
     }
-
-    if (solutionSchema && suma == maxPoints) {
+    console.log(suma);
+    if (suma == maxPoints) {
       setClicked(false);
       setIsFormFilled(true);
       setShowButton(true);
@@ -505,7 +515,7 @@ const TeacherProfile = (user) => {
       testData,
       points,
     };
-  
+
     const url = `${process.env.REACT_APP_API_URL}/exercise/programming`;
 
     fetch(url, {

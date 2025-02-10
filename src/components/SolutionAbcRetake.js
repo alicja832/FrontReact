@@ -84,7 +84,7 @@ export default function SolutionAbcRetake({ task }) {
         setAnswerChecked(result[0].answer);
       })
       .catch((error) => console.error("Error fetching students:", error));
-  },[]);
+  }, []);
 
   return (
     <div className="main-container">
@@ -103,7 +103,7 @@ export default function SolutionAbcRetake({ task }) {
         )}
         {exercise && (
           <div
-            className = {classes.mainContainer}
+            className={classes.mainContainer}
             style={{
               display: "flex",
               justifyContent: "flex-start",

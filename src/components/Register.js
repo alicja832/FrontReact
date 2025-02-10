@@ -56,8 +56,11 @@ export default function Register() {
     }
   };
 
-  const register = async (e) => {
-    e.preventDefault();
+  /**
+   * register the person
+   */
+  const register = async () => {
+  
     setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
